@@ -21,13 +21,18 @@ import android.widget.Toast;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
+
 public class MainActivity extends AppCompatActivity {
 
     public static Activity activity;
     private Button scanBtn;
     private double longitude, latitude;
-    private TextView formatTxt, contentTxt;
-    private TextView longitudeView, latitudeView;
+    private String studentID;
+    private TextView formatView, contentView, longitudeView, latitudeView, timeView, dateView;
+    private Calendar calendar;
     private LocationManager locationManager;
     private LocationListener listener;
 
@@ -37,12 +42,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         activity = this;
         scanBtn = (Button)findViewById(R.id.scan_button);
-        formatTxt = (TextView)findViewById(R.id.scan_format);
-        contentTxt = (TextView)findViewById(R.id.scan_content);
+        formatView = (TextView)findViewById(R.id.scan_format);
+        contentView = (TextView)findViewById(R.id.scan_content);
         longitudeView = (TextView) findViewById(R.id.longitudeView);
         latitudeView = (TextView) findViewById(R.id.latitudeView);
-
+        timeView = (TextView) findViewById(R.id.timeView);
+        dateView = (TextView) findViewById(R.id.dateView);
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+
+        //here
 
         listener = new LocationListener() {
             @Override
@@ -51,17 +59,14 @@ public class MainActivity extends AppCompatActivity {
                 latitude = location.getLatitude();
                 return;
             }
-
             @Override
             public void onStatusChanged(String s, int i, Bundle bundle) {
                 // no need
             }
-
             @Override
             public void onProviderEnabled(String s) {
                 // no need
             }
-
             @Override
             public void onProviderDisabled(String s) {
                 // wont do anything if it is disabled. Might make it so that it redirects the user to the settings screen
@@ -73,15 +78,15 @@ public class MainActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         IntentResult scanningResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
         if (scanningResult != null) {
-            String scanContent = scanningResult.getContents();
+            studentID = scanningResult.getContents();
             String scanFormat = scanningResult.getFormatName();
             if (!scanFormat.equals("CODE_128")) {
                 Toast toast = Toast.makeText(getApplicationContext(),
                         "Invalid barcode type", Toast.LENGTH_SHORT);
                 toast.show();
             } else {
-                formatTxt.setText("FORMAT: " + scanFormat);
-                contentTxt.setText("CONTENT: " + scanContent);
+                formatView.setText("FORMAT: " + scanFormat);
+                contentView.setText("CONTENT: " + studentID);
             }
         }
         else{
@@ -121,9 +126,12 @@ public class MainActivity extends AppCompatActivity {
                     longitudeView.append("\n " + longitude);
                     latitudeView.append("\n " + latitude);
                 }
+                calendar = Calendar.getInstance(); // gets date and time data
+                SimpleDateFormat date = new SimpleDateFormat("MM-dd-yyyy");
+                SimpleDateFormat time = new SimpleDateFormat("HH:mm");// used to store date in month-day-year format
+                dateView.append("\n " + date.format(calendar.getTime()));
+                timeView.append("\n " + time.format(calendar.getTime()));
                 if(view.getId()==R.id.scan_button){
-                        /*ArrayList<String> format = new ArrayList<String>();
-                        format.add("CODE_128");*/
                     IntentIntegrator scanIntegrator = new IntentIntegrator(activity);
                     scanIntegrator.initiateScan();
                 }

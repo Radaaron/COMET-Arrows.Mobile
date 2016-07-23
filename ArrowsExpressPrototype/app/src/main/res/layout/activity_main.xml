@@ -9,45 +9,27 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.aaron.arrowsexpressprototype.MainActivity">
 
+    <Button android:id="@+id/gps_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="GPS"
+        android:layout_marginTop="138dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
     <Button android:id="@+id/scan_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Scan"
-        android:layout_marginTop="129dp"
-        android:layout_alignParentTop="true"
+        android:layout_below="@+id/gps_button"
         android:layout_centerHorizontal="true" />
     <TextView
-        android:id="@+id/scan_format"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
+        android:gravity="center"
         android:layout_height="wrap_content"
-        android:textIsSelectable="true"
+        android:text="Area Stop: "
+        android:textSize="20sp"
+        android:id="@+id/areaView"
         android:layout_below="@+id/scan_button"
-        android:layout_centerHorizontal="true" />
-    <TextView
-        android:id="@+id/scan_content"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textIsSelectable="true"
-        android:layout_below="@+id/scan_format"
-        android:layout_centerHorizontal="true" />
-    <TextView
-        android:layout_width="match_parent"
-        android:gravity="center"
-        android:layout_height="wrap_content"
-        android:text="Longitude: "
-        android:textSize="20sp"
-        android:id="@+id/longitudeView"
-        android:layout_below="@+id/scan_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-    <TextView
-        android:layout_width="match_parent"
-        android:gravity="center"
-        android:layout_height="wrap_content"
-        android:text="Latitude: "
-        android:textSize="20sp"
-        android:id="@+id/latitudeView"
-        android:layout_below="@+id/longitudeView"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
     <TextView
@@ -57,7 +39,7 @@
         android:text="Time: "
         android:textSize="20sp"
         android:id="@+id/timeView"
-        android:layout_below="@+id/latitudeView"
+        android:layout_below="@+id/areaView"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
     <TextView
@@ -70,5 +52,15 @@
         android:layout_below="@+id/timeView"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
+    <TextView
+        android:layout_width="match_parent"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:text="Student ID: "
+        android:textSize="20sp"
+        android:id="@+id/scan_content"
+        android:layout_below="@+id/dateView"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
 </RelativeLayout>

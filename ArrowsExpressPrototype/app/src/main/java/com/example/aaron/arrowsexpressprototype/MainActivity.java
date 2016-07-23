@@ -17,10 +17,10 @@ import java.util.Calendar;
 public class MainActivity extends AppCompatActivity implements OnClickListener{
 
     public static Activity activity;
-    private Button scanBtn;
+    private Button scanBtn, gpsBtn;
     private String studentID;
-    private double longitude, latitude;
-    private TextView formatView, contentView, longitudeView, latitudeView, timeView, dateView;
+    private String area;
+    private TextView contentView, areaView, timeView, dateView;
     private Calendar calendar;
     private GPSHandler gpsHandler;
 
@@ -31,55 +31,53 @@ public class MainActivity extends AppCompatActivity implements OnClickListener{
         setContentView(R.layout.activity_main);
         activity = this;
         scanBtn = (Button)findViewById(R.id.scan_button);
-        formatView = (TextView)findViewById(R.id.scan_format);
+        gpsBtn = (Button)findViewById(R.id.gps_button);
         contentView = (TextView)findViewById(R.id.scan_content);
-        longitudeView = (TextView) findViewById(R.id.longitudeView);
-        latitudeView = (TextView) findViewById(R.id.latitudeView);
+        areaView = (TextView)findViewById(R.id.areaView);
         timeView = (TextView) findViewById(R.id.timeView);
         dateView = (TextView) findViewById(R.id.dateView);
-        gpsHandler = new GPSHandler (getSystemService(LOCATION_SERVICE));
         scanBtn.setOnClickListener(this);
+        gpsBtn.setOnClickListener(this);
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        IntentResult scanningResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
-        if (scanningResult != null) {
-            studentID = scanningResult.getContents();
-            String scanFormat = scanningResult.getFormatName();
-            if (!scanFormat.equals("CODE_128")) {
-                Toast toast = Toast.makeText(getApplicationContext(),
-                        "Invalid barcode type", Toast.LENGTH_SHORT);
-                toast.show();
+        if(requestCode == 0){ // null
+            IntentResult scanningResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+            if (scanningResult != null) {
+                studentID = scanningResult.getContents();
+                String scanFormat = scanningResult.getFormatName();
+                if (!scanFormat.equals("CODE_128")) {
+                    Toast toast = Toast.makeText(getApplicationContext(),
+                            "Invalid barcode type", Toast.LENGTH_SHORT);
+                    toast.show();
+                } else {
+                    contentView.append("\n " + studentID);
+                }
             } else {
-                formatView.setText("FORMAT: " + scanFormat);
-                contentView.setText("CONTENT: " + studentID);
+                Toast toast = Toast.makeText(getApplicationContext(),
+                        "No scan data received!", Toast.LENGTH_SHORT);
+                toast.show();
             }
         }
-        else{
-            Toast toast = Toast.makeText(getApplicationContext(),
-                    "No scan data received!", Toast.LENGTH_SHORT);
-            toast.show();
+        else if(requestCode == 1){ // GPSHandler
+            Bundle extras = intent.getExtras();
+            area = extras.getString("area");
+            areaView.append("\n" + area);
         }
     }
 
     public void onClick(View view){
+        if(view.getId() == R.id.gps_button){
+            Intent intent = new Intent(this, GPSHandler.class);
+            startActivityForResult(intent, 1);
+        }
         if(view.getId()== R.id.scan_button){
-            IntentIntegrator scanIntegrator = new IntentIntegrator(this);
-            gpsHandler.getGPS();
-            longitude = gpsHandler.getLongitude();
-            latitude = gpsHandler.getLatitude();
-            if(longitude != 0.0 && latitude != 0.0) {
-                longitudeView.append("\n " + longitude);
-                latitudeView.append("\n " + latitude);
-            }
+            IntentIntegrator scanIntegrator = new IntentIntegrator(activity);
             calendar = Calendar.getInstance(); // gets date and time data
             SimpleDateFormat date = new SimpleDateFormat("MM-dd-yyyy");
             SimpleDateFormat time = new SimpleDateFormat("HH:mm");// used to store date in month-day-year format
-            dateView.append("\n " + date.format(calendar.getTime()));
-            timeView.append("\n " + time.format(calendar.getTime()));
-            if(view.getId()==R.id.scan_button){
-                scanIntegrator.initiateScan();
-            }
+            dateView.append("\n" + date.format(calendar.getTime()));
+            timeView.append("\n" + time.format(calendar.getTime()));
             scanIntegrator.initiateScan();
         }
     }

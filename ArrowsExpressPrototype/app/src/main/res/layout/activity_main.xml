@@ -9,245 +9,180 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.aaron.arrowsexpressprototype.MainActivity"
     android:background="#f5f5f5"
-    android:padding="40dp"
     android:gravity="center">
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="#f5f5f5"
-        android:id="@+id/linearLayout"
-        android:layout_above="@+id/linearLayout2"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true">
-        <ImageButton
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:id="@+id/gps_button"
-            android:layout_gravity="center"
-            android:src="@drawable/button_stop"
-            android:layout_weight="1"
-            android:background="#f5f5f5"
-            android:adjustViewBounds="true"
-            android:padding="5dp"
-            android:scaleType="fitCenter"/>
-        <ImageButton
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/scanID_button"
-            android:src="@drawable/button_scanner"
-            android:layout_weight="1"
-            android:background="#f5f5f5"
-            android:adjustViewBounds="true"
-            android:padding="5dp"
-            android:scaleType="fitCenter"
-            android:layout_gravity="center" />
-    </LinearLayout>
 
-    <LinearLayout
-        android:orientation="horizontal"
+    <Button
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="#f5f5f5"
-        android:id="@+id/linearLayout2"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
-        <ImageButton
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:id="@+id/imageButton3"
-            android:layout_gravity="center"
-            android:src="@drawable/button_manual_stop"
-            android:layout_weight="1"
-            android:background="#f5f5f5"
-            android:adjustViewBounds="true"
-            android:padding="5dp"
-            android:scaleType="fitCenter"/>
-        <ImageButton
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/imageButton4"
-            android:src="@drawable/button_manual_id"
-            android:layout_weight="1"
-            android:background="#f5f5f5"
-            android:adjustViewBounds="true"
-            android:padding="5dp"
-            android:scaleType="fitCenter"
-            android:layout_gravity="center" />
-    </LinearLayout>
+        android:layout_height="40dp"
+        android:text="End Trip"
+        android:id="@+id/endTrip_button"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"
+        android:background="#00c853"
+        android:textColor="#f5f5f5"
+        android:textSize="18sp"
+        android:layout_marginBottom="5dp" />
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_above="@+id/linearLayout"
-        android:background="@drawable/window_labels"
-        android:layout_marginBottom="5dp"
-        android:layout_marginRight="5dp"
-        android:layout_marginLeft="5dp">
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center|right"
-            android:padding="0dp">
-            <TextView
-                android:layout_width="wrap_content"
-                android:gravity="center"
-                android:layout_height="wrap_content"
-                android:textSize="15sp"
-                android:id="@+id/areaLabel"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:padding="5dp"
-                android:textColor="@color/colorText"
-                android:background="#f5f5f5"
-                android:foregroundGravity="center"
-                android:layout_gravity="left|center"
-                android:text="Service Stop: "
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:gravity="center"
-                android:layout_height="wrap_content"
-                android:textSize="15sp"
-                android:id="@+id/timeLabel"
-                android:layout_below="@+id/areaView"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:padding="5dp"
-                android:textColor="@color/colorText"
-                android:background="#f5f5f5"
-                android:foregroundGravity="center"
-                android:layout_gravity="left|center"
-                android:text="Time: "
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:gravity="center"
-                android:layout_height="wrap_content"
-                android:textSize="15sp"
-                android:id="@+id/dateLabel"
-                android:layout_below="@+id/timeView"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:padding="5dp"
-                android:textColor="@color/colorText"
-                android:background="#f5f5f5"
-                android:foregroundGravity="center"
-                android:layout_gravity="left|center"
-                android:text="Date: "
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:gravity="center"
-                android:layout_height="wrap_content"
-                android:textSize="15sp"
-                android:id="@+id/contentLabel"
-                android:layout_below="@+id/dateView"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
-                android:padding="5dp"
-                android:textColor="@color/colorText"
-                android:background="#f5f5f5"
-                android:foregroundGravity="center"
-                android:layout_gravity="left|center"
-                android:text="ID Number:"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp" />
-        </LinearLayout>
+        android:weightSum="1"
+        android:id="@+id/linearLayout"
+        android:background="#f5f5f5"
+        android:layout_below="@id/endTrip_button">
+
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center|right"
-            android:layout_weight="5"
-            android:padding="0dp">
+            android:layout_weight="0.99"
+            android:background="#f5f5f5">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:gravity="center"
                 android:layout_height="wrap_content"
-                android:textSize="15sp"
+                android:textSize="18sp"
                 android:id="@+id/areaView"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:padding="5dp"
-                android:textColor="@color/colorText"
                 android:background="#f5f5f5"
                 android:foregroundGravity="center"
-                android:layout_gravity="center"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp" />
+                android:layout_gravity="left|center"
+                android:text="Service Stop: "
+                android:textColor="#000000"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:gravity="center"
                 android:layout_height="wrap_content"
-                android:textSize="15sp"
+                android:textSize="18sp"
                 android:id="@+id/timeView"
                 android:layout_below="@+id/areaView"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:padding="5dp"
-                android:textColor="@color/colorText"
                 android:background="#f5f5f5"
                 android:foregroundGravity="center"
-                android:layout_gravity="center"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp" />
+                android:layout_gravity="left|center"
+                android:text="Time: "
+                android:textColor="#000000" />
             <TextView
                 android:layout_width="wrap_content"
                 android:gravity="center"
                 android:layout_height="wrap_content"
-                android:textSize="15sp"
+                android:textSize="18sp"
                 android:id="@+id/dateView"
                 android:layout_below="@+id/timeView"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:padding="5dp"
-                android:textColor="@color/colorText"
                 android:background="#f5f5f5"
                 android:foregroundGravity="center"
-                android:layout_gravity="center"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:gravity="center"
-                android:layout_height="wrap_content"
-                android:textSize="15sp"
-                android:id="@+id/contentView"
-                android:layout_below="@+id/dateView"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
-                android:padding="5dp"
-                android:textColor="@color/colorText"
-                android:background="#f5f5f5"
-                android:foregroundGravity="center"
-                android:layout_gravity="center"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp" />
+                android:layout_gravity="left|center"
+                android:text="Date: "
+                android:textColor="#000000" />
+
         </LinearLayout>
+
+        <ImageButton
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:id="@+id/manGPS_button"
+            android:src="@drawable/ic_create_black_24dp"
+            android:background="#f5f5f5"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter" />
+
     </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/linearLayout"
+        android:background="#f5f5f5"
+        android:weightSum="1"
+        android:id="@+id/linearLayout2">
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="ID Numbers"
+            android:id="@+id/textView"
+            android:layout_gravity="center_horizontal"
+            android:background="#43a047"
+            android:textColor="#f5f5f5"
+            android:padding="3dp"
+            android:textSize="18sp" />
+
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="267dp"
+            android:layout_gravity="center_horizontal"
+            android:weightSum="1">
+
+            <ListView
+                android:layout_width="289dp"
+                android:layout_height="match_parent"
+                android:id="@+id/idListView"
+                android:layout_gravity="center_horizontal"
+                android:layout_weight="0.63" />
+
+            <ImageButton
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:id="@+id/manScan_button"
+                android:src="@drawable/ic_create_black_24dp"
+                android:background="#f5f5f5"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                android:layout_alignParentBottom="true" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/linearLayout2"
+        android:layout_centerHorizontal="true">
+
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="40dp"
+            android:text="Scan GPS"
+            android:id="@+id/gps_button"
+            android:layout_below="@+id/linearLayout"
+            android:layout_centerHorizontal="true"
+            android:background="#00c853"
+            android:textColor="#f5f5f5"
+            android:textSize="18sp"
+            android:layout_weight="1"
+            android:layout_marginRight="5dp" />
+
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="40dp"
+            android:text="Scan ID"
+            android:id="@+id/scanID_button"
+            android:layout_below="@+id/linearLayout"
+            android:layout_centerHorizontal="true"
+            android:background="#00c853"
+            android:textColor="#f5f5f5"
+            android:textSize="18sp"
+            android:layout_weight="1"
+            android:layout_marginLeft="5dp" />
+
+    </LinearLayout>
+
 </RelativeLayout>

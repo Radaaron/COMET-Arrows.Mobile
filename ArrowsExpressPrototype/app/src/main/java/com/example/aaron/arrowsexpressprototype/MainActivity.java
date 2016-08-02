@@ -1,14 +1,19 @@
 package com.example.aaron.arrowsexpressprototype;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,15 +21,21 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 
-public class MainActivity extends AppCompatActivity implements OnClickListener{
+public class MainActivity extends BaseActivity implements OnClickListener{
 
     public static Activity activity;
-    private ImageButton scanBtn, gpsBtn;
+    private Button scanBtn, gpsBtn, endBtn;
+    private ImageButton manScan, manGPS;
     private String studentID;
     private String area;
-    private TextView contentView, areaView, timeView, dateView;
+    private TextView areaView, timeView, dateView;
+    private ArrayList<String> idList;
+    private ArrayList<ServiceEvent> eventsList;
+    ArrayAdapter<String> idListAdapter;
+    private ListView idListView;
     private Calendar calendar;
 
 
@@ -33,89 +44,142 @@ public class MainActivity extends AppCompatActivity implements OnClickListener{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         activity = this;
-        scanBtn = (ImageButton)findViewById(R.id.scanID_button);
-        gpsBtn = (ImageButton)findViewById(R.id.gps_button);
-        contentView = (TextView)findViewById(R.id.contentView);
+        createTripList();
+        scanBtn = (Button)findViewById(R.id.scanID_button);
+        gpsBtn = (Button)findViewById(R.id.gps_button);
+        endBtn = (Button)findViewById(R.id.endTrip_button);
+        manScan = (ImageButton)findViewById(R.id.manScan_button);
+        manGPS = (ImageButton)findViewById(R.id.manGPS_button);
         areaView = (TextView)findViewById(R.id.areaView);
         timeView = (TextView) findViewById(R.id.timeView);
         dateView = (TextView) findViewById(R.id.dateView);
+        eventsList =  new ArrayList<ServiceEvent>();
+        idList = new ArrayList<String>();
+        idListView = (ListView)findViewById(R.id.idListView);
+        idListAdapter = new ArrayAdapter<String>(this, R.layout.custom_list_item, idList);
+        idListView.setAdapter(idListAdapter);
         scanBtn.setOnClickListener(this);
         gpsBtn.setOnClickListener(this);
+        endBtn.setOnClickListener(this);
+        manGPS.setOnClickListener(this);
+        manScan.setOnClickListener(this);
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        if(requestCode == 0){ // null
+        if(requestCode == 1){ // GPSHandler
+            Bundle extras = intent.getExtras();
+            area = extras.getString("area");
+            if(area.equals("off")){
+                Toast toast = Toast.makeText(getApplicationContext(),
+                        "GPS IS TURNED OFF", Toast.LENGTH_SHORT);
+                toast.show();
+            }
+            else if(area != null){
+                areaView.append("" + area);
+            }
+            else {
+                Toast toast = Toast.makeText(getApplicationContext(),
+                        "NOT IN SERVICE STOP", Toast.LENGTH_SHORT);
+                toast.show();
+            }
+        } else {
             IntentResult scanningResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
             if (scanningResult != null) {
                 studentID = scanningResult.getContents();
                 String scanFormat = scanningResult.getFormatName();
                 if (!scanFormat.equals("CODE_128")) {
                     Toast toast = Toast.makeText(getApplicationContext(),
-                            "Invalid barcode type", Toast.LENGTH_SHORT);
+                            "INVALID BARCODE TYPE", Toast.LENGTH_SHORT);
                     toast.show();
-                } else {
-                    contentView.setText("" + studentID);
                 }
-            } else {
-                Toast toast = Toast.makeText(getApplicationContext(),
-                        "No scan data received!", Toast.LENGTH_SHORT);
-                toast.show();
-            }
-        }
-        else if(requestCode == 1){ // GPSHandler
-            Bundle extras = intent.getExtras();
-            area = extras.getString("area");
-            if(area != null){
-                areaView.setText("" + area);
+                else {
+                    idList.add(studentID);
+                    idListAdapter.notifyDataSetChanged();
+                    addToTrip(area, calendar, studentID);
+                }
             }
             else {
                 Toast toast = Toast.makeText(getApplicationContext(),
-                        "Not in a Stop area", Toast.LENGTH_SHORT);
+                        "NO SCAN DATA RECEIVED", Toast.LENGTH_SHORT);
                 toast.show();
             }
         }
     }
 
-    public void resetTextViews(){
-        areaView.setText("");
-        dateView.setText("");
-        timeView.setText("");
+    public void addToTrip(String area, Calendar calendar, String studentID){
+        ServiceEvent temp = new ServiceEvent(area, calendar, studentID);
+        eventsList.add(temp);
+    }
+
+    public void resetAll(){
+        areaView.setText("Service Stop: ");
+        dateView.setText("Date: ");
+        timeView.setText("Time: ");
     }
 
     public void onClick(View view){
         if(view.getId() == R.id.gps_button){
-            resetTextViews();
+            resetAll();
             Intent intent = new Intent(this, GPSHandler.class);
             startActivityForResult(intent, 1);
             calendar = Calendar.getInstance(); // gets date and time data
             SimpleDateFormat date = new SimpleDateFormat("MM-dd-yyyy");
             SimpleDateFormat time = new SimpleDateFormat("HH:mm");// used to store date in month-day-year format
-            dateView.setText("" + date.format(calendar.getTime()));
-            timeView.setText("" + time.format(calendar.getTime()));
+            dateView.append("" + date.format(calendar.getTime()));
+            timeView.append("" + time.format(calendar.getTime()));
         }
-        if(view.getId()== R.id.scanID_button){
+        else if(view.getId()== R.id.scanID_button){
             IntentIntegrator scanIntegrator = new IntentIntegrator(activity);
             scanIntegrator.initiateScan();
         }
-    }
+        else if(view.getId()== R.id.manGPS_button){ // uses Alert Dialogue to prompt user for input
+            View inputView = (LayoutInflater.from(MainActivity.this)).inflate(R.layout.user_input, null);
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
+            AlertDialog.Builder alertBuilder = new AlertDialog.Builder(MainActivity.this);
+            alertBuilder.setView(inputView);
+            final EditText userInput = (EditText) inputView.findViewById(R.id.userInput);
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        //Options items
-        int id = item.getItemId();
-
-        if (id == R.id.action_settings) {
-            return true;
+            alertBuilder.setCancelable(true)
+                    .setPositiveButton("Enter", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            area = userInput.getText().toString();
+                            areaView.append("" + area);
+                        }
+                    });
+            Dialog dialog = alertBuilder.create();
+            dialog.show();
         }
+        else if(view.getId()== R.id.manScan_button){
+            View inputView = (LayoutInflater.from(MainActivity.this)).inflate(R.layout.user_input, null);
 
-        return super.onOptionsItemSelected(item);
+            AlertDialog.Builder alertBuilder = new AlertDialog.Builder(MainActivity.this);
+            alertBuilder.setView(inputView);
+            final EditText userInput = (EditText) inputView.findViewById(R.id.userInput);
+
+            alertBuilder.setCancelable(true)
+                    .setPositiveButton("Enter", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            studentID = userInput.getText().toString();
+                            idList.add(studentID);
+                            idListAdapter.notifyDataSetChanged();
+                            addToTrip(area, calendar, studentID);
+                        }
+                    });
+            Dialog dialog = alertBuilder.create();
+            dialog.show();
+        }
+        else if(view.getId()== R.id.endTrip_button){
+            Trip temp = new Trip(eventsList);
+            addTrip(temp);
+            resetAll();
+            idList.clear();
+            idListAdapter.notifyDataSetChanged();
+            Toast toast = Toast.makeText(getApplicationContext(),
+                    "TRIP RECORDED", Toast.LENGTH_SHORT);
+            toast.show();
+        }
     }
 
 }

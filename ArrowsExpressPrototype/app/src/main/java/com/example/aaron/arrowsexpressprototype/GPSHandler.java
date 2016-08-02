@@ -50,7 +50,12 @@ public class GPSHandler extends AppCompatActivity {
             }
             @Override
             public void onProviderDisabled(String s) {
-                // wont do anything if it is disabled. Might make it so that it redirects the user to the settings screen
+                Intent returnArea = new Intent();
+                Bundle extras = new Bundle();
+                extras.putString("area", "off");
+                returnArea.putExtras(extras);
+                setResult(RESULT_OK, returnArea);
+                finish();
             }
         };
         scanGPS();

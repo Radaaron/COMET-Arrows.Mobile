@@ -1,7 +1,8 @@
 <resources>
 
-    <string name="app_name">Arrows Express Prototype</string>
-
+    <string name="app_name">Arrows Express</string>
+    <string name="action_main">Main</string>
+    <string name="action_stored">Stored Data</string>
     <string name="action_settings">Settings</string>
 
 </resources>

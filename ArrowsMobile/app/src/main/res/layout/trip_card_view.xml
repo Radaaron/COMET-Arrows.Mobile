@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.CardView
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/trip_card_view"
+        android:layout_gravity="center"
+        android:padding="2dp"
+        android:elevation="2dp"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        card_view:cardCornerRadius="2dp">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+
+            <CheckBox
+                android:id="@+id/trip_check_box"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent">
+            </CheckBox>
+
+            <TextView
+                android:text="06:30am"
+                android:id="@+id/trip_time_view"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingStart="15dp"
+                android:paddingEnd="0dp"
+                android:paddingTop="24dp"
+                android:gravity="start"
+                android:textSize="20sp">
+            </TextView>
+
+            <TextView
+                android:text="Manila to STC"
+                android:id="@+id/trip_route_view"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingStart="15dp"
+                android:paddingEnd="0dp"
+                android:paddingTop="24dp"
+                android:textSize="20sp">
+            </TextView>
+
+            <TextView
+                android:text="20"
+                android:id="@+id/trip_capacity_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingStart="0dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="24dp"
+                android:gravity="end"
+                android:textSize="20sp">
+            </TextView>
+
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>

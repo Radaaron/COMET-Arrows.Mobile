@@ -35,7 +35,7 @@ public class AllTripsFragment extends Fragment implements OnTripSelectedListener
         RecyclerView rv = (RecyclerView) rootView.findViewById(R.id.nav_all_trips_recycler_view);
         rv.setHasFixedSize(true);
         tripList = getArguments().getParcelableArrayList("tripList");
-        TripAdapter adapter = new TripAdapter(tripList, this);
+        TripRecyclerAdapter adapter = new TripRecyclerAdapter(tripList, this);
         rv.setAdapter(adapter);
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         rv.setLayoutManager(llm);

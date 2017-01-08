@@ -123,6 +123,7 @@ public class LandingActivity extends AppCompatActivity
     public void onFragmentInteraction(Object object) {
         Intent intent = new Intent();
         Trip selectedTrip = (Trip) object;
+        intent.putExtra("next", "Embarkation");
         intent.putExtra("selectedTrip", selectedTrip);
         setResult(Activity.RESULT_OK, intent);
         finish();

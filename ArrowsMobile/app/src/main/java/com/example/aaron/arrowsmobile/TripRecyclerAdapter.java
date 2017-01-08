@@ -5,13 +5,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-public class TripAdapter extends RecyclerView.Adapter<TripAdapter.ViewHolder> {
+public class TripRecyclerAdapter extends RecyclerView.Adapter<TripRecyclerAdapter.ViewHolder> {
 
     private OnTripSelectedListener tripSelectedListener;
     private int selected = -1;
@@ -20,28 +19,26 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.ViewHolder> {
     // Provide a reference to the views for each data item
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public CardView tripCardView;
-        public CheckBox tripCheckBox;
         public TextView tripTimeView;
         public TextView tripRouteView;
         public TextView tripCapacityView;
         public ViewHolder(View v) {
             super(v);
             this.tripCardView = (CardView) v.findViewById(R.id.trip_card_view);
-            this.tripCheckBox = (CheckBox) v.findViewById(R.id.trip_check_box);
             this.tripTimeView = (TextView) v.findViewById(R.id.trip_time_view);
             this.tripRouteView = (TextView) v.findViewById(R.id.trip_route_view);
             this.tripCapacityView = (TextView) v.findViewById(R.id.trip_capacity_view);
         }
     }
 
-    public TripAdapter(ArrayList<Trip> myDataset, OnTripSelectedListener listener) {
+    public TripRecyclerAdapter(ArrayList<Trip> myDataset, OnTripSelectedListener listener) {
         this.mDataset = myDataset;
         this.tripSelectedListener = listener;
     }
 
     // Create new views (invoked by the layout manager)
     @Override
-    public TripAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public TripRecyclerAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.trip_card_view, parent, false);
@@ -61,7 +58,6 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.ViewHolder> {
         holder.tripCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                holder.tripCheckBox.setChecked(!holder.tripCheckBox.isChecked());
                 selected = (int) v.getTag();
                 tripSelectedListener.onTripSelect(selected);
             }

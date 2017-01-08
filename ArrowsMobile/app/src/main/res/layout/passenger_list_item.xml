@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp">
+
+    <CheckBox
+        android:id="@+id/passenger_check_in_box"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingEnd="2dp">
+    </CheckBox>
+
+    <CheckBox
+        android:id="@+id/passenger_check_out_box"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="2dp"
+        android:paddingEnd="2dp">
+    </CheckBox>
+
+    <TextView
+        android:text="11407883"
+        android:id="@+id/passenger_id_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:paddingStart="24dp"
+        android:paddingEnd="16dp"
+        android:fontFamily="sans-serif"/>
+
+</LinearLayout>

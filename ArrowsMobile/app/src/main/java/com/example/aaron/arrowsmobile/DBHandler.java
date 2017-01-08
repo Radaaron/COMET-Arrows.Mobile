@@ -140,7 +140,7 @@ public class DBHandler extends SQLiteOpenHelper{
         cv = new ContentValues();
         cv.put(DBContract.Vehicle.COLUMN_VEHICLE_ID, "1234567890");
         cv.put(DBContract.Vehicle.COLUMN_VEHICLE_TYPE, "Large");
-        cv.put(DBContract.Vehicle.COLUMN_CAPACITY, 12);
+        cv.put(DBContract.Vehicle.COLUMN_CAPACITY, 3);
         cv.put(DBContract.Vehicle.COLUMN_IMAGE, "tempImage");
         cv.put(DBContract.Vehicle.COLUMN_PLATE_NUM, "1234567");
         cv.put(DBContract.Vehicle.COLUMN_MODEL, "tempModel");
@@ -194,8 +194,8 @@ public class DBHandler extends SQLiteOpenHelper{
         cv = new ContentValues();
         cv.put(DBContract.Stop.COLUMN_STOP_ID, 00000);
         cv.put(DBContract.Stop.COLUMN_STOP_NAME, "First Stop");
-        cv.put(DBContract.Stop.COLUMN_LATITUDE, "100.00");
-        cv.put(DBContract.Stop.COLUMN_LONGITUDE, "100.00");
+        cv.put(DBContract.Stop.COLUMN_LATITUDE, "20.00");
+        cv.put(DBContract.Stop.COLUMN_LONGITUDE, "20.00");
         insertTest = db.insert(DBContract.Stop.TABLE_STOP, null, cv);
         if(dbInsertTest(insertTest)){
             return false;
@@ -214,8 +214,8 @@ public class DBHandler extends SQLiteOpenHelper{
         cv = new ContentValues();
         cv.put(DBContract.Stop.COLUMN_STOP_ID, 00001);
         cv.put(DBContract.Stop.COLUMN_STOP_NAME, "Second Stop");
-        cv.put(DBContract.Stop.COLUMN_LATITUDE, "150.00");
-        cv.put(DBContract.Stop.COLUMN_LONGITUDE, "150.00");
+        cv.put(DBContract.Stop.COLUMN_LATITUDE, "60.00");
+        cv.put(DBContract.Stop.COLUMN_LONGITUDE, "60.00");
         insertTest = db.insert(DBContract.Stop.TABLE_STOP, null, cv);
         if(dbInsertTest(insertTest)){
             return false;
@@ -312,7 +312,8 @@ public class DBHandler extends SQLiteOpenHelper{
         c = db.query(DBContract.Passenger.TABLE_PASSENGER, null, null, null, null, null, null);
         ArrayList<Passenger> passengerList = new ArrayList();
         if(c.moveToFirst()){
-            Calendar tapIn  = Calendar.getInstance(), tapOut  = Calendar.getInstance();
+            // just set them later when they tap in / out
+            Calendar tapIn = null, tapOut = null;
             boolean isChance;
             do{
                 isChance = c.getInt(c.getColumnIndex(DBContract.Passenger.COLUMN_IS_CHANCE)) > 0;
@@ -334,21 +335,21 @@ public class DBHandler extends SQLiteOpenHelper{
                 try {
                     date = dateFormat.parse(tripDateTime);
                 } catch (ParseException e) {
-                    Log.e(TAG, "Parsing ISO8601 datetime failed", e);;
+                    Log.e(TAG, "Parsing ISO8601 datetime failed", e);
                 }
                 tripDate.setTime(date);
                 tripDateTime = c.getString(c.getColumnIndex(DBContract.Trip.COLUMN_DEP_TIME));
                 try {
                     date = timeFormat.parse(tripDateTime);
                 } catch (ParseException e) {
-                    Log.e(TAG, "Parsing ISO8601 datetime failed", e);;
+                    Log.e(TAG, "Parsing ISO8601 datetime failed", e);
                 }
                 depTime.setTime(date);
                 tripDateTime = c.getString(c.getColumnIndex(DBContract.Trip.COLUMN_ARRIVAL_TIME));
                 try {
                     date = timeFormat.parse(tripDateTime);
                 } catch (ParseException e) {
-                    Log.e(TAG, "Parsing ISO8601 datetime failed", e);;
+                    Log.e(TAG, "Parsing ISO8601 datetime failed", e);
                 }
                 arrivalTime.setTime(date);
                 isSpecial = c.getInt(c.getColumnIndex(DBContract.Trip.COLUMN_IS_SPECIAL)) > 0;

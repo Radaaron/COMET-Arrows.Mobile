@@ -173,6 +173,10 @@ public class Trip implements Parcelable{
         return this.passengerList.get(index);
     }
 
+    public ArrayList<Passenger> getPassengerList(){
+        return this.passengerList;
+    }
+
     public int getPassengerCount(){
         return this.passengerList.size();
     }

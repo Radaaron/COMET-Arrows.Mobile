@@ -84,6 +84,10 @@ public class Route implements Parcelable{
         return this.routeStopList.get(index);
     }
 
+    public ArrayList<RouteStop> getRouteStopList(){
+        return this.routeStopList;
+    }
+
     @Override
     public int describeContents() {
         return 0;

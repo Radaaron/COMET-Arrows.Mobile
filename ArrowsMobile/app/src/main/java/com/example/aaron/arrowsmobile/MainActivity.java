@@ -22,9 +22,21 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
-            // start embarkation
-            Intent intent = new Intent(this, EmbarkationActivity.class);
-            startActivityForResult(intent, 1);
+            String next = data.getStringExtra("next");
+            if(next.equals("Landing")){
+                Intent intent = new Intent(this, LandingActivity.class);
+                startActivityForResult(intent, 1);
+            } else if(next.equals("Embarkation")){
+                Trip selectedTrip = data.getParcelableExtra("selectedTrip");
+                Intent intent = new Intent(this, EmbarkationActivity.class);
+                intent.putExtra("selectedTrip", selectedTrip);
+                startActivityForResult(intent, 1);
+            } else if(next.equals("Trip")){
+                Trip selectedTrip = data.getParcelableExtra("selectedTrip");
+                Intent intent = new Intent(this, TripActivity.class);
+                intent.putExtra("selectedTrip", selectedTrip);
+                startActivityForResult(intent, 1);
+            }
         }
     }
 }

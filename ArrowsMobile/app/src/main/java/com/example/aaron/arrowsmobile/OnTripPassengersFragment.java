@@ -14,13 +14,13 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 
 
-public class TripPassengersFragment extends Fragment {
+public class OnTripPassengersFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     private Trip selectedTrip;
     private ArrayList<Passenger> passengerList;
 
-    public TripPassengersFragment() {
+    public OnTripPassengersFragment() {
         // Required empty public constructor
     }
 

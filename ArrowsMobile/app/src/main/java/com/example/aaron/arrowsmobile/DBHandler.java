@@ -98,13 +98,14 @@ public class DBHandler extends SQLiteOpenHelper{
         calendar.set(Calendar.HOUR, 06);
         calendar.set(Calendar.MINUTE, 00);
         cv.put(DBContract.Trip.COLUMN_DEP_TIME, time.format(calendar.getTime()));
-        calendar.set(Calendar.HOUR, 07);
-        calendar.set(Calendar.MINUTE, 00);
-        cv.put(DBContract.Trip.COLUMN_ARRIVAL_TIME, time.format(calendar.getTime()));
+        cv.putNull(DBContract.Trip.COLUMN_ARRIVAL_TIME);
         cv.put(DBContract.Trip.COLUMN_DURATION, 60.00);
         cv.put(DBContract.Trip.COLUMN_IS_SPECIAL, false);
         cv.put(DBContract.Trip.COLUMN_SP_NUM_PASS, -1);
         cv.put(DBContract.Trip.COLUMN_PURPOSE, "Sample Trip");
+        cv.put(DBContract.Trip.COLUMN_TRIP_VEHICLE, "1234567890");
+        cv.put(DBContract.Trip.COLUMN_TRIP_DRIVER, 1234567);
+        cv.put(DBContract.Trip.COLUMN_TRIP_TRIP_SCHED, 0000000001);
         insertTest = db.insert(DBContract.Trip.TABLE_TRIP, null, cv);
         if(dbInsertTest(insertTest)){
             return false;
@@ -120,6 +121,7 @@ public class DBHandler extends SQLiteOpenHelper{
         cv.put(DBContract.Passenger.COLUMN_DISEMBARKATION_PT, "Manila Campus");
         cv.put(DBContract.Passenger.COLUMN_DESTINATION, "STC CAMPUS");
         cv.put(DBContract.Passenger.COLUMN_IS_CHANCE, false);
+        cv.put(DBContract.Passenger.COLUMN_TRIP, 0000000001);
         insertTest = db.insert(DBContract.Passenger.TABLE_PASSENGER, null, cv);
         if(dbInsertTest(insertTest)){
             return false;
@@ -157,6 +159,7 @@ public class DBHandler extends SQLiteOpenHelper{
         calendar.set(Calendar.HOUR, 06);
         calendar.set(Calendar.MINUTE, 00);
         cv.put(DBContract.TripSched.COLUMN_DEP_TIME, time.format(calendar.getTime()));
+        cv.put(DBContract.TripSched.COLUMN_TRIP_SCHED_ROUTE, 00001);
         insertTest = db.insert(DBContract.TripSched.TABLE_TRIP_SCHED, null, cv);
         if(dbInsertTest(insertTest)){
             return false;
@@ -167,6 +170,7 @@ public class DBHandler extends SQLiteOpenHelper{
         cv.put(DBContract.Route.COLUMN_ROUTE_ID, 00001);
         cv.put(DBContract.Route.COLUMN_ROUTE_NAME, "Manila to STC");
         cv.put(DBContract.Route.COLUMN_ROUTE_DESCRIPTION, "Route for Manila to STC");
+        cv.put(DBContract.Route.COLUMN_ROUTE_LINE, 00001);
         insertTest = db.insert(DBContract.Route.TABLE_ROUTE, null, cv);
         if(dbInsertTest(insertTest)){
             return false;
@@ -185,6 +189,8 @@ public class DBHandler extends SQLiteOpenHelper{
         cv = new ContentValues();
         cv.put(DBContract.RouteStop.COLUMN_STOP_NUM, "00000");
         cv.put(DBContract.RouteStop.COLUMN_ORDER, 00000);
+        cv.put(DBContract.RouteStop.COLUMN_ROUTE_STOP_STOP, 00000);
+        cv.put(DBContract.RouteStop.COLUMN_ROUTE_STOP_ROUTE, 00001);
         insertTest = db.insert(DBContract.RouteStop.TABLE_ROUTE_STOP, null, cv);
         if(dbInsertTest(insertTest)){
             return false;
@@ -205,6 +211,8 @@ public class DBHandler extends SQLiteOpenHelper{
         cv = new ContentValues();
         cv.put(DBContract.RouteStop.COLUMN_STOP_NUM, "00001");
         cv.put(DBContract.RouteStop.COLUMN_ORDER, 00001);
+        cv.put(DBContract.RouteStop.COLUMN_ROUTE_STOP_STOP, 00001);
+        cv.put(DBContract.RouteStop.COLUMN_ROUTE_STOP_ROUTE, 00001);
         insertTest = db.insert(DBContract.RouteStop.TABLE_ROUTE_STOP, null, cv);
         if(dbInsertTest(insertTest)){
             return false;
@@ -327,7 +335,7 @@ public class DBHandler extends SQLiteOpenHelper{
         i = 0; // one to one
         if(c.moveToFirst()){
             Date date = null;
-            Calendar tripDate = Calendar.getInstance(), depTime  = Calendar.getInstance(), arrivalTime  = Calendar.getInstance();;
+            Calendar tripDate = Calendar.getInstance(), depTime = Calendar.getInstance(), arrivalTime = null;
             boolean isSpecial;
             String tripDateTime;
             do{
@@ -345,13 +353,6 @@ public class DBHandler extends SQLiteOpenHelper{
                     Log.e(TAG, "Parsing ISO8601 datetime failed", e);
                 }
                 depTime.setTime(date);
-                tripDateTime = c.getString(c.getColumnIndex(DBContract.Trip.COLUMN_ARRIVAL_TIME));
-                try {
-                    date = timeFormat.parse(tripDateTime);
-                } catch (ParseException e) {
-                    Log.e(TAG, "Parsing ISO8601 datetime failed", e);
-                }
-                arrivalTime.setTime(date);
                 isSpecial = c.getInt(c.getColumnIndex(DBContract.Trip.COLUMN_IS_SPECIAL)) > 0;
                 Trip trip = new Trip(c.getInt(c.getColumnIndex(DBContract.Trip.COLUMN_TRIP_ID)), c.getString(c.getColumnIndex(DBContract.Trip.COLUMN_REMARKS)), tripDate, depTime, arrivalTime, c.getDouble(c.getColumnIndex(DBContract.Trip.COLUMN_DURATION)), isSpecial, c.getInt(c.getColumnIndex(DBContract.Trip.COLUMN_SP_NUM_PASS)), c.getString(c.getColumnIndex(DBContract.Trip.COLUMN_PURPOSE)), tripSchedList.get(i), vehicleList.get(i), driverList.get(i), passengerList);
                 i++;

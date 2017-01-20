@@ -49,7 +49,7 @@ public class LandingActivity extends AppCompatActivity
         dateView.append("" + date.format(calendar.getTime())); // displays date
         setTitle("" + date.format(calendar.getTime()));
 
-        // retrieve mock data
+        // retrieve data for recycler view
         dbHandler = new DBHandler(this);
         tripList = dbHandler.getAllTrips();
 
@@ -77,7 +77,7 @@ public class LandingActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.landing_drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else if(currentFragment instanceof AllTripsFragment){
+        } else if(currentFragment instanceof AllTripsFragment || currentFragment instanceof PendingTripsFragment || currentFragment instanceof CompletedTripsFragment){
             // do nothing
         } else {
             super.onBackPressed();
@@ -110,9 +110,23 @@ public class LandingActivity extends AppCompatActivity
             fragmentTransaction.replace(R.id.landing_fragment_container, currentFragment);
             fragmentTransaction.commit();
         }
-        else if (id == R.id.nav_completed_trips) {
+        else if (id == R.id.nav_pending_trips && !(currentFragment instanceof PendingTripsFragment)) {
+            Bundle bundle = new Bundle();
+            bundle.putParcelableArrayList("tripList", tripList);
+            currentFragment = new PendingTripsFragment();
+            currentFragment.setArguments(bundle);
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.landing_fragment_container, currentFragment);
+            fragmentTransaction.commit();
         }
-        else if (id == R.id.nav_pending_trips) {
+        else if (id == R.id.nav_completed_trips && !(currentFragment instanceof CompletedTripsFragment)) {
+            Bundle bundle = new Bundle();
+            bundle.putParcelableArrayList("tripList", tripList);
+            currentFragment = new CompletedTripsFragment();
+            currentFragment.setArguments(bundle);
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.landing_fragment_container, currentFragment);
+            fragmentTransaction.commit();
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.landing_drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -127,6 +141,18 @@ public class LandingActivity extends AppCompatActivity
         intent.putExtra("selectedTrip", selectedTrip);
         setResult(Activity.RESULT_OK, intent);
         finish();
+    }
+
+    public ArrayList<Trip> getTripList(String type){
+        ArrayList<Trip> tripList = null;
+        if(type.equals("all")){
+
+        }else if(type.equals("pended")){
+
+        } else if(type.equals("completed")){
+
+        }
+        return tripList;
     }
 
 }

@@ -52,12 +52,13 @@ public class TripActivity extends AppCompatActivity implements View.OnClickListe
         // set first stop text
         nextStop = selectedTrip.getTripSched().getRoute().getRouteStop(0).getStop().getStopName();
         nextStopButton.setText("Next Stop: " + nextStop);
+        nextStopButton.setEnabled(false);
         // start scanning
         scanGPS();
 
         Bundle bundle = new Bundle();
         bundle.putParcelable("selectedTrip", selectedTrip);
-        currentFragment = new TripPassengersFragment();
+        currentFragment = new OnTripPassengersFragment();
         currentFragment.setArguments(bundle);
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.trip_fragment_container, currentFragment);
@@ -68,6 +69,15 @@ public class TripActivity extends AppCompatActivity implements View.OnClickListe
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.scan_barcode, menu);
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(currentFragment instanceof OnTripPassengersFragment){
+            // do nothing
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
@@ -100,7 +110,7 @@ public class TripActivity extends AppCompatActivity implements View.OnClickListe
             // refresh page
             Bundle bundle = new Bundle();
             bundle.putParcelable("selectedTrip", selectedTrip);
-            currentFragment = new TripPassengersFragment();
+            currentFragment = new OnTripPassengersFragment();
             currentFragment.setArguments(bundle);
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.trip_fragment_container, currentFragment);
@@ -108,10 +118,18 @@ public class TripActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        scanGPS();
+    }
+
 
     @Override
     public void onClick(View view) {
         if (view.getId()== R.id.next_stop_button) {
+            Calendar cal = Calendar.getInstance();
+            selectedTrip.setArrivalTime(cal);
             Intent intent = new Intent();
             intent.putExtra("next", "Landing");
             setResult(Activity.RESULT_OK, intent);
@@ -152,6 +170,7 @@ public class TripActivity extends AppCompatActivity implements View.OnClickListe
         if(stopName != null){
             if(stopName.equals("off")){
                 Toast.makeText(this, "GPS Disabled", Toast.LENGTH_LONG).show();
+                nextStopButton.setEnabled(false);
             }
             else{
                 // set currentStop and nextStop if there is, if the currentStop is the last stop, set nextStop to null and enable end trip button

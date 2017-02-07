@@ -64,42 +64,45 @@ public class TripDetailsDialogFragment extends DialogFragment implements View.On
                 selectedTrip.getTripID(),
                 DBContract.Trip.TABLE_TRIP,
                 DBContract.Trip.COLUMN_TRIP_ID));
-
         tripDepartureTimeView.setText(selectedTrip.getStringFromDB(this.getContext(),
                 DBContract.Trip.COLUMN_DEP_TIME,
                 selectedTrip.getTripID(),
                 DBContract.Trip.TABLE_TRIP,
                 DBContract.Trip.COLUMN_TRIP_ID));
-
         tripRouteView.setText(selectedTrip.getStringFromDB(this.getContext(),
                 DBContract.Route.COLUMN_ROUTE_NAME,
                 selectedTrip.getRouteID(),
                 DBContract.Route.TABLE_ROUTE,
                 DBContract.Route.COLUMN_ROUTE_ID));
-
         tripDriverView.setText(selectedTrip.getStringFromDB(this.getContext(),
                 DBContract.Driver.COLUMN_FIRST_NAME,
                 selectedTrip.getDriverID(),
                 DBContract.Driver.TABLE_DRIVER,
                 DBContract.Driver.COLUMN_DRIVER_ID));
-
         tripDriverView.append(" " + selectedTrip.getStringFromDB(this.getContext(),
                 DBContract.Driver.COLUMN_LAST_NAME,
                 selectedTrip.getDriverID(),
                 DBContract.Driver.TABLE_DRIVER,
                 DBContract.Driver.COLUMN_DRIVER_ID));
-
         tripVehicleView.setText(selectedTrip.getStringFromDB(this.getContext(),
                 DBContract.Vehicle.COLUMN_MODEL,
                 selectedTrip.getVehicleID(),
                 DBContract.Vehicle.TABLE_VEHICLE,
                 DBContract.Vehicle.COLUMN_VEHICLE_ID));
-
         tripPlateView.setText(selectedTrip.getStringFromDB(this.getContext(),
                 DBContract.Vehicle.COLUMN_PLATE_NUM,
                 selectedTrip.getVehicleID(),
                 DBContract.Vehicle.TABLE_VEHICLE,
                 DBContract.Vehicle.COLUMN_VEHICLE_ID));
+
+        //check if the trip is already completed
+        if(selectedTrip.getStringFromDB(this.getContext(),
+                DBContract.Trip.COLUMN_ARRIVAL_TIME,
+                selectedTrip.getTripID(),
+                DBContract.Trip.TABLE_TRIP,
+                DBContract.Trip.COLUMN_TRIP_ID) != null){
+            embarkationStart.setEnabled(false);
+        }
 
         return rootView;
     }

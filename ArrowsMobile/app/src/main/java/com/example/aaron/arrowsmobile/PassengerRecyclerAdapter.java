@@ -50,26 +50,26 @@ public class PassengerRecyclerAdapter extends RecyclerView.Adapter<PassengerRecy
         public void onBindViewHolder(final PassengerRecyclerAdapter.ViewHolder holder, int position) {
             holder.passengerIdView.setText(Integer.toString(mDataset.get(position)));
             // check if the passenger id has already been tapped in and out
-            for(int i = 0; i < mDataset.size(); i++){
+            if(keyHandler.getStringFromDB(context,
+                    DBContract.Passenger.COLUMN_TAP_IN,
+                    Integer.toString(mDataset.get(position)),
+                    DBContract.Passenger.TABLE_PASSENGER,
+                    DBContract.Passenger.COLUMN_PASSENGER_ID) != null){
+                holder.passengerCheckInBox.setChecked(true);
+                holder.passengerCheckInBox.setEnabled(false);
+                holder.passengerCheckOutBox.setEnabled(false);
                 if(keyHandler.getStringFromDB(context,
-                        DBContract.Passenger.COLUMN_TAP_IN,
-                        Integer.toString(mDataset.get(i)),
+                        DBContract.Passenger.COLUMN_TAP_OUT,
+                        Integer.toString(mDataset.get(position)),
                         DBContract.Passenger.TABLE_PASSENGER,
                         DBContract.Passenger.COLUMN_PASSENGER_ID) != null){
-                    holder.passengerCheckInBox.setChecked(true);
-                    holder.passengerCheckInBox.setEnabled(false);
-                    if(keyHandler.getStringFromDB(context,
-                            DBContract.Passenger.COLUMN_TAP_OUT,
-                            Integer.toString(mDataset.get(i)),
-                            DBContract.Passenger.TABLE_PASSENGER,
-                            DBContract.Passenger.COLUMN_PASSENGER_ID) != null){
-                        holder.passengerCheckOutBox.setChecked(true);
-                        holder.passengerCheckOutBox.setEnabled(false);
-                    }
-                } else {
+                    holder.passengerCheckOutBox.setChecked(true);
                     holder.passengerCheckInBox.setEnabled(false);
                     holder.passengerCheckOutBox.setEnabled(false);
                 }
+            } else {
+                holder.passengerCheckInBox.setEnabled(false);
+                holder.passengerCheckOutBox.setEnabled(false);
             }
         }
 

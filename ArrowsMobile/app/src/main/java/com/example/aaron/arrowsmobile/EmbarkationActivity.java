@@ -24,6 +24,8 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import static com.example.aaron.arrowsmobile.DBContract.Route.TABLE_ROUTE;
+
 public class EmbarkationActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnFragmentInteractionListener, View.OnClickListener {
 
@@ -31,6 +33,7 @@ public class EmbarkationActivity extends AppCompatActivity
     KeyHandler selectedTrip;
     Fragment currentFragment;
     String chanceDestination = null;
+    String[] possibleDestinations = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +57,7 @@ public class EmbarkationActivity extends AppCompatActivity
         // get access to DB and retrieve trip details
         dbHandler = new DBHandler(this);
         selectedTrip = getIntent().getParcelableExtra("selectedTrip");
+        possibleDestinations = getPossibleDestinations();
 
         dateView.setText(selectedTrip.getStringFromDB(getApplicationContext(),
                 DBContract.Trip.COLUMN_TRIP_DATE,
@@ -70,11 +74,25 @@ public class EmbarkationActivity extends AppCompatActivity
         routeView.setText(selectedTrip.getStringFromDB(getApplicationContext(),
                 DBContract.Route.COLUMN_ROUTE_NAME,
                 selectedTrip.getRouteID(),
-                DBContract.Route.TABLE_ROUTE,
+                TABLE_ROUTE,
                 DBContract.Route.COLUMN_ROUTE_ID));
 
         // initially commit passenger manifest fragment
         setPassengerManifestFragment();
+    }
+
+    private String[] getPossibleDestinations() {
+        String[] temp = new String[selectedTrip.getStopIDList().size()];
+        String stopName;
+        for(int i = 0; i < selectedTrip.getStopIDList().size(); i++){
+            stopName = selectedTrip.getStringFromDB(getApplicationContext(),
+                    DBContract.Stop.COLUMN_STOP_NAME,
+                    selectedTrip.getStopIDList().get(i),
+                    DBContract.Stop.TABLE_STOP,
+                    DBContract.Stop.COLUMN_STOP_ID);
+            temp[i] = stopName;
+        }
+        return temp;
     }
 
     public void setPassengerManifestFragment(){
@@ -90,6 +108,7 @@ public class EmbarkationActivity extends AppCompatActivity
 
     public void setChanceFragment(){
         Bundle bundle = new Bundle();
+        selectedTrip.refreshPassengerIDList(); // refresh list for new chance passenger
         bundle.putParcelable("selectedTrip", selectedTrip);
         currentFragment = new ChancePassengersFragment();
         currentFragment.setArguments(bundle);
@@ -168,7 +187,7 @@ public class EmbarkationActivity extends AppCompatActivity
                     setPassengerManifestFragment();
                 } else{
                     // get chance passenger destination
-                    final String[] destinations = {"Caltex", "STC Campus"};
+                    final String[] destinations = possibleDestinations;
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setTitle("Choose Chance Passenger Destination");
                     builder.setItems(destinations, new DialogInterface.OnClickListener() {
@@ -186,7 +205,7 @@ public class EmbarkationActivity extends AppCompatActivity
                             // get any manifest passenger's disembarkation point since they all have the same disembarkation point
                             cv.put(DBContract.Passenger.COLUMN_DISEMBARKATION_PT, selectedTrip.getStringFromDB(getApplicationContext(),
                                     DBContract.Passenger.COLUMN_DISEMBARKATION_PT,
-                                    id,
+                                    selectedTrip.getPassengerIDList().get(0),
                                     DBContract.Passenger.TABLE_PASSENGER,
                                     DBContract.Passenger.COLUMN_PASSENGER_ID));
                             cv.put(DBContract.Passenger.COLUMN_DESTINATION, chanceDestination);

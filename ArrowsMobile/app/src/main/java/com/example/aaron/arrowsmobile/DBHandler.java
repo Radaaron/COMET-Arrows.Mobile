@@ -113,7 +113,7 @@ public class DBHandler extends SQLiteOpenHelper{
 
         // Passenger1
         cv = new ContentValues();
-        cv.put(DBContract.Passenger.COLUMN_PASSENGER_ID, 11407883);
+        cv.put(DBContract.Passenger.COLUMN_PASSENGER_ID, 11407884);
         cv.put(DBContract.Passenger.COLUMN_FEEDBACK_ON, "none");
         cv.put(DBContract.Passenger.COLUMN_FEEDBACK, 0);
         cv.putNull(DBContract.Passenger.COLUMN_TAP_IN);

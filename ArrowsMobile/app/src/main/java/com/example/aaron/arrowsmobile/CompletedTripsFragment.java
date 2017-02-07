@@ -40,9 +40,9 @@ public class CompletedTripsFragment extends Fragment implements OnTripSelectedLi
 
         // check if trip is pending
         for(int i = 0 ; i < fullList.size(); i++){
-            arrivalTime = tripList.get(i).getStringFromDB(this.getContext(),
+            arrivalTime = fullList.get(i).getStringFromDB(this.getContext(),
                     DBContract.Trip.COLUMN_ARRIVAL_TIME,
-                    tripList.get(i).getTripID(),
+                    fullList.get(i).getTripID(),
                     DBContract.Trip.TABLE_TRIP,
                     DBContract.Trip.COLUMN_TRIP_ID);
             if(arrivalTime != null){

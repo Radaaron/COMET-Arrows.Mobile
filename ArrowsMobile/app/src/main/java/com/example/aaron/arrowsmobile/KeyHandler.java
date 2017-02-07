@@ -144,12 +144,30 @@ public class KeyHandler implements Parcelable{
         parcel.writeList(this.stopIDList);
     }
 
+    // refreshes list of passengerID's in case of a chance passenger
+    public void refreshPassengerIDList(){
+        SQLiteDatabase db = dbHandler.getReadableDatabase();
+        Cursor cursor = db.query(DBContract.Passenger.TABLE_PASSENGER, null, null, null, null, null, null);
+        if(cursor.moveToFirst()){
+            do{
+                if(!(passengerIDList.contains(cursor.getInt(cursor.getColumnIndex(DBContract.Passenger.COLUMN_PASSENGER_ID))))) {
+                    passengerIDList.add(cursor.getInt(cursor.getColumnIndex(DBContract.Passenger.COLUMN_PASSENGER_ID)));
+                }
+            }while(cursor.moveToNext());
+        }
+        else{
+            Log.e(TAG, "passengerIDList refresh failed!");
+        }
+        cursor.close();
+        db.close();
+    }
+
     // handles the returning of string values from db
     public String getStringFromDB(Context context, String column, Object selected, String table, String id) {
         dbHandler = new DBHandler(context);
+        String temp = null;
         SQLiteDatabase db = dbHandler.getReadableDatabase();
         String[] columns = {""}, selection = {""};
-
         columns[0] = column;
         selection[0] = String.valueOf(selected);
         Cursor cursor = db.query(table,
@@ -160,14 +178,14 @@ public class KeyHandler implements Parcelable{
                 null,
                 null);
         if(cursor.moveToFirst()){
-            return cursor.getString(cursor.getColumnIndex(column));
+            temp = cursor.getString(cursor.getColumnIndex(column));
         }
         else{
             Log.e(TAG, "getStringFromDB() failed!");
         }
         cursor.close();
         db.close();
-        return null;
+        return temp;
     }
 
     // handles the returning of int values from db
@@ -175,7 +193,7 @@ public class KeyHandler implements Parcelable{
         dbHandler = new DBHandler(context);
         SQLiteDatabase db = dbHandler.getReadableDatabase();
         String[] columns = {""}, selection = {""};
-
+        int temp = -1 ;
         columns[0] = column;
         selection[0] = String.valueOf(selected);
         Cursor cursor = db.query(table,
@@ -186,14 +204,14 @@ public class KeyHandler implements Parcelable{
                 null,
                 null);
         if(cursor.moveToFirst()){
-            return cursor.getInt(cursor.getColumnIndex(column));
+            temp =  cursor.getInt(cursor.getColumnIndex(column));
         }
         else{
             Log.e(TAG, "getIntFromDB() failed!");
         }
         cursor.close();
         db.close();
-        return -1;
+        return temp;
     }
 
     // handles the returning of double values from db
@@ -201,7 +219,7 @@ public class KeyHandler implements Parcelable{
         dbHandler = new DBHandler(context);
         SQLiteDatabase db = dbHandler.getReadableDatabase();
         String[] columns = {""}, selection = {""};
-
+        double temp = -1;
         columns[0] = column;
         selection[0] = String.valueOf(selected);
         Cursor cursor = db.query(table,
@@ -212,14 +230,14 @@ public class KeyHandler implements Parcelable{
                 null,
                 null);
         if(cursor.moveToFirst()){
-            return cursor.getDouble(cursor.getColumnIndex(column));
+            temp = cursor.getDouble(cursor.getColumnIndex(column));
         }
         else{
             Log.e(TAG, "getIntFromDB() failed!");
         }
         cursor.close();
         db.close();
-        return -1.0;
+        return temp;
     }
 
     // handles the returning of double values from db
@@ -227,7 +245,7 @@ public class KeyHandler implements Parcelable{
         dbHandler = new DBHandler(context);
         SQLiteDatabase db = dbHandler.getReadableDatabase();
         String[] columns = {""}, selection = {""};
-
+        boolean temp = false;
         columns[0] = column;
         selection[0] = String.valueOf(selected);
         Cursor cursor = db.query(table,
@@ -238,14 +256,14 @@ public class KeyHandler implements Parcelable{
                 null,
                 null);
         if(cursor.moveToFirst()){
-            return cursor.getInt(cursor.getColumnIndex(column)) > 0;
+            temp = cursor.getInt(cursor.getColumnIndex(column)) > 0;
         }
         else{
             Log.e(TAG, "getIntFromDB() failed!");
         }
         cursor.close();
         db.close();
-        return false;
+        return temp;
     }
 
 }

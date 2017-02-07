@@ -16,7 +16,7 @@ import java.util.ArrayList;
 public class AllTripsFragment extends Fragment implements OnTripSelectedListener{
 
     private OnFragmentInteractionListener mListener;
-    private ArrayList<Trip> tripList;
+    private ArrayList<KeyHandler> tripList;
 
     public AllTripsFragment() {
         // Required empty public constructor
@@ -35,7 +35,7 @@ public class AllTripsFragment extends Fragment implements OnTripSelectedListener
         RecyclerView rv = (RecyclerView) rootView.findViewById(R.id.all_trips_recycler_view);
         rv.setHasFixedSize(true);
         tripList = getArguments().getParcelableArrayList("tripList");
-        TripRecyclerAdapter adapter = new TripRecyclerAdapter(tripList, this);
+        TripRecyclerAdapter adapter = new TripRecyclerAdapter(tripList, this, getContext());
         rv.setAdapter(adapter);
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         rv.setLayoutManager(llm);

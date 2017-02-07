@@ -17,8 +17,8 @@ import java.util.ArrayList;
 public class PassengerManifestFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
-    private Trip selectedTrip;
-    private ArrayList<Passenger> passengerList;
+    private KeyHandler selectedTrip;
+    private ArrayList<Integer> passengerList;
 
     public PassengerManifestFragment() {
         // Required empty public constructor
@@ -33,16 +33,19 @@ public class PassengerManifestFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_passenger_manifest, container, false);
         selectedTrip = getArguments().getParcelable("selectedTrip");
-        ArrayList<Passenger> fullList = selectedTrip.getPassengerList();
         passengerList = new ArrayList<>();
         // check if passenger is part of passenger manifest
-        for(int i = 0 ; i < fullList.size(); i++){
-            if(!fullList.get(i).isChance()){
-                passengerList.add(fullList.get(i));
+        for(int i = 0 ; i < selectedTrip.getPassengerIDList().size(); i++){
+            if(!(selectedTrip.getBooleanFromDB(getContext(),
+                    DBContract.Passenger.COLUMN_IS_CHANCE,
+                    selectedTrip.getPassengerIDList().get(i),
+                    DBContract.Passenger.TABLE_PASSENGER,
+                    DBContract.Passenger.COLUMN_PASSENGER_ID))){
+                passengerList.add(selectedTrip.getPassengerIDList().get(i));
             }
         }
         RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.passenger_manifest_recycler_view);
-        PassengerRecyclerAdapter adapter = new PassengerRecyclerAdapter(passengerList);
+        PassengerRecyclerAdapter adapter = new PassengerRecyclerAdapter(passengerList, getContext());
         recyclerView.setAdapter(adapter);
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), llm.getOrientation());

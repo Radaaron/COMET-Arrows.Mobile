@@ -16,7 +16,7 @@ import java.util.ArrayList;
 public class PendingTripsFragment extends Fragment implements OnTripSelectedListener{
 
     private OnFragmentInteractionListener mListener;
-    private ArrayList<Trip> tripList;
+    private ArrayList<KeyHandler> tripList;
 
     public PendingTripsFragment() {
         // Required empty public constructor
@@ -34,15 +34,26 @@ public class PendingTripsFragment extends Fragment implements OnTripSelectedList
         View rootView = inflater.inflate(R.layout.fragment_pending_trips, container, false);
         RecyclerView rv = (RecyclerView) rootView.findViewById(R.id.pending_trips_recycler_view);
         rv.setHasFixedSize(true);
-        ArrayList<Trip> fullList = getArguments().getParcelableArrayList("tripList");
+        ArrayList<KeyHandler> fullList = getArguments().getParcelableArrayList("tripList");
         tripList = new ArrayList<>();
+        String[] columns = {""}, selection = {""};
+        String arrivalTime = "";
+
         // check if trip is pending
         for(int i = 0 ; i < fullList.size(); i++){
-            if(fullList.get(i).getArrivalTime() == null){
+
+            arrivalTime = tripList.get(i).getStringFromDB(this.getContext(),
+                    DBContract.Trip.COLUMN_ARRIVAL_TIME,
+                    tripList.get(i).getTripID(),
+                    DBContract.Trip.TABLE_TRIP,
+                    DBContract.Trip.COLUMN_TRIP_ID);
+
+            if(arrivalTime == null){
                 tripList.add(fullList.get(i));
             }
         }
-        TripRecyclerAdapter adapter = new TripRecyclerAdapter(tripList, this);
+
+        TripRecyclerAdapter adapter = new TripRecyclerAdapter(tripList, this, getContext());
         rv.setAdapter(adapter);
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         rv.setLayoutManager(llm);

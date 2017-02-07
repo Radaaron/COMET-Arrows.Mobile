@@ -10,31 +10,33 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:theme="@style/ThemeOverlay.AppCompat.Dark"
-    android:weightSum="1">
+    android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         app:srcCompat="@drawable/templogo"
-        android:id="@+id/imageView" />
+        android:id="@+id/imageView"
+        android:gravity="bottom"/>
 
     <TextView
         android:text="Arrows Express"
-        android:textAlignment="center"
-        android:padding="2dp"
+        android:id="@+id/appNameView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/appNameView"
-        android:layout_weight="0.48" />
+        android:textSize="16sp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:fontFamily="sans-serif"/>
 
     <TextView
-        android:text=" "
-        android:textAlignment="center"
-        android:padding="2dp"
+        android:text="xx/xx/xxxx"
+        android:id="@+id/dateView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/dateView"
-        android:layout_weight="0.29" />
+        android:textSize="16sp"
+        android:paddingTop="4dp"
+        android:paddingBottom="2dp"
+        android:fontFamily="sans-serif"/>
 
 </LinearLayout>

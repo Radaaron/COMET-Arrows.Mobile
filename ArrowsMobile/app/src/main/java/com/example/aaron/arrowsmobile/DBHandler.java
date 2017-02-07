@@ -7,17 +7,17 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 
 import static android.content.ContentValues.TAG;
 
 public class DBHandler extends SQLiteOpenHelper{
 
     final static String SCHEMA = "arrowsDB.db";
+    SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+    SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
 
     public DBHandler(Context context) {
         super(context, SCHEMA, null, 1);
@@ -121,7 +121,7 @@ public class DBHandler extends SQLiteOpenHelper{
         cv.put(DBContract.Passenger.COLUMN_DISEMBARKATION_PT, "Manila Campus");
         cv.put(DBContract.Passenger.COLUMN_DESTINATION, "STC CAMPUS");
         cv.put(DBContract.Passenger.COLUMN_IS_CHANCE, false);
-        cv.put(DBContract.Passenger.COLUMN_TRIP, 0000000001);
+        cv.put(DBContract.Passenger.COLUMN_PASSENGER_TRIP, 0000000001);
         insertTest = db.insert(DBContract.Passenger.TABLE_PASSENGER, null, cv);
         if(dbInsertTest(insertTest)){
             return false;
@@ -232,136 +232,106 @@ public class DBHandler extends SQLiteOpenHelper{
         return true;
     }
 
-    // getting mock values (testing only)
-    public ArrayList<Trip> getAllTrips(){
+    public ArrayList<KeyHandler> getTripKeyHolderList(){
+        ArrayList<KeyHandler> keyHandlerList = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
-        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        Cursor cTrip = db.query(DBContract.Trip.TABLE_TRIP, null, null, null, null, null, null);
+        if(cTrip.moveToFirst()) {
+            KeyHandler keyHandler = null;
+            int tripID = 0, driverID = 0, tripSchedID = 0, routeID = 0, lineID = 0;
+            String vehicleID = null, order = null;
+            String[] columns = {""}, selection = {""};
+            ArrayList<Integer> stopIDList = new ArrayList<>(), passengerIDList = new ArrayList<>();
+            do {
+                tripID = cTrip.getInt(cTrip.getColumnIndex(DBContract.Trip.COLUMN_TRIP_ID));
+                vehicleID = cTrip.getString(cTrip.getColumnIndex(DBContract.Trip.COLUMN_TRIP_VEHICLE));
+                driverID = cTrip.getInt(cTrip.getColumnIndex(DBContract.Trip.COLUMN_TRIP_DRIVER));
+                tripSchedID = cTrip.getInt(cTrip.getColumnIndex(DBContract.Trip.COLUMN_TRIP_TRIP_SCHED));
 
-        // inside out format: Stop -> RouteStop|Line -> Route -> TripSched|Vehicle|Driver|Passengers -> Trips
-        Cursor c = db.query(DBContract.Stop.TABLE_STOP, null, null, null, null, null, null);
-        ArrayList<Stop> stopList = new ArrayList();
-        if(c.moveToFirst()){
-            do{
-                Stop stop = new Stop(c.getInt(c.getColumnIndex(DBContract.Stop.COLUMN_STOP_ID)), c.getString(c.getColumnIndex(DBContract.Stop.COLUMN_STOP_NAME)), c.getString(c.getColumnIndex(DBContract.Stop.COLUMN_LATITUDE)), c.getString(c.getColumnIndex(DBContract.Stop.COLUMN_LONGITUDE)));
-                stopList.add(stop);
-            } while( c.moveToNext());
-        }
-
-        c = db.query(DBContract.RouteStop.TABLE_ROUTE_STOP, null, null, null, null, null, null);
-        ArrayList<RouteStop> routeStopList = new ArrayList();
-        int i = 0; // one to one
-        if(c.moveToFirst()){
-            do{
-                RouteStop routeStop = new RouteStop(c.getString(c.getColumnIndex(DBContract.RouteStop.COLUMN_STOP_NUM)), c.getInt(c.getColumnIndex(DBContract.RouteStop.COLUMN_ORDER)), stopList.get(i));
-                routeStopList.add(routeStop);
-                i++;
-            } while( c.moveToNext());
-        }
-
-        c = db.query(DBContract.Line.TABLE_LINE, null, null, null, null, null, null);
-        ArrayList<Line> lineList = new ArrayList();
-        if(c.moveToFirst()){
-            do{
-                Line line = new Line(c.getInt(c.getColumnIndex(DBContract.Line.COLUMN_LINE_NUM)), c.getString(c.getColumnIndex(DBContract.Line.COLUMN_LINE_NAME)));
-                lineList.add(line);
-            } while( c.moveToNext());
-        }
-
-        c = db.query(DBContract.Route.TABLE_ROUTE, null, null, null, null, null, null);
-        ArrayList<Route> routeList = new ArrayList();
-        i = 0; // one to one
-        if(c.moveToFirst()){
-            do{
-                Route route = new Route(c.getInt(c.getColumnIndex(DBContract.Route.COLUMN_ROUTE_ID)), c.getString(c.getColumnIndex(DBContract.Route.COLUMN_ROUTE_NAME)), c.getString(c.getColumnIndex(DBContract.Route.COLUMN_ROUTE_DESCRIPTION)), lineList.get(i), routeStopList);
-                routeList.add(route);
-                i++;
-            } while( c.moveToNext());
-        }
-
-        c = db.query(DBContract.TripSched.TABLE_TRIP_SCHED, null, null, null, null, null, null);
-        ArrayList<TripSched> tripSchedList = new ArrayList();
-        i = 0; // one to one
-        if(c.moveToFirst()){
-            Date date = null;
-            Calendar tripSchedDepTime = Calendar.getInstance();
-            do{
-                String depTime = c.getString(c.getColumnIndex(DBContract.TripSched.COLUMN_DEP_TIME));
-                try {
-                    date = timeFormat.parse(depTime);
-                } catch (ParseException e) {
-                    Log.e(TAG, "Parsing ISO8601 datetime failed", e);
+                // get routeID from tripSchedID route foreign key
+                columns[0] = DBContract.TripSched.COLUMN_TRIP_SCHED_ROUTE;
+                selection[0] = String.valueOf(tripSchedID);
+                Cursor cRoute = db.query(DBContract.TripSched.TABLE_TRIP_SCHED,
+                        columns,
+                        " " + DBContract.TripSched.COLUMN_TRIP_SCHED_ID + " = ? ",
+                        selection,
+                        null,
+                        null,
+                        null);
+                if(cRoute.moveToFirst()){
+                    routeID = cRoute.getInt(cRoute.getColumnIndex(DBContract.TripSched.COLUMN_TRIP_SCHED_ROUTE));
                 }
-                tripSchedDepTime.setTime(date);
-                TripSched tripSched = new TripSched(c.getInt(c.getColumnIndex(DBContract.TripSched.COLUMN_TRIP_SCHED_ID)), c.getString(c.getColumnIndex(DBContract.TripSched.COLUMN_TRIP_NUM)), tripSchedDepTime, routeList.get(i));
-                tripSchedList.add(tripSched);
-                i++;
-            } while( c.moveToNext());
-        }
-
-        c = db.query(DBContract.Vehicle.TABLE_VEHICLE, null, null, null, null, null, null);
-        ArrayList<Vehicle> vehicleList = new ArrayList();
-        if(c.moveToFirst()){
-            do{
-                Vehicle vehicle = new Vehicle(c.getString(c.getColumnIndex(DBContract.Vehicle.COLUMN_VEHICLE_ID)), c.getString(c.getColumnIndex(DBContract.Vehicle.COLUMN_VEHICLE_TYPE)), c.getInt(c.getColumnIndex(DBContract.Vehicle.COLUMN_CAPACITY)), c.getString(c.getColumnIndex(DBContract.Vehicle.COLUMN_IMAGE)), c.getString(c.getColumnIndex(DBContract.Vehicle.COLUMN_PLATE_NUM)), c.getString(c.getColumnIndex(DBContract.Vehicle.COLUMN_MODEL)), c.getString(c.getColumnIndex(DBContract.Vehicle.COLUMN_BRAND)));
-                vehicleList.add(vehicle);
-            } while( c.moveToNext());
-        }
-
-        c = db.query(DBContract.Driver.TABLE_DRIVER, null, null, null, null, null, null);
-        ArrayList<Driver> driverList = new ArrayList();
-        if(c.moveToFirst()){
-            do{
-                Driver driver = new Driver(c.getInt(c.getColumnIndex(DBContract.Driver.COLUMN_DRIVER_ID)), c.getString(c.getColumnIndex(DBContract.Driver.COLUMN_LAST_NAME)), c.getString(c.getColumnIndex(DBContract.Driver.COLUMN_FIRST_NAME)), c.getString(c.getColumnIndex(DBContract.Driver.COLUMN_NICKNAME)));
-                driverList.add(driver);
-            } while( c.moveToNext());
-        }
-
-        c = db.query(DBContract.Passenger.TABLE_PASSENGER, null, null, null, null, null, null);
-        ArrayList<Passenger> passengerList = new ArrayList();
-        if(c.moveToFirst()){
-            // just set them later when they tap in / out
-            Calendar tapIn = null, tapOut = null;
-            boolean isChance;
-            do{
-                isChance = c.getInt(c.getColumnIndex(DBContract.Passenger.COLUMN_IS_CHANCE)) > 0;
-                Passenger passenger = new Passenger(c.getInt(c.getColumnIndex(DBContract.Passenger.COLUMN_PASSENGER_ID)), c.getString(c.getColumnIndex(DBContract.Passenger.COLUMN_FEEDBACK_ON)), c.getInt(c.getColumnIndex(DBContract.Passenger.COLUMN_FEEDBACK)), tapIn, tapOut, c.getString(c.getColumnIndex(DBContract.Passenger.COLUMN_DISEMBARKATION_PT)), c.getString(c.getColumnIndex(DBContract.Passenger.COLUMN_DESTINATION)), isChance);
-                passengerList.add(passenger);
-            } while( c.moveToNext());
-        }
-
-        c = db.query(DBContract.Trip.TABLE_TRIP, null, null, null, null, null, null);
-        ArrayList<Trip> tripList = new ArrayList<>();
-        i = 0; // one to one
-        if(c.moveToFirst()){
-            Date date = null;
-            Calendar tripDate = Calendar.getInstance(), depTime = Calendar.getInstance(), arrivalTime = null;
-            boolean isSpecial;
-            String tripDateTime;
-            do{
-                tripDateTime = c.getString(c.getColumnIndex(DBContract.Trip.COLUMN_TRIP_DATE));
-                try {
-                    date = dateFormat.parse(tripDateTime);
-                } catch (ParseException e) {
-                    Log.e(TAG, "Parsing ISO8601 datetime failed", e);
+                else{
+                    Log.e(TAG, "routeID foreign key NOT FOUND");
                 }
-                tripDate.setTime(date);
-                tripDateTime = c.getString(c.getColumnIndex(DBContract.Trip.COLUMN_DEP_TIME));
-                try {
-                    date = timeFormat.parse(tripDateTime);
-                } catch (ParseException e) {
-                    Log.e(TAG, "Parsing ISO8601 datetime failed", e);
+                cRoute.close();
+
+                // get lineID from routeID line foreign key
+                columns[0] = DBContract.Route.COLUMN_ROUTE_LINE;
+                selection[0] = String.valueOf(routeID);
+                Cursor cLine = db.query(DBContract.Route.TABLE_ROUTE,
+                        columns,
+                        " " + DBContract.Route.COLUMN_ROUTE_ID + " = ? ",
+                        selection,
+                        null,
+                        null,
+                        null);
+                if(cLine.moveToFirst()){
+                    lineID = cLine.getInt(cLine.getColumnIndex(DBContract.Route.COLUMN_ROUTE_LINE));
                 }
-                depTime.setTime(date);
-                isSpecial = c.getInt(c.getColumnIndex(DBContract.Trip.COLUMN_IS_SPECIAL)) > 0;
-                Trip trip = new Trip(c.getInt(c.getColumnIndex(DBContract.Trip.COLUMN_TRIP_ID)), c.getString(c.getColumnIndex(DBContract.Trip.COLUMN_REMARKS)), tripDate, depTime, arrivalTime, c.getDouble(c.getColumnIndex(DBContract.Trip.COLUMN_DURATION)), isSpecial, c.getInt(c.getColumnIndex(DBContract.Trip.COLUMN_SP_NUM_PASS)), c.getString(c.getColumnIndex(DBContract.Trip.COLUMN_PURPOSE)), tripSchedList.get(i), vehicleList.get(i), driverList.get(i), passengerList);
-                i++;
-                tripList.add(trip);
-            } while( c.moveToNext());
+                else{
+                    Log.e(TAG, "routeID foreign key NOT FOUND");
+                }
+                cLine.close();
+
+                // get list of stopID using routestops junction table routeID relationship
+                columns[0] = DBContract.RouteStop.COLUMN_ROUTE_STOP_STOP;
+                selection[0] = String.valueOf(routeID);
+                order = DBContract.RouteStop.COLUMN_ORDER + " ASC";
+                Cursor cStop = db.query(DBContract.RouteStop.TABLE_ROUTE_STOP,
+                        columns,
+                        " " + DBContract.RouteStop.COLUMN_ROUTE_STOP_ROUTE + " = ? ",
+                        selection,
+                        null,
+                        null,
+                        null);
+                if(cStop.moveToFirst()){
+                    do{
+                        stopIDList.add(cStop.getInt(cStop.getColumnIndex((DBContract.RouteStop.COLUMN_ROUTE_STOP_STOP))));
+                    } while( cStop.moveToNext());
+                }
+                else{
+                    Log.e(TAG, "stopID foreign keys NOT FOUND");
+                }
+                cStop.close();
+
+                // get list of passengerID using passenger tripID foreign key
+                columns[0] = DBContract.Passenger.COLUMN_PASSENGER_ID;
+                selection[0] = String.valueOf(tripID);
+                Cursor cPassenger = db.query(DBContract.Passenger.TABLE_PASSENGER,
+                        columns,
+                        " " + DBContract.Passenger.COLUMN_PASSENGER_TRIP + " = ? ",
+                        selection,
+                        null,
+                        null,
+                        null);
+                if(cPassenger.moveToFirst()){
+                    do{
+                        passengerIDList.add(cPassenger.getInt(cPassenger.getColumnIndex((DBContract.Passenger.COLUMN_PASSENGER_ID))));
+                    } while( cPassenger.moveToNext());
+                }
+                else{
+                    Log.e(TAG, "tripID passenger foreign keys NOT FOUND");
+                }
+                cPassenger.close();
+
+                keyHandler = new KeyHandler(tripID, vehicleID, passengerIDList, driverID, tripSchedID, routeID, lineID, stopIDList);
+                keyHandlerList.add(keyHandler);
+            } while (cTrip.moveToNext());
+            cTrip.close();
         }
         db.close();
-        c.close();
-        return tripList;
+        return keyHandlerList;
     }
 
 }

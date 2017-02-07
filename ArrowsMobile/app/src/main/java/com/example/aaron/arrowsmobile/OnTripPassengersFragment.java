@@ -17,8 +17,8 @@ import java.util.ArrayList;
 public class OnTripPassengersFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
-    private Trip selectedTrip;
-    private ArrayList<Passenger> passengerList;
+    private KeyHandler selectedTrip;
+    private ArrayList<Integer> passengerList;
 
     public OnTripPassengersFragment() {
         // Required empty public constructor
@@ -33,9 +33,9 @@ public class OnTripPassengersFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_trip_passengers, container, false);
         selectedTrip = getArguments().getParcelable("selectedTrip");
-        passengerList = selectedTrip.getPassengerList();
+        passengerList = selectedTrip.getPassengerIDList();
         RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.trip_passengers_recycler_view);
-        PassengerRecyclerAdapter adapter = new PassengerRecyclerAdapter(passengerList);
+        PassengerRecyclerAdapter adapter = new PassengerRecyclerAdapter(passengerList, getContext());
         recyclerView.setAdapter(adapter);
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), llm.getOrientation());

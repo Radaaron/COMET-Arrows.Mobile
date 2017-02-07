@@ -1,8 +1,10 @@
 package com.example.aaron.arrowsmobile;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,14 +20,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
 public class TripActivity extends AppCompatActivity implements View.OnClickListener, OnFragmentInteractionListener, OnTripStopListener{
 
     DBHandler dbHandler;
-    Trip selectedTrip;
-    ArrayList<Passenger> passengerList;
+    KeyHandler selectedTrip;
+    ArrayList<Stop> stopList;
     Fragment currentFragment;
     LocationManager locationManager;
     GPSHandler gpsHandler;
@@ -42,15 +45,18 @@ public class TripActivity extends AppCompatActivity implements View.OnClickListe
         nextStopButton = (Button) findViewById(R.id.next_stop_button);
         nextStopButton.setOnClickListener(this);
         locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
-
-        // get access to DB and retrieve trip details
-        dbHandler = new DBHandler(this);
+        // retrieve list of stops and passengers
+        dbHandler = new DBHandler(getApplicationContext());
         selectedTrip = getIntent().getParcelableExtra("selectedTrip");
-        gpsHandler = new GPSHandler(selectedTrip.getTripSched().getRoute().getRouteStopList(), this);
-        passengerList = selectedTrip.getPassengerList();
-        setTitle("Trip Route: " + selectedTrip.getTripSched().getRoute().getRouteName());
+        populateStopList();
+        gpsHandler = new GPSHandler(stopList, this);
+        setTitle("Trip Route: " + selectedTrip.getStringFromDB(getApplicationContext(),
+                DBContract.Route.COLUMN_ROUTE_NAME,
+                selectedTrip.getRouteID(),
+                DBContract.Route.TABLE_ROUTE,
+                DBContract.Route.COLUMN_ROUTE_ID));
         // set first stop text
-        nextStop = selectedTrip.getTripSched().getRoute().getRouteStop(0).getStop().getStopName();
+        nextStop = stopList.get(0).getStopName();
         nextStopButton.setText("Next Stop: " + nextStop);
         nextStopButton.setEnabled(false);
         // start scanning
@@ -98,11 +104,16 @@ public class TripActivity extends AppCompatActivity implements View.OnClickListe
             // nothing lol
         } else if(resultCode == RESULT_OK){
             String id = data.getStringExtra("id");
-            for(int i = 0; i < selectedTrip.getPassengerCount(); i++){
-                if(Integer.toString(selectedTrip.getPassenger(i).getPassengerID()).equals(id)){
+            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+            Calendar cal;
+            SQLiteDatabase db = dbHandler.getWritableDatabase();
+            ContentValues cv = new ContentValues();
+            for(int i = 0; i < selectedTrip.getPassengerIDList().size(); i++){
+                if(Integer.toString(selectedTrip.getPassengerIDList().get(i)).equals(id)){
                     // set passenger tap out
-                    Calendar cal = Calendar.getInstance();
-                    selectedTrip.getPassenger(i).setTapOut(cal);
+                    cal = Calendar.getInstance();
+                    cv.put(DBContract.Passenger.COLUMN_TAP_OUT, timeFormat.format(cal.getTime()));
+                    db.update(DBContract.Passenger.TABLE_PASSENGER, cv, DBContract.Passenger.COLUMN_PASSENGER_ID + "="+id, null);
                 }
             }
             // resume scanning
@@ -128,8 +139,14 @@ public class TripActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View view) {
         if (view.getId()== R.id.next_stop_button) {
+            // update trip arrival time
+            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+            SQLiteDatabase db = dbHandler.getWritableDatabase();
+            ContentValues cv = new ContentValues();
             Calendar cal = Calendar.getInstance();
-            selectedTrip.setArrivalTime(cal);
+            cv.put(DBContract.Trip.COLUMN_ARRIVAL_TIME, timeFormat.format(cal.getTime()));
+            db.update(DBContract.Trip.TABLE_TRIP, cv, DBContract.Trip.COLUMN_TRIP_ID + "=" +selectedTrip.getTripID(), null);
+            // go back to landing activity for new trip
             Intent intent = new Intent();
             intent.putExtra("next", "Landing");
             setResult(Activity.RESULT_OK, intent);
@@ -165,6 +182,35 @@ public class TripActivity extends AppCompatActivity implements View.OnClickListe
         // nothing
     }
 
+    public void populateStopList(){
+        stopList = new ArrayList<>();
+        for(int i = 0; i < selectedTrip.getStopIDList().size(); i++){
+            Stop stop = new Stop(
+                    selectedTrip.getIntFromDB(getApplicationContext(),
+                            DBContract.Stop.COLUMN_STOP_ID,
+                            selectedTrip.getStopIDList().get(i),
+                            DBContract.Stop.TABLE_STOP,
+                            DBContract.Stop.COLUMN_STOP_ID),
+                    selectedTrip.getStringFromDB(getApplicationContext(),
+                            DBContract.Stop.COLUMN_STOP_NAME,
+                            selectedTrip.getStopIDList().get(i),
+                            DBContract.Stop.TABLE_STOP,
+                            DBContract.Stop.COLUMN_STOP_ID),
+                    selectedTrip.getStringFromDB(getApplicationContext(),
+                            DBContract.Stop.COLUMN_LONGITUDE,
+                            selectedTrip.getStopIDList().get(i),
+                            DBContract.Stop.TABLE_STOP,
+                            DBContract.Stop.COLUMN_STOP_ID),
+                    selectedTrip.getStringFromDB(getApplicationContext(),
+                            DBContract.Stop.COLUMN_LONGITUDE,
+                            selectedTrip.getStopIDList().get(i),
+                            DBContract.Stop.TABLE_STOP,
+                            DBContract.Stop.COLUMN_STOP_ID)
+            );
+            stopList.add(stop);
+        }
+    }
+
     @Override
     public void OnTripStopArrival(String stopName) {
         if(stopName != null){
@@ -177,20 +223,20 @@ public class TripActivity extends AppCompatActivity implements View.OnClickListe
                 int i = 0;
                 int nextStopPosition = 0;
                 boolean found = false;
-                while(i < selectedTrip.getTripSched().getRoute().getRouteStopList().size() && !(found)){
-                    if(selectedTrip.getTripSched().getRoute().getRouteStop(i).getStop().getStopName().equals(stopName)){
-                        currentStop = selectedTrip.getTripSched().getRoute().getRouteStop(i).getStop().getStopName();
+                while(i < stopList.size() && !(found)){
+                    if(stopList.get(i).getStopName().equals(stopName)){
+                        currentStop = stopList.get(i).getStopName();
                         found = true;
                         nextStopPosition = i + 1;
                     }
                     i++;
                 }
-                if(nextStopPosition == selectedTrip.getTripSched().getRoute().getRouteStopList().size()){
+                if(nextStopPosition == stopList.size()){
                     nextStop = null;
                     nextStopButton.setText("End Trip");
                     nextStopButton.setEnabled(true);
                 } else {
-                    nextStop = selectedTrip.getTripSched().getRoute().getRouteStop(nextStopPosition).getStop().getStopName();
+                    nextStop = stopList.get(nextStopPosition).getStopName();
                     nextStopButton.setText("Next Stop: " + nextStop);
                 }
             }

@@ -1,5 +1,6 @@
 package com.example.aaron.arrowsmobile;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,7 +12,9 @@ import java.util.ArrayList;
 
 public class PassengerRecyclerAdapter extends RecyclerView.Adapter<PassengerRecyclerAdapter.ViewHolder> {
 
-    private ArrayList<Passenger> mDataset;
+    private ArrayList<Integer> mDataset;
+    KeyHandler keyHandler;
+    Context context;
 
     // Provide a reference to the views for each data item
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -26,8 +29,10 @@ public class PassengerRecyclerAdapter extends RecyclerView.Adapter<PassengerRecy
         }
     }
 
-        public PassengerRecyclerAdapter(ArrayList<Passenger> myDataset) {
+        public PassengerRecyclerAdapter(ArrayList<Integer> myDataset, Context context) {
             this.mDataset = myDataset;
+            this.keyHandler = new KeyHandler();
+            this.context = context;
         }
 
         // Create new views (invoked by the layout manager)
@@ -43,13 +48,21 @@ public class PassengerRecyclerAdapter extends RecyclerView.Adapter<PassengerRecy
         // Fills the contents of a view, tags each card, and implements onclick listener to return selected trip index
         @Override
         public void onBindViewHolder(final PassengerRecyclerAdapter.ViewHolder holder, int position) {
-            holder.passengerIdView.setText(Integer.toString(mDataset.get(position).getPassengerID()));
+            holder.passengerIdView.setText(Integer.toString(mDataset.get(position)));
             // check if the passenger id has already been tapped in and out
             for(int i = 0; i < mDataset.size(); i++){
-                if(mDataset.get(i).getTapIn() != null){
+                if(keyHandler.getStringFromDB(context,
+                        DBContract.Passenger.COLUMN_TAP_IN,
+                        Integer.toString(mDataset.get(i)),
+                        DBContract.Passenger.TABLE_PASSENGER,
+                        DBContract.Passenger.COLUMN_PASSENGER_ID) != null){
                     holder.passengerCheckInBox.setChecked(true);
                     holder.passengerCheckInBox.setEnabled(false);
-                    if(mDataset.get(i).getTapOut() != null){
+                    if(keyHandler.getStringFromDB(context,
+                            DBContract.Passenger.COLUMN_TAP_OUT,
+                            Integer.toString(mDataset.get(i)),
+                            DBContract.Passenger.TABLE_PASSENGER,
+                            DBContract.Passenger.COLUMN_PASSENGER_ID) != null){
                         holder.passengerCheckOutBox.setChecked(true);
                         holder.passengerCheckOutBox.setEnabled(false);
                     }

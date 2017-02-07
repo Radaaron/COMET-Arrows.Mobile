@@ -1,8 +1,10 @@
 package com.example.aaron.arrowsmobile;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -26,7 +28,7 @@ public class EmbarkationActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnFragmentInteractionListener, View.OnClickListener {
 
     DBHandler dbHandler;
-    Trip selectedTrip;
+    KeyHandler selectedTrip;
     Fragment currentFragment;
     String chanceDestination = null;
 
@@ -48,17 +50,34 @@ public class EmbarkationActivity extends AppCompatActivity
         TextView dateView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.nav_date_view);
         TextView timeView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.nav_time_view);
         TextView routeView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.nav_route_view);
-        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
 
         // get access to DB and retrieve trip details
         dbHandler = new DBHandler(this);
         selectedTrip = getIntent().getParcelableExtra("selectedTrip");
-        dateView.setText(dateFormat.format(selectedTrip.getTripDate().getTime()));
-        timeView.setText(timeFormat.format(selectedTrip.getDepTime().getTime()));
-        routeView.setText(selectedTrip.getTripSched().getRoute().getRouteName());
+
+        dateView.setText(selectedTrip.getStringFromDB(getApplicationContext(),
+                DBContract.Trip.COLUMN_TRIP_DATE,
+                selectedTrip.getTripID(),
+                DBContract.Trip.TABLE_TRIP,
+                DBContract.Trip.COLUMN_TRIP_ID));
+
+        timeView.setText(selectedTrip.getStringFromDB(getApplicationContext(),
+                DBContract.Trip.COLUMN_DEP_TIME,
+                selectedTrip.getTripID(),
+                DBContract.Trip.TABLE_TRIP,
+                DBContract.Trip.COLUMN_TRIP_ID));
+
+        routeView.setText(selectedTrip.getStringFromDB(getApplicationContext(),
+                DBContract.Route.COLUMN_ROUTE_NAME,
+                selectedTrip.getRouteID(),
+                DBContract.Route.TABLE_ROUTE,
+                DBContract.Route.COLUMN_ROUTE_ID));
 
         // initially commit passenger manifest fragment
+        setPassengerManifestFragment();
+    }
+
+    public void setPassengerManifestFragment(){
         Bundle bundle = new Bundle();
         bundle.putParcelable("selectedTrip", selectedTrip);
         currentFragment = new PassengerManifestFragment();
@@ -66,7 +85,18 @@ public class EmbarkationActivity extends AppCompatActivity
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.embarkation_fragment_container, currentFragment);
         setTitle("Passenger Manifest");
-        fragmentTransaction.commit();
+        fragmentTransaction.commitAllowingStateLoss();
+    }
+
+    public void setChanceFragment(){
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("selectedTrip", selectedTrip);
+        currentFragment = new ChancePassengersFragment();
+        currentFragment.setArguments(bundle);
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.embarkation_fragment_container, currentFragment);
+        setTitle("Chance Passengers");
+        fragmentTransaction.commitAllowingStateLoss();
     }
 
     @Override
@@ -104,23 +134,9 @@ public class EmbarkationActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.nav_passenger_manifest && !(currentFragment instanceof PassengerManifestFragment)) {
-            Bundle bundle = new Bundle();
-            bundle.putParcelable("selectedTrip", selectedTrip);
-            currentFragment = new PassengerManifestFragment();
-            currentFragment.setArguments(bundle);
-            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.embarkation_fragment_container, currentFragment);
-            setTitle("Passenger Manifest");
-            fragmentTransaction.commit();
+            setPassengerManifestFragment();
         } else if (id == R.id.nav_chance_passengers && !(currentFragment instanceof ChancePassengersFragment)) {
-            Bundle bundle = new Bundle();
-            bundle.putParcelable("selectedTrip", selectedTrip);
-            currentFragment = new ChancePassengersFragment();
-            currentFragment.setArguments(bundle);
-            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.embarkation_fragment_container, currentFragment);
-            setTitle("Chance Passengers");
-            fragmentTransaction.commit();
+            setChanceFragment();
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.embarkation_drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -129,44 +145,27 @@ public class EmbarkationActivity extends AppCompatActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+        SQLiteDatabase db = dbHandler.getWritableDatabase();
         if (resultCode == RESULT_CANCELED) {
             // no change, just refresh whatever the current fragment is
             if(currentFragment instanceof PassengerManifestFragment){
-                Bundle bundle = new Bundle();
-                bundle.putParcelable("selectedTrip", selectedTrip);
-                currentFragment = new PassengerManifestFragment();
-                currentFragment.setArguments(bundle);
-                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.embarkation_fragment_container, currentFragment);
-                setTitle("Passenger Manifest");
-                fragmentTransaction.commitAllowingStateLoss(); // needed because its commiting after savedInstanceState
+                setPassengerManifestFragment();
             } else if(currentFragment instanceof ChancePassengersFragment){
-                Bundle bundle = new Bundle();
-                bundle.putParcelable("selectedTrip", selectedTrip);
-                currentFragment = new ChancePassengersFragment();
-                currentFragment.setArguments(bundle);
-                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.embarkation_fragment_container, currentFragment);
-                setTitle("Chance Passengers");
-                fragmentTransaction.commitAllowingStateLoss();
+                setChanceFragment();
             }
         } else if(resultCode == RESULT_OK){
             final String id = data.getStringExtra("id");
             // check whether id is in manifest or is chance passenger
-            for(int i = 0; i < selectedTrip.getPassengerCount(); i++){
-                if(Integer.toString(selectedTrip.getPassenger(i).getPassengerID()).equals(id)){
+            for(int i = 0; i < selectedTrip.getPassengerIDList().size(); i++){
+                if(Integer.toString(selectedTrip.getPassengerIDList().get(i)).equals(id)){
                     // set existing passenger tap in
                     Calendar cal = Calendar.getInstance();
-                    selectedTrip.getPassenger(i).setTapIn(cal);
+                    ContentValues cv = new ContentValues();
+                    cv.put(DBContract.Passenger.COLUMN_TAP_IN, timeFormat.format(cal.getTime()));
+                    db.update(DBContract.Passenger.TABLE_PASSENGER, cv, DBContract.Passenger.COLUMN_PASSENGER_ID + "=" +id, null);
                     // refresh passenger manifest
-                    Bundle bundle = new Bundle();
-                    bundle.putParcelable("selectedTrip", selectedTrip);
-                    currentFragment = new PassengerManifestFragment();
-                    currentFragment.setArguments(bundle);
-                    FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                    fragmentTransaction.replace(R.id.embarkation_fragment_container, currentFragment);
-                    setTitle("Passenger Manifest");
-                    fragmentTransaction.commitAllowingStateLoss();
+                    setPassengerManifestFragment();
                 } else{
                     // get chance passenger destination
                     final String[] destinations = {"Caltex", "STC Campus"};
@@ -177,31 +176,31 @@ public class EmbarkationActivity extends AppCompatActivity
                             chanceDestination = destinations[which];
                             // add new passenger
                             Calendar cal = Calendar.getInstance();
-                            Passenger chancePass = new Passenger(Integer.parseInt(id), "", 0, cal, null, selectedTrip.getPassenger(0).getDisembarkationPt(), chanceDestination, true);
-                            selectedTrip.addToPassengerList(chancePass);
+                            SQLiteDatabase db = dbHandler.getWritableDatabase();
+                            ContentValues cv = new ContentValues();
+                            cv.put(DBContract.Passenger.COLUMN_PASSENGER_ID, id);
+                            cv.put(DBContract.Passenger.COLUMN_FEEDBACK_ON, "");
+                            cv.put(DBContract.Passenger.COLUMN_FEEDBACK, 0);
+                            cv.put(DBContract.Passenger.COLUMN_TAP_IN, timeFormat.format(cal.getTime()));
+                            cv.put(DBContract.Passenger.COLUMN_TAP_OUT, (byte[]) null);
+                            // get any manifest passenger's disembarkation point since they all have the same disembarkation point
+                            cv.put(DBContract.Passenger.COLUMN_DISEMBARKATION_PT, selectedTrip.getStringFromDB(getApplicationContext(),
+                                    DBContract.Passenger.COLUMN_DISEMBARKATION_PT,
+                                    id,
+                                    DBContract.Passenger.TABLE_PASSENGER,
+                                    DBContract.Passenger.COLUMN_PASSENGER_ID));
+                            cv.put(DBContract.Passenger.COLUMN_DESTINATION, chanceDestination);
+                            cv.put(DBContract.Passenger.COLUMN_IS_CHANCE, true);
+                            db.insert(DBContract.Passenger.TABLE_PASSENGER, null, cv);
                             // refresh chance passengers
-                            Bundle bundle = new Bundle();
-                            bundle.putParcelable("selectedTrip", selectedTrip);
-                            currentFragment = new ChancePassengersFragment();
-                            currentFragment.setArguments(bundle);
-                            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                            fragmentTransaction.replace(R.id.embarkation_fragment_container, currentFragment);
-                            setTitle("Chance Passengers");
-                            fragmentTransaction.commitAllowingStateLoss();
+                            setChanceFragment();
                         }
                     });
                     builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             chanceDestination = null;
                             // refresh chance passengers
-                            Bundle bundle = new Bundle();
-                            bundle.putParcelable("selectedTrip", selectedTrip);
-                            currentFragment = new ChancePassengersFragment();
-                            currentFragment.setArguments(bundle);
-                            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                            fragmentTransaction.replace(R.id.embarkation_fragment_container, currentFragment);
-                            setTitle("Chance Passengers");
-                            fragmentTransaction.commitAllowingStateLoss();
+                            setChanceFragment();
                         }
                     });
                     AlertDialog dialog = builder.create();
@@ -211,14 +210,23 @@ public class EmbarkationActivity extends AppCompatActivity
         }
     }
 
-    public int remainingSpace(Trip selectedTrip){
-        int free = selectedTrip.getVehicle().getCapacity();
-        for(int i = 0; i < selectedTrip.getPassengerCount(); i++){
-            if(selectedTrip.getPassenger(i).getTapIn() != null){
-                free--;
+    // checks the remaining space by vehicle capacity minus the number of tapped in passengers
+    public int remainingSpace(KeyHandler selectedTrip){
+        int capacity = selectedTrip.getIntFromDB(getApplicationContext(),
+                DBContract.Vehicle.COLUMN_CAPACITY,
+                selectedTrip.getVehicleID(),
+                DBContract.Vehicle.TABLE_VEHICLE,
+                DBContract.Vehicle.COLUMN_VEHICLE_ID);
+        for(int i = 0; i < selectedTrip.getPassengerIDList().size(); i++){
+            if(selectedTrip.getStringFromDB(getApplicationContext(),
+                    DBContract.Passenger.COLUMN_TAP_IN,
+                    selectedTrip.getPassengerIDList().get(i),
+                    DBContract.Passenger.TABLE_PASSENGER,
+                    DBContract.Passenger.COLUMN_PASSENGER_ID) != null){
+                capacity--;
             }
         }
-        return free;
+        return capacity;
     }
 
     @Override
@@ -247,12 +255,7 @@ public class EmbarkationActivity extends AppCompatActivity
                     public void onClick(DialogInterface dialog, int id) {
                         Bundle bundle = new Bundle();
                         bundle.putParcelable("selectedTrip", selectedTrip);
-                        currentFragment = new ChancePassengersFragment();
-                        currentFragment.setArguments(bundle);
-                        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                        fragmentTransaction.replace(R.id.embarkation_fragment_container, currentFragment);
-                        setTitle("Chance Passengers");
-                        fragmentTransaction.commitAllowingStateLoss();
+                        setChanceFragment();
                     }
                 });
                 AlertDialog dialog = builder.create();

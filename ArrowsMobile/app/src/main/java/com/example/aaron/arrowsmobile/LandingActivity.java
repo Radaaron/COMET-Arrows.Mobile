@@ -25,7 +25,7 @@ public class LandingActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnFragmentInteractionListener{
 
     DBHandler dbHandler;
-    ArrayList<Trip> tripList;
+    ArrayList<KeyHandler> tripList;
     TextView dateView;
     Calendar calendar;
     Fragment currentFragment;
@@ -46,12 +46,12 @@ public class LandingActivity extends AppCompatActivity
         dateView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.dateView);
         calendar = Calendar.getInstance(); // gets date
         SimpleDateFormat date = new SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH);
-        dateView.append("" + date.format(calendar.getTime())); // displays date
+        dateView.setText("" + date.format(calendar.getTime())); // displays date
         setTitle("" + date.format(calendar.getTime()));
 
         // retrieve data for recycler view
         dbHandler = new DBHandler(this);
-        tripList = dbHandler.getAllTrips();
+        tripList = dbHandler.getTripKeyHolderList();
 
         // initially commit all trips fragment
         Bundle bundle = new Bundle();
@@ -136,23 +136,11 @@ public class LandingActivity extends AppCompatActivity
     @Override
     public void onFragmentInteraction(Object object) {
         Intent intent = new Intent();
-        Trip selectedTrip = (Trip) object;
+        KeyHandler selectedTrip = (KeyHandler) object;
         intent.putExtra("next", "Embarkation");
         intent.putExtra("selectedTrip", selectedTrip);
         setResult(Activity.RESULT_OK, intent);
         finish();
-    }
-
-    public ArrayList<Trip> getTripList(String type){
-        ArrayList<Trip> tripList = null;
-        if(type.equals("all")){
-
-        }else if(type.equals("pended")){
-
-        } else if(type.equals("completed")){
-
-        }
-        return tripList;
     }
 
 }

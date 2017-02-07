@@ -4,20 +4,18 @@ package com.example.aaron.arrowsmobile;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.Calendar;
-
 public class Passenger implements Parcelable{
 
     private int passengerID;
     private String feedbackOn;
     private int feedback;
-    private Calendar tapIn;
-    private Calendar tapOut;
+    private String tapIn;
+    private String tapOut;
     private String disembarkationPt;
     private String destination;
     private boolean isChance;
 
-    public Passenger(int passengerID, String feedbackOn, int feedback, Calendar tapIn, Calendar tapOut, String disembarkationPt, String destination, Boolean isChance) {
+    public Passenger(int passengerID, String feedbackOn, int feedback, String tapIn, String tapOut, String disembarkationPt, String destination, Boolean isChance) {
         this.passengerID = passengerID;
         this.feedbackOn = feedbackOn;
         this.feedback = feedback;
@@ -32,8 +30,8 @@ public class Passenger implements Parcelable{
         this.passengerID = in.readInt();
         this.feedbackOn = in.readString();
         this.feedback = in.readInt();
-        this.tapIn = (Calendar) in.readSerializable();
-        this.tapOut = (Calendar) in.readSerializable();
+        this.tapIn = (String) in.readSerializable();
+        this.tapOut = (String) in.readSerializable();
         this.disembarkationPt = in.readString();
         this.destination = in.readString();
         this.isChance = in.readByte() != 0;
@@ -100,19 +98,19 @@ public class Passenger implements Parcelable{
         this.disembarkationPt = disembarkationPt;
     }
 
-    public Calendar getTapOut() {
+    public String getTapOut() {
         return this.tapOut;
     }
 
-    public void setTapOut(Calendar tapOut) {
+    public void setTapOut(String tapOut) {
         this.tapOut = tapOut;
     }
 
-    public Calendar getTapIn() {
+    public String getTapIn() {
         return this.tapIn;
     }
 
-    public void setTapIn(Calendar tapIn) {
+    public void setTapIn(String tapIn) {
         this.tapIn = tapIn;
     }
 

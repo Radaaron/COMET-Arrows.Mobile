@@ -1,5 +1,6 @@
 package com.example.aaron.arrowsmobile;
 
+import android.content.Context;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -7,14 +8,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 public class TripRecyclerAdapter extends RecyclerView.Adapter<TripRecyclerAdapter.ViewHolder> {
 
     private OnTripSelectedListener tripSelectedListener;
     private int selected = -1;
-    private ArrayList<Trip> mDataset;
+    private ArrayList<KeyHandler> mDataset;
+    Context context;
+    String depTime = "", routeName = "";
+    int passengerCount = 0, vehicleCapacity = 0;
 
     // Provide a reference to the views for each data item
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -31,9 +34,10 @@ public class TripRecyclerAdapter extends RecyclerView.Adapter<TripRecyclerAdapte
         }
     }
 
-    public TripRecyclerAdapter(ArrayList<Trip> myDataset, OnTripSelectedListener listener) {
+    public TripRecyclerAdapter(ArrayList<KeyHandler> myDataset, OnTripSelectedListener listener, Context context) {
         this.mDataset = myDataset;
         this.tripSelectedListener = listener;
+        this.context = context;
     }
 
     // Create new views (invoked by the layout manager)
@@ -49,11 +53,11 @@ public class TripRecyclerAdapter extends RecyclerView.Adapter<TripRecyclerAdapte
     // Fills the contents of a view, tags each card, and implements onclick listener to return selected trip index
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
-        holder.tripTimeView.setText(timeFormat.format(mDataset.get(position).getDepTime().getTime()));
-        holder.tripRouteView.setText(mDataset.get(position).getTripSched().getRoute().getRouteName());
+        populateCardItem(position);
+        holder.tripTimeView.setText(depTime);
+        holder.tripRouteView.setText(routeName);
         // "passenger count / capacity"
-        holder.tripCapacityView.setText(mDataset.get(position).getPassengerCount() + "/" + mDataset.get(position).getVehicle().getCapacity());
+        holder.tripCapacityView.setText(passengerCount + "/" + vehicleCapacity);
         holder.tripCardView.setTag(position);
         holder.tripCardView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,6 +66,28 @@ public class TripRecyclerAdapter extends RecyclerView.Adapter<TripRecyclerAdapte
                 tripSelectedListener.onTripSelect(selected);
             }
         });
+    }
+
+    public void populateCardItem(int position){
+        depTime = mDataset.get(position).getStringFromDB(context,
+                DBContract.Trip.COLUMN_DEP_TIME,
+                mDataset.get(position).getTripID(),
+                DBContract.Trip.TABLE_TRIP,
+                DBContract.Trip.COLUMN_TRIP_ID);
+
+        routeName = mDataset.get(position).getStringFromDB(context,
+                DBContract.Route.COLUMN_ROUTE_NAME,
+                mDataset.get(position).getRouteID(),
+                DBContract.Route.TABLE_ROUTE,
+                DBContract.Route.COLUMN_ROUTE_ID);
+
+        passengerCount = mDataset.get(position).getPassengerIDList().size();
+
+        vehicleCapacity = mDataset.get(position).getIntFromDB(context,
+                DBContract.Vehicle.COLUMN_CAPACITY,
+                mDataset.get(position).getVehicleID(),
+                DBContract.Vehicle.TABLE_VEHICLE,
+                DBContract.Vehicle.COLUMN_VEHICLE_ID);
     }
 
     // Return the size of dataset (invoked by the layout manager)

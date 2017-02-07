@@ -4,7 +4,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
 
 public class Trip implements Parcelable{
@@ -12,9 +11,9 @@ public class Trip implements Parcelable{
     // entity fields
     private int tripID;
     private String remarks;
-    private Calendar tripDate;
-    private Calendar depTime;
-    private Calendar arrivalTime;
+    private String tripDate;
+    private String depTime;
+    private String arrivalTime;
     private double duration;
     private boolean isSpecial;
     private int spNumPass;
@@ -25,7 +24,7 @@ public class Trip implements Parcelable{
     private Driver driver;
     private ArrayList<Passenger> passengerList;
 
-    public Trip(int tripID, String remarks, Calendar tripDate, Calendar depTime, Calendar arrivalTime, double duration, boolean isSpecial, int spNumPass, String purpose, TripSched tripSched, Vehicle vehicle, Driver driver, ArrayList<Passenger> passengerList) {
+    public Trip(int tripID, String remarks, String tripDate, String depTime, String arrivalTime, double duration, boolean isSpecial, int spNumPass, String purpose, TripSched tripSched, Vehicle vehicle, Driver driver, ArrayList<Passenger> passengerList) {
         this.tripID = tripID;
         this.remarks = remarks;
         this.tripDate = tripDate;
@@ -44,9 +43,9 @@ public class Trip implements Parcelable{
     protected Trip(Parcel in) {
         this.tripID = in.readInt();
         this.remarks = in.readString();
-        this.tripDate = (Calendar) in.readSerializable();
-        this.depTime = (Calendar) in.readSerializable();
-        this.arrivalTime = (Calendar) in.readSerializable();
+        this.tripDate = (String) in.readSerializable();
+        this.depTime = (String) in.readSerializable();
+        this.arrivalTime = (String) in.readSerializable();
         this.duration = in.readDouble();
         this.isSpecial = in.readByte() != 0;
         this.spNumPass = in.readInt();
@@ -133,27 +132,27 @@ public class Trip implements Parcelable{
         this.duration = duration;
     }
 
-    public Calendar getArrivalTime() {
+    public String getArrivalTime() {
         return this.arrivalTime;
     }
 
-    public void setArrivalTime(Calendar arrivalTime) {
+    public void setArrivalTime(String arrivalTime) {
         this.arrivalTime = arrivalTime;
     }
 
-    public Calendar getDepTime() {
+    public String getDepTime() {
         return this.depTime;
     }
 
-    public void setDepTime(Calendar depTime) {
+    public void setDepTime(String depTime) {
         this.depTime = depTime;
     }
 
-    public Calendar getTripDate() {
+    public String getTripDate() {
         return this.tripDate;
     }
 
-    public void setTripDate(Calendar tripDate) {
+    public void setTripDate(String tripDate) {
         this.tripDate = tripDate;
     }
 

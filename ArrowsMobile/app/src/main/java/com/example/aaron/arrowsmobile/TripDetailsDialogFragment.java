@@ -14,12 +14,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import java.text.SimpleDateFormat;
-
 public class TripDetailsDialogFragment extends DialogFragment implements View.OnClickListener{
 
     OnFragmentInteractionListener mListener;
-    Trip selectedTrip;
+    KeyHandler selectedTrip;
     TextView tripDateView;
     TextView tripDepartureTimeView;
     TextView tripRouteView;
@@ -61,14 +59,47 @@ public class TripDetailsDialogFragment extends DialogFragment implements View.On
         embarkationStart = (Button) rootView.findViewById(R.id.start_embarkation_button);
         embarkationStart.setOnClickListener(this);
 
-        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
-        tripDateView.setText(dateFormat.format(selectedTrip.getTripDate().getTime()));
-        tripDepartureTimeView.setText(timeFormat.format(selectedTrip.getDepTime().getTime()));
-        tripRouteView.setText(selectedTrip.getTripSched().getRoute().getRouteName());
-        tripDriverView.setText(selectedTrip.getDriver().getFirstName() + " " + selectedTrip.getDriver().getLastName());
-        tripVehicleView.setText(selectedTrip.getVehicle().getModel());
-        tripPlateView.setText(selectedTrip.getVehicle().getPlateNum());
+        tripDateView.setText(selectedTrip.getStringFromDB(this.getContext(),
+                DBContract.Trip.COLUMN_TRIP_DATE,
+                selectedTrip.getTripID(),
+                DBContract.Trip.TABLE_TRIP,
+                DBContract.Trip.COLUMN_TRIP_ID));
+
+        tripDepartureTimeView.setText(selectedTrip.getStringFromDB(this.getContext(),
+                DBContract.Trip.COLUMN_DEP_TIME,
+                selectedTrip.getTripID(),
+                DBContract.Trip.TABLE_TRIP,
+                DBContract.Trip.COLUMN_TRIP_ID));
+
+        tripRouteView.setText(selectedTrip.getStringFromDB(this.getContext(),
+                DBContract.Route.COLUMN_ROUTE_NAME,
+                selectedTrip.getRouteID(),
+                DBContract.Route.TABLE_ROUTE,
+                DBContract.Route.COLUMN_ROUTE_ID));
+
+        tripDriverView.setText(selectedTrip.getStringFromDB(this.getContext(),
+                DBContract.Driver.COLUMN_FIRST_NAME,
+                selectedTrip.getDriverID(),
+                DBContract.Driver.TABLE_DRIVER,
+                DBContract.Driver.COLUMN_DRIVER_ID));
+
+        tripDriverView.append(" " + selectedTrip.getStringFromDB(this.getContext(),
+                DBContract.Driver.COLUMN_LAST_NAME,
+                selectedTrip.getDriverID(),
+                DBContract.Driver.TABLE_DRIVER,
+                DBContract.Driver.COLUMN_DRIVER_ID));
+
+        tripVehicleView.setText(selectedTrip.getStringFromDB(this.getContext(),
+                DBContract.Vehicle.COLUMN_MODEL,
+                selectedTrip.getVehicleID(),
+                DBContract.Vehicle.TABLE_VEHICLE,
+                DBContract.Vehicle.COLUMN_VEHICLE_ID));
+
+        tripPlateView.setText(selectedTrip.getStringFromDB(this.getContext(),
+                DBContract.Vehicle.COLUMN_PLATE_NUM,
+                selectedTrip.getVehicleID(),
+                DBContract.Vehicle.TABLE_VEHICLE,
+                DBContract.Vehicle.COLUMN_VEHICLE_ID));
 
         return rootView;
     }
@@ -113,4 +144,5 @@ public class TripDetailsDialogFragment extends DialogFragment implements View.On
             dismiss();
         }
     }
+
 }

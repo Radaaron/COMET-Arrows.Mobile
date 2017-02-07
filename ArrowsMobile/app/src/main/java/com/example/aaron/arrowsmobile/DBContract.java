@@ -70,7 +70,7 @@ public final class DBContract {
         public static final String COLUMN_DISEMBARKATION_PT = "disembarkation_pt";
         public static final String COLUMN_DESTINATION = "destination";
         public static final String COLUMN_IS_CHANCE = "is_chance";
-        public static final String COLUMN_TRIP = "trip";
+        public static final String COLUMN_PASSENGER_TRIP = "trip";
     }
 
     public static class Reservation implements BaseColumns{
@@ -86,7 +86,7 @@ public final class DBContract {
         public static final String COLUMN_ROUTE_ID = "route_id";
         public static final String COLUMN_ROUTE_NAME = "route_name";
         public static final String COLUMN_ROUTE_DESCRIPTION = "route_description";
-        public static final String COLUMN_ROUTE_LINE = "route";
+        public static final String COLUMN_ROUTE_LINE = "route_line";
     }
 
     public static class RouteStop implements BaseColumns{
@@ -224,8 +224,8 @@ public final class DBContract {
             + Passenger.COLUMN_DISEMBARKATION_PT + " VARCHAR, "
             + Passenger.COLUMN_DESTINATION + " VARCHAR, "
             + Passenger.COLUMN_IS_CHANCE + " BOOLEAN, "
-            + Passenger.COLUMN_TRIP + " INTEGER, "
-            + " FOREIGN KEY ( " + Passenger.COLUMN_TRIP + " ) REFERENCES " + TABLE_TRIP + "( " + Trip.COLUMN_TRIP_ID + " ))";
+            + Passenger.COLUMN_PASSENGER_TRIP + " INTEGER, "
+            + " FOREIGN KEY ( " + Passenger.COLUMN_PASSENGER_TRIP + " ) REFERENCES " + TABLE_TRIP + "( " + Trip.COLUMN_TRIP_ID + " ))";
 
     public static final String CREATE_TABLE_RESERVATION = "CREATE TABLE "
             + Reservation.TABLE_RESERVATION + " ("

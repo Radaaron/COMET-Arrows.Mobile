@@ -24,16 +24,15 @@ public class MainActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK) {
             String next = data.getStringExtra("next");
             if(next.equals("Landing")){
-                Trip finishedTrip = data.getParcelableExtra("selectedTrip");
-                Intent intent = new Intent(this, TripActivity.class);
+                Intent intent = new Intent(this, LandingActivity.class);
                 startActivityForResult(intent, 1);
             } else if(next.equals("Embarkation")){
-                Trip selectedTrip = data.getParcelableExtra("selectedTrip");
+                KeyHandler selectedTrip = data.getParcelableExtra("selectedTrip");
                 Intent intent = new Intent(this, EmbarkationActivity.class);
                 intent.putExtra("selectedTrip", selectedTrip);
                 startActivityForResult(intent, 1);
             } else if(next.equals("Trip")){
-                Trip onTrip = data.getParcelableExtra("selectedTrip");
+                KeyHandler onTrip = data.getParcelableExtra("selectedTrip");
                 Intent intent = new Intent(this, TripActivity.class);
                 intent.putExtra("selectedTrip", onTrip);
                 startActivityForResult(intent, 1);

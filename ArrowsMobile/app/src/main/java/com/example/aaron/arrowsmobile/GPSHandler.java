@@ -14,9 +14,9 @@ public class GPSHandler implements LocationListener {
     private ArrayList<GPSFence> fenceList = null;
     private OnTripStopListener mListener;
 
-    GPSHandler(ArrayList<RouteStop> routeStops, OnTripStopListener listener){
+    GPSHandler(ArrayList<Stop> stopList, OnTripStopListener listener){
         fenceList = new ArrayList<>();
-        populateFenceList(routeStops);
+        populateFenceList(stopList);
         mListener = listener;
     }
 
@@ -59,9 +59,9 @@ public class GPSHandler implements LocationListener {
     }
 
     // fills up fenceList with GPSFence objects with parameters from Constants
-    public void populateFenceList(ArrayList<RouteStop> routeStops){
-        for(int i = 0; i < routeStops.size(); i++){
-            GPSFence fence = new GPSFence(routeStops.get(i).getStop().getStopName(), Double.parseDouble(routeStops.get(i).getStop().getLongitude()), Double.parseDouble(routeStops.get(i).getStop().getLatitude()), 5.00);
+    public void populateFenceList(ArrayList<Stop> stopList){
+        for(int i = 0; i < stopList.size(); i++){
+            GPSFence fence = new GPSFence(stopList.get(i).getStopName(), Double.parseDouble(stopList.get(i).getLongitude()), Double.parseDouble(stopList.get(i).getLatitude()), 5.00);
             fenceList.add(fence);
         }
     }

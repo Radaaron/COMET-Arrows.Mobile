@@ -5,6 +5,7 @@ import android.provider.BaseColumns;
 import static com.example.aaron.arrowsmobile.DBContract.Stop.COLUMN_STOP_ID;
 import static com.example.aaron.arrowsmobile.DBContract.Trip.TABLE_TRIP;
 import static com.example.aaron.arrowsmobile.DBContract.TripSched.TABLE_TRIP_SCHED;
+import static com.example.aaron.arrowsmobile.DBContract.User.TABLE_USER;
 
 public final class DBContract {
     // Contract class for database
@@ -70,7 +71,8 @@ public final class DBContract {
         public static final String COLUMN_DISEMBARKATION_PT = "disembarkation_pt";
         public static final String COLUMN_DESTINATION = "destination";
         public static final String COLUMN_IS_CHANCE = "is_chance";
-        public static final String COLUMN_PASSENGER_TRIP = "trip";
+        public static final String COLUMN_PASSENGER_TRIP = "passenger_trip";
+        public static final String COLUMN_PASSENGER_USER = "passenger_user";
     }
 
     public static class Reservation implements BaseColumns{
@@ -225,7 +227,9 @@ public final class DBContract {
             + Passenger.COLUMN_DESTINATION + " VARCHAR, "
             + Passenger.COLUMN_IS_CHANCE + " BOOLEAN, "
             + Passenger.COLUMN_PASSENGER_TRIP + " INTEGER, "
-            + " FOREIGN KEY ( " + Passenger.COLUMN_PASSENGER_TRIP + " ) REFERENCES " + TABLE_TRIP + "( " + Trip.COLUMN_TRIP_ID + " ))";
+            + Passenger.COLUMN_PASSENGER_USER + " INTEGER, "
+            + " FOREIGN KEY ( " + Passenger.COLUMN_PASSENGER_TRIP + " ) REFERENCES " + TABLE_TRIP + "( " + Trip.COLUMN_TRIP_ID + " ),"
+            + " FOREIGN KEY ( " + Passenger.COLUMN_PASSENGER_USER + " ) REFERENCES " + TABLE_USER + "( " + User.COLUMN_ID_NUM + " ))";
 
     public static final String CREATE_TABLE_RESERVATION = "CREATE TABLE "
             + Reservation.TABLE_RESERVATION + " ("
@@ -298,7 +302,7 @@ public final class DBContract {
 
 
     public static final String CREATE_TABLE_USER = "CREATE TABLE "
-            + User.TABLE_USER + " ("
+            + TABLE_USER + " ("
             + User.COLUMN_ID_NUM + " INTEGER PRIMARY KEY, "
             + User.COLUMN_NAME + " VARCHAR, "
             + User.COLUMN_EMAIL + " VARCHAR, "
@@ -339,7 +343,7 @@ public final class DBContract {
     public static final String DELETE_SYSTEM_CONFIG = "DROP TABLE IF EXISTS " + SystemConfig.TABLE_SYSTEM_CONFIG;
     public static final String DELETE_TRIP = "DROP TABLE IF EXISTS " + TABLE_TRIP;
     public static final String DELETE_TRIP_SCHED = "DROP TABLE IF EXISTS " + TABLE_TRIP_SCHED;
-    public static final String DELETE_USER = "DROP TABLE IF EXISTS " + User.TABLE_USER;
+    public static final String DELETE_USER = "DROP TABLE IF EXISTS " + TABLE_USER;
     public static final String DELETE_USER_TYPE = "DROP TABLE IF EXISTS " + UserType.TABLE_USER_TYPE;
     public static final String DELETE_VEHICLE = "DROP TABLE IF EXISTS " + Vehicle.TABLE_VEHICLE;
 

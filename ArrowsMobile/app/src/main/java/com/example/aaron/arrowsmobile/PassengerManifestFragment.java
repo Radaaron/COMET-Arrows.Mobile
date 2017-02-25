@@ -45,7 +45,7 @@ public class PassengerManifestFragment extends Fragment {
             }
         }
         RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.passenger_manifest_recycler_view);
-        PassengerRecyclerAdapter adapter = new PassengerRecyclerAdapter(passengerList, getContext());
+        EmbarkationPassengerRecyclerAdapter adapter = new EmbarkationPassengerRecyclerAdapter(passengerList, getContext());
         recyclerView.setAdapter(adapter);
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), llm.getOrientation());

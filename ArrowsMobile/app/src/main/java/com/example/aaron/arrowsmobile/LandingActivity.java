@@ -47,16 +47,16 @@ public class LandingActivity extends AppCompatActivity
         calendar = Calendar.getInstance(); // gets date
         SimpleDateFormat date = new SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH);
         dateView.setText("" + date.format(calendar.getTime())); // displays date
-        setTitle("" + date.format(calendar.getTime()));
+        setTitle("Upcoming Trips");
 
         // retrieve data for recycler view
         dbHandler = new DBHandler(this);
         tripList = dbHandler.getTripKeyHolderList();
 
-        // initially commit all trips fragment
+        // commit upcoming trips fragment
         Bundle bundle = new Bundle();
         bundle.putParcelableArrayList("tripList", tripList);
-        currentFragment = new AllTripsFragment();
+        currentFragment = new UpcomingTripsFragment();
         currentFragment.setArguments(bundle);
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.landing_fragment_container, currentFragment);
@@ -77,7 +77,7 @@ public class LandingActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.landing_drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else if(currentFragment instanceof AllTripsFragment || currentFragment instanceof PendingTripsFragment || currentFragment instanceof CompletedTripsFragment){
+        } else if(currentFragment instanceof UpcomingTripsFragment){
             // do nothing
         } else {
             super.onBackPressed();
@@ -101,32 +101,8 @@ public class LandingActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        if (id == R.id.nav_all_trips && !(currentFragment instanceof AllTripsFragment)) {
-            Bundle bundle = new Bundle();
-            bundle.putParcelableArrayList("tripList", tripList);
-            currentFragment = new AllTripsFragment();
-            currentFragment.setArguments(bundle);
-            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.landing_fragment_container, currentFragment);
-            fragmentTransaction.commit();
-        }
-        else if (id == R.id.nav_pending_trips && !(currentFragment instanceof PendingTripsFragment)) {
-            Bundle bundle = new Bundle();
-            bundle.putParcelableArrayList("tripList", tripList);
-            currentFragment = new PendingTripsFragment();
-            currentFragment.setArguments(bundle);
-            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.landing_fragment_container, currentFragment);
-            fragmentTransaction.commit();
-        }
-        else if (id == R.id.nav_completed_trips && !(currentFragment instanceof CompletedTripsFragment)) {
-            Bundle bundle = new Bundle();
-            bundle.putParcelableArrayList("tripList", tripList);
-            currentFragment = new CompletedTripsFragment();
-            currentFragment.setArguments(bundle);
-            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.landing_fragment_container, currentFragment);
-            fragmentTransaction.commit();
+        if (id == R.id.change_vehicle) {
+            // change vehicle
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.landing_drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

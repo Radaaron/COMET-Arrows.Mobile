@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import static android.content.ContentValues.TAG;
+import static com.example.aaron.arrowsmobile.DBContract.Passenger.COLUMN_PASSENGER_ID;
+import static com.example.aaron.arrowsmobile.DBContract.Passenger.COLUMN_PASSENGER_USER;
 
 public class DBHandler extends SQLiteOpenHelper{
 
@@ -113,7 +115,7 @@ public class DBHandler extends SQLiteOpenHelper{
 
         // Passenger1
         cv = new ContentValues();
-        cv.put(DBContract.Passenger.COLUMN_PASSENGER_ID, 11407884);
+        cv.put(COLUMN_PASSENGER_ID, 0000000001);
         cv.put(DBContract.Passenger.COLUMN_FEEDBACK_ON, "none");
         cv.put(DBContract.Passenger.COLUMN_FEEDBACK, 0);
         cv.putNull(DBContract.Passenger.COLUMN_TAP_IN);
@@ -122,6 +124,7 @@ public class DBHandler extends SQLiteOpenHelper{
         cv.put(DBContract.Passenger.COLUMN_DESTINATION, "STC CAMPUS");
         cv.put(DBContract.Passenger.COLUMN_IS_CHANCE, false);
         cv.put(DBContract.Passenger.COLUMN_PASSENGER_TRIP, 0000000001);
+        cv.put(COLUMN_PASSENGER_USER, 11407883);
         insertTest = db.insert(DBContract.Passenger.TABLE_PASSENGER, null, cv);
         if(dbInsertTest(insertTest)){
             return false;
@@ -229,6 +232,20 @@ public class DBHandler extends SQLiteOpenHelper{
             return false;
         }
 
+        // User1
+        cv = new ContentValues();
+        cv.put(DBContract.User.COLUMN_ID_NUM, 11407883);
+        cv.put(DBContract.User.COLUMN_NAME, "Aaron M. Candelaria");
+        cv.put(DBContract.User.COLUMN_EMAIL, "email@example.com");
+        cv.put(DBContract.User.COLUMN_EMERGENCY_CONTACT, "Emergency Contact");
+        cv.put(DBContract.User.COLUMN_EMERGENCY_CONTACT_NUM, "12345678911");
+        cv.put(DBContract.User.COLUMN_IS_ADMIN, false);
+        cv.putNull(DBContract.User.COLUMN_ADMIN_PASSWORD);
+        insertTest = db.insert(DBContract.User.TABLE_USER, null, cv);
+        if(dbInsertTest(insertTest)){
+            return false;
+        }
+
         return true;
     }
 
@@ -240,8 +257,8 @@ public class DBHandler extends SQLiteOpenHelper{
             KeyHandler keyHandler = null;
             int tripID = 0, driverID = 0, tripSchedID = 0, routeID = 0, lineID = 0;
             String vehicleID = null, order = null;
-            String[] columns = {""}, selection = {""};
-            ArrayList<Integer> stopIDList = new ArrayList<>(), passengerIDList = new ArrayList<>();
+            String[] columns = {"", null}, selection = {""};
+            ArrayList<Integer> stopIDList = new ArrayList<>(), passengerIDList = new ArrayList<>(), userIDList = new ArrayList<>();
             do {
                 tripID = cTrip.getInt(cTrip.getColumnIndex(DBContract.Trip.COLUMN_TRIP_ID));
                 vehicleID = cTrip.getString(cTrip.getColumnIndex(DBContract.Trip.COLUMN_TRIP_VEHICLE));
@@ -287,7 +304,6 @@ public class DBHandler extends SQLiteOpenHelper{
                 // get list of stopID using routestops junction table routeID relationship
                 columns[0] = DBContract.RouteStop.COLUMN_ROUTE_STOP_STOP;
                 selection[0] = String.valueOf(routeID);
-                order = DBContract.RouteStop.COLUMN_ORDER + " ASC";
                 Cursor cStop = db.query(DBContract.RouteStop.TABLE_ROUTE_STOP,
                         columns,
                         " " + DBContract.RouteStop.COLUMN_ROUTE_STOP_ROUTE + " = ? ",
@@ -305,8 +321,9 @@ public class DBHandler extends SQLiteOpenHelper{
                 }
                 cStop.close();
 
-                // get list of passengerID using passenger tripID foreign key
+                // get list of passengerID using passenger tripID foreign key while also populating the list of userID using userID foreign key
                 columns[0] = DBContract.Passenger.COLUMN_PASSENGER_ID;
+                columns[1] = DBContract.Passenger.COLUMN_PASSENGER_USER;
                 selection[0] = String.valueOf(tripID);
                 Cursor cPassenger = db.query(DBContract.Passenger.TABLE_PASSENGER,
                         columns,
@@ -318,6 +335,7 @@ public class DBHandler extends SQLiteOpenHelper{
                 if(cPassenger.moveToFirst()){
                     do{
                         passengerIDList.add(cPassenger.getInt(cPassenger.getColumnIndex((DBContract.Passenger.COLUMN_PASSENGER_ID))));
+                        userIDList.add(cPassenger.getInt(cPassenger.getColumnIndex((DBContract.Passenger.COLUMN_PASSENGER_USER))));
                     } while( cPassenger.moveToNext());
                 }
                 else{
@@ -325,7 +343,7 @@ public class DBHandler extends SQLiteOpenHelper{
                 }
                 cPassenger.close();
 
-                keyHandler = new KeyHandler(tripID, vehicleID, passengerIDList, driverID, tripSchedID, routeID, lineID, stopIDList);
+                keyHandler = new KeyHandler(tripID, vehicleID, passengerIDList, driverID, tripSchedID, routeID, lineID, stopIDList, userIDList);
                 keyHandlerList.add(keyHandler);
             } while (cTrip.moveToNext());
             cTrip.close();

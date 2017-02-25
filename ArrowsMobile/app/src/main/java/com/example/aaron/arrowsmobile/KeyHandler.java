@@ -17,6 +17,7 @@ public class KeyHandler implements Parcelable{
     private int tripID;
     private String vehicleID;
     private ArrayList<Integer> passengerIDList;
+    private ArrayList<Integer> userIDList;
     private int driverID;
     private int tripSchedID;
     private int routeID;
@@ -29,7 +30,7 @@ public class KeyHandler implements Parcelable{
         // empty constructor for method use only
     }
 
-    public KeyHandler(int tripID, String vehicleID, ArrayList<Integer> passengerIDList, int driverID, int tripSchedID, int routeID, int lineID, ArrayList<Integer> stopIDList) {
+    public KeyHandler(int tripID, String vehicleID, ArrayList<Integer> passengerIDList, int driverID, int tripSchedID, int routeID, int lineID, ArrayList<Integer> stopIDList, ArrayList<Integer> userIDList) {
         this.tripID = tripID;
         this.vehicleID = vehicleID;
         this.passengerIDList = passengerIDList;
@@ -38,6 +39,7 @@ public class KeyHandler implements Parcelable{
         this.routeID = routeID;
         this.lineID = lineID;
         this.stopIDList = stopIDList;
+        this.userIDList = userIDList;
     }
 
     protected KeyHandler(Parcel in) {
@@ -49,6 +51,7 @@ public class KeyHandler implements Parcelable{
         this.routeID = in.readInt();
         this.lineID = in.readInt();
         this.stopIDList = in.readArrayList(Integer.class.getClassLoader());
+        this.userIDList = in.readArrayList(Integer.class.getClassLoader());
     }
 
     public static final Creator<KeyHandler> CREATOR = new Creator<KeyHandler>() {
@@ -127,6 +130,14 @@ public class KeyHandler implements Parcelable{
         this.vehicleID = vehicleID;
     }
 
+    public ArrayList<Integer> getUserIDList() {
+        return userIDList;
+    }
+
+    public void setUserIDList(ArrayList<Integer> userIDList) {
+        this.userIDList = userIDList;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -142,24 +153,7 @@ public class KeyHandler implements Parcelable{
         parcel.writeInt(this.routeID);
         parcel.writeInt(this.lineID);
         parcel.writeList(this.stopIDList);
-    }
-
-    // refreshes list of passengerID's in case of a chance passenger
-    public void refreshPassengerIDList(){
-        SQLiteDatabase db = dbHandler.getReadableDatabase();
-        Cursor cursor = db.query(DBContract.Passenger.TABLE_PASSENGER, null, null, null, null, null, null);
-        if(cursor.moveToFirst()){
-            do{
-                if(!(passengerIDList.contains(cursor.getInt(cursor.getColumnIndex(DBContract.Passenger.COLUMN_PASSENGER_ID))))) {
-                    passengerIDList.add(cursor.getInt(cursor.getColumnIndex(DBContract.Passenger.COLUMN_PASSENGER_ID)));
-                }
-            }while(cursor.moveToNext());
-        }
-        else{
-            Log.e(TAG, "passengerIDList refresh failed!");
-        }
-        cursor.close();
-        db.close();
+        parcel.writeList(this.userIDList);
     }
 
     // handles the returning of string values from db
@@ -233,7 +227,7 @@ public class KeyHandler implements Parcelable{
             temp = cursor.getDouble(cursor.getColumnIndex(column));
         }
         else{
-            Log.e(TAG, "getIntFromDB() failed!");
+            Log.e(TAG, "getDoubleFromDB() failed!");
         }
         cursor.close();
         db.close();
@@ -259,7 +253,7 @@ public class KeyHandler implements Parcelable{
             temp = cursor.getInt(cursor.getColumnIndex(column)) > 0;
         }
         else{
-            Log.e(TAG, "getIntFromDB() failed!");
+            Log.e(TAG, "getBooleanFromDB() failed!");
         }
         cursor.close();
         db.close();

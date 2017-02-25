@@ -18,7 +18,7 @@ public class OnTripPassengersFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     private KeyHandler selectedTrip;
-    private ArrayList<Integer> passengerList;
+    private ArrayList<Integer> passengerList, onTripPassengerList;
 
     public OnTripPassengersFragment() {
         // Required empty public constructor
@@ -34,8 +34,19 @@ public class OnTripPassengersFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_trip_passengers, container, false);
         selectedTrip = getArguments().getParcelable("selectedTrip");
         passengerList = selectedTrip.getPassengerIDList();
+        // only show the passengers that have been tapped in
+        onTripPassengerList = new ArrayList<>();
+        for(int i = 0; i < passengerList.size(); i++){
+            if(selectedTrip.getStringFromDB(getContext(),
+                    DBContract.Passenger.COLUMN_TAP_IN,
+                    Integer.toString(passengerList.get(i)),
+                    DBContract.Passenger.TABLE_PASSENGER,
+                    DBContract.Passenger.COLUMN_PASSENGER_ID) != null){
+                onTripPassengerList.add(passengerList.get(i));
+            }
+        }
         RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.trip_passengers_recycler_view);
-        PassengerRecyclerAdapter adapter = new PassengerRecyclerAdapter(passengerList, getContext());
+        OnTripPassengerRecyclerAdapter adapter = new OnTripPassengerRecyclerAdapter(onTripPassengerList, getContext());
         recyclerView.setAdapter(adapter);
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), llm.getOrientation());

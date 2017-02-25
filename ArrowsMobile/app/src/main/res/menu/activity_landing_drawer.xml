@@ -3,19 +3,9 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_all_trips"
+            android:id="@+id/change_vehicle"
             android:icon="@drawable/bus"
-            android:title="All Trips" />
-
-        <item
-            android:id="@+id/nav_pending_trips"
-            android:icon="@drawable/bus"
-            android:title="Pending Trips" />
-
-        <item
-            android:id="@+id/nav_completed_trips"
-            android:icon="@drawable/bus"
-            android:title="Completed Trips" />
+            android:title="Change Vehicle" />
     </group>
 
 </menu>

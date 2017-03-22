@@ -3,9 +3,13 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/change_vehicle"
+            android:id="@+id/change_plate_num"
             android:icon="@drawable/bus"
             android:title="Change Vehicle" />
+        <item
+            android:id="@+id/change_driver"
+            android:icon="@drawable/account_multiple"
+            android:title="Change Driver" />
     </group>
 
 </menu>

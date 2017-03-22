@@ -20,8 +20,8 @@
         android:gravity="bottom"/>
 
     <TextView
-        android:text="Arrows Express"
-        android:id="@+id/appNameView"
+        android:text="Current Plate Number: "
+        android:id="@+id/plateNumView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="16sp"
@@ -30,8 +30,8 @@
         android:fontFamily="sans-serif"/>
 
     <TextView
-        android:text="xx/xx/xxxx"
-        android:id="@+id/dateView"
+        android:text="Current Driver: "
+        android:id="@+id/driverNameView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="16sp"

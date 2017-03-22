@@ -60,6 +60,7 @@ public class JSONHandler {
                     JSONArray routeStops = arrowsArray.getJSONArray(8);
                     JSONArray stops = arrowsArray.getJSONArray(9);
                     JSONArray users = arrowsArray.getJSONArray(10);
+                    JSONArray reservations = arrowsArray.getJSONArray(11);
 
                     //store all trips into database
                     for(int i = 0; i < trips.length(); i++){
@@ -89,9 +90,9 @@ public class JSONHandler {
                         cv.put(DBContract.Passenger.COLUMN_TAP_OUT, passenger.getString("tapOut"));
                         cv.put(DBContract.Passenger.COLUMN_DISEMBARKATION_PT, passenger.getString("disembarkationPt"));
                         cv.put(DBContract.Passenger.COLUMN_DESTINATION, passenger.getString("destination"));
-                        cv.put(DBContract.Passenger.COLUMN_IS_CHANCE, passenger.getBoolean("isChance"));
-                        cv.put(DBContract.Passenger.COLUMN_PASSENGER_TRIP, passenger.getInt("passengerTrip"));
-                        cv.put(DBContract.Passenger.COLUMN_PASSENGER_USER, passenger.getInt("passengerUser"));
+                        cv.put(DBContract.Passenger.COLUMN_PASSENGER_RESERVATION, passenger.getInt("passengerReservationNum"));
+                        cv.put(DBContract.Passenger.COLUMN_PASSENGER_VEHICLE, passenger.getString("passengerVehicle"));
+                        cv.put(DBContract.Passenger.COLUMN_PASSENGER_DRIVER, passenger.getInt("passengerDriver"));
                         db.insert(DBContract.Passenger.TABLE_PASSENGER, null, cv);
                     }
 
@@ -132,6 +133,7 @@ public class JSONHandler {
                     for(int i = 0; i < routes.length(); i++){
                         JSONObject route = routes.getJSONObject(i);
                         cv.put(DBContract.Route.COLUMN_ROUTE_ID, route.getInt("routeID"));
+                        cv.put(DBContract.Route.COLUMN_ROUTE_ORIGIN, route.getString("routeOrigin"));
                         cv.put(DBContract.Route.COLUMN_ROUTE_NAME, route.getString("routeName"));
                         cv.put(DBContract.Route.COLUMN_ROUTE_DESCRIPTION, route.getString("routeDescription"));
                         cv.put(DBContract.Route.COLUMN_ROUTE_LINE, route.getInt("routeLine"));
@@ -169,7 +171,6 @@ public class JSONHandler {
                     //store all users into database
                     for(int i = 0; i < users.length(); i++){
                         JSONObject user = users.getJSONObject(i);
-                        // User1
                         cv = new ContentValues();
                         cv.put(DBContract.User.COLUMN_ID_NUM, user.getInt("idNum"));
                         cv.put(DBContract.User.COLUMN_NAME, user.getString("name"));
@@ -178,7 +179,22 @@ public class JSONHandler {
                         cv.put(DBContract.User.COLUMN_EMERGENCY_CONTACT_NUM, user.getString("emergencyContactNum"));
                         cv.put(DBContract.User.COLUMN_IS_ADMIN, user.getBoolean("isAdmin"));
                         cv.put(DBContract.User.COLUMN_ADMIN_PASSWORD, user.getString("adminPassword"));
+                        cv.put(DBContract.User.COLUMN_AP_PRIORITY_ID, user.getString("apPriorityID"));
                         db.insert(DBContract.User.TABLE_USER, null, cv);
+                    }
+
+                    //store all reservations into database
+                    for(int i = 0; i < reservations.length(); i++){
+                        JSONObject reservation = reservations.getJSONObject(i);
+                        cv = new ContentValues();
+                        cv.put(DBContract.Reservation.COLUMN_RESERVATION_NUM, reservation.getInt("reservationNum"));
+                        cv.put(DBContract.Reservation.COLUMN_TIMESTAMP, reservation.getInt("timeStamp"));
+                        cv.put(DBContract.Reservation.COLUMN_DESTINATION, reservation.getInt("destination"));
+                        cv.put(DBContract.Reservation.COLUMN_REMARK, reservation.getInt("remark"));
+                        cv.put(DBContract.Reservation.COLUMN_RESERVATION_TRIP, reservation.getInt("reservationTrip"));
+                        cv.put(DBContract.Reservation.COLUMN_RESERVATION_ROUTE_STOP, reservation.getString("reservationRouteStop"));
+                        cv.put(DBContract.Reservation.COLUMN_RESERVATION_USER, reservation.getInt("reservationUser"));
+                        db.insert(DBContract.Reservation.TABLE_RESERVATION, null, cv);
                     }
 
                 } catch (final JSONException e) {

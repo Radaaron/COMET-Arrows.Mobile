@@ -17,20 +17,20 @@ public class TripRecyclerAdapter extends RecyclerView.Adapter<TripRecyclerAdapte
     private ArrayList<KeyHandler> mDataset;
     Context context;
     String depTime = "", routeName = "";
-    int passengerCount = 0, vehicleCapacity = 0;
+    int passengerCount = 0;
 
     // Provide a reference to the views for each data item
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public CardView tripCardView;
         public TextView tripTimeView;
         public TextView tripRouteView;
-        public TextView tripCapacityView;
+        public TextView tripPassengerCountView;
         public ViewHolder(View v) {
             super(v);
             this.tripCardView = (CardView) v.findViewById(R.id.trip_card_view);
             this.tripTimeView = (TextView) v.findViewById(R.id.trip_time_view);
             this.tripRouteView = (TextView) v.findViewById(R.id.trip_route_view);
-            this.tripCapacityView = (TextView) v.findViewById(R.id.trip_capacity_view);
+            this.tripPassengerCountView = (TextView) v.findViewById(R.id.trip_passenger_count_view);
         }
     }
 
@@ -57,7 +57,7 @@ public class TripRecyclerAdapter extends RecyclerView.Adapter<TripRecyclerAdapte
         holder.tripTimeView.setText(depTime);
         holder.tripRouteView.setText(routeName);
         // "passenger count / capacity"
-        holder.tripCapacityView.setText(passengerCount + "/" + vehicleCapacity);
+        holder.tripPassengerCountView.setText("" + passengerCount);
         holder.tripCardView.setTag(position);
         holder.tripCardView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,12 +82,6 @@ public class TripRecyclerAdapter extends RecyclerView.Adapter<TripRecyclerAdapte
                 DBContract.Route.COLUMN_ROUTE_ID);
 
         passengerCount = mDataset.get(position).getPassengerIDList().size();
-
-        vehicleCapacity = mDataset.get(position).getIntFromDB(context,
-                DBContract.Vehicle.COLUMN_CAPACITY,
-                mDataset.get(position).getVehicleID(),
-                DBContract.Vehicle.TABLE_VEHICLE,
-                DBContract.Vehicle.COLUMN_VEHICLE_ID);
     }
 
     // Return the size of dataset (invoked by the layout manager)

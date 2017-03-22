@@ -2,10 +2,13 @@ package com.example.aaron.arrowsmobile;
 
 import android.provider.BaseColumns;
 
+import static com.example.aaron.arrowsmobile.DBContract.Landing.TABLE_LANDING;
+import static com.example.aaron.arrowsmobile.DBContract.Reservation.TABLE_RESERVATION;
 import static com.example.aaron.arrowsmobile.DBContract.Stop.COLUMN_STOP_ID;
 import static com.example.aaron.arrowsmobile.DBContract.Trip.TABLE_TRIP;
 import static com.example.aaron.arrowsmobile.DBContract.TripSched.TABLE_TRIP_SCHED;
 import static com.example.aaron.arrowsmobile.DBContract.User.TABLE_USER;
+import static com.example.aaron.arrowsmobile.DBContract.Vehicle.TABLE_VEHICLE;
 
 public final class DBContract {
     // Contract class for database
@@ -14,38 +17,7 @@ public final class DBContract {
 
     public static final String DB_NAME = "arrowsDB.db";
 
-    // db-entity classes (alphabetical)
-    public static class AcademicPeriod implements BaseColumns{
-        public static final String TABLE_ACADEMIC_PERIOD = "academic_period";
-        public static final String COLUMN_PERIOD_ID = "period_id";
-        public static final String COLUMN_PERIOD = "period";
-        public static final String COLUMN_AY_START = "AY_start";
-        public static final String COLUMN_AY_END = "AY_end";
-        public static final String COLUMN_START_DATE = "start_date";
-        public static final String COLUMN_END_DATE = "end_date";
-    }
-
-    public static class CanDrive implements BaseColumns{
-        public static final String TABLE_CAN_DRIVE = "can_drive";
-        public static final String COLUMN_MODEL = "model";
-    }
-
-    public static class ClassAssignment implements BaseColumns{
-        public static final String TABLE_CLASS_ASSIGNMENT = "class_assignment";
-    }
-
-    public static class ClassSchedule implements BaseColumns{
-        public static final String TABLE_CLASS_SCHEDULE = "class_schedule";
-        public static final String COLUMN_SCHED_ID = "sched_id";
-        public static final String COLUMN_AY = "AY";
-        public static final String COLUMN_COURSE_CODE = "course_code";
-        public static final String COLUMN_START_TIME = "start_time";
-        public static final String COLUMN_END_TIME = "end_time";
-        public static final String COLUMN_TERM = "term";
-        public static final String COLUMN_DAY = "day";
-        public static final String COLUMN_SECTION = "section";
-        public static final String COLUMN_ROOM = "room";
-    }
+    // db-entity classes (alphabetical, only important tables)
 
     public static class Driver implements BaseColumns{
         public static final String TABLE_DRIVER = "driver";
@@ -70,9 +42,9 @@ public final class DBContract {
         public static final String COLUMN_TAP_OUT = "tap_out";
         public static final String COLUMN_DISEMBARKATION_PT = "disembarkation_pt";
         public static final String COLUMN_DESTINATION = "destination";
-        public static final String COLUMN_IS_CHANCE = "is_chance";
-        public static final String COLUMN_PASSENGER_TRIP = "passenger_trip";
-        public static final String COLUMN_PASSENGER_USER = "passenger_user";
+        public static final String COLUMN_PASSENGER_RESERVATION = "passenger_reservation_number";
+        public static final String COLUMN_PASSENGER_VEHICLE = "passenger_vehicle";
+        public static final String COLUMN_PASSENGER_DRIVER = "passenger_driver";
     }
 
     public static class Reservation implements BaseColumns{
@@ -81,11 +53,15 @@ public final class DBContract {
         public static final String COLUMN_TIMESTAMP = "timestamp";
         public static final String COLUMN_DESTINATION = "destination";
         public static final String COLUMN_REMARK = "remark";
+        public static final String COLUMN_RESERVATION_TRIP = "reservation_trip";
+        public static final String COLUMN_RESERVATION_ROUTE_STOP = "reservation_route_stop";
+        public static final String COLUMN_RESERVATION_USER = "reservation_user";
     }
 
     public static class Route implements BaseColumns{
         public static final String TABLE_ROUTE = "route";
         public static final String COLUMN_ROUTE_ID = "route_id";
+        public static final String COLUMN_ROUTE_ORIGIN = "route_origin";
         public static final String COLUMN_ROUTE_NAME = "route_name";
         public static final String COLUMN_ROUTE_DESCRIPTION = "route_description";
         public static final String COLUMN_ROUTE_LINE = "route_line";
@@ -99,26 +75,12 @@ public final class DBContract {
         public static final String COLUMN_ROUTE_STOP_ROUTE = "route_stop_route";
     }
 
-    public static class Status implements BaseColumns{
-        public static final String TABLE_STATUS = "status";
-        public static final String COLUMN_STATUS_CODE = "status_code";
-        public static final String COLUMN_STATUS_NAME = "status_name";
-        public static final String COLUMN_STATUS_TYPE = "status_type";
-    }
-
     public static class Stop implements BaseColumns{
         public static final String TABLE_STOP = "stop";
         public static final String COLUMN_STOP_ID = "stop_id";
         public static final String COLUMN_STOP_NAME = "stop_name";
         public static final String COLUMN_LATITUDE = "latitude";
         public static final String COLUMN_LONGITUDE = "longitude";
-    }
-
-    public static class SystemConfig implements BaseColumns{
-        public static final String TABLE_SYSTEM_CONFIG = "system_config";
-        public static final String COLUMN_CONFIG_ID = "config_id";
-        public static final String COLUMN_CONFIG_NAME = "config_name";
-        public static final String COLUMN_CONFIG_VAL = "config_val";
     }
 
     public static class Trip implements BaseColumns{
@@ -154,13 +116,7 @@ public final class DBContract {
         public static final String COLUMN_EMERGENCY_CONTACT_NUM = "emergency_contact_num";
         public static final String COLUMN_IS_ADMIN = "is_admin";
         public static final String COLUMN_ADMIN_PASSWORD = "admin_password";
-    }
-
-    public static class UserType implements BaseColumns{
-        public static final String TABLE_USER_TYPE = "user_type";
-        public static final String COLUMN_TYPE_ID = "type_id";
-        public static final String COLUMN_TYPE_NAME = "type_name";
-        public static final String COLUMN_TYPE_PRIORITY = "type_priority";
+        public static final String COLUMN_AP_PRIORITY_ID = "ap_priority_id";
     }
 
     public static class Vehicle implements BaseColumns{
@@ -174,35 +130,15 @@ public final class DBContract {
         public static final String COLUMN_BRAND = "brand";
     }
 
+    // app-only tables
+    public static class Landing implements BaseColumns{
+        public static final String TABLE_LANDING = "landing";
+        public static final String COLUMN_LANDING_ID = "landing_id";
+        public static final String COLUMN_LANDING_PLATE_NUM = "landing_plate_num";
+        public static final String COLUMN_LANDING_DRIVER = "landing_plate_driver";
+    }
 
     // create
-    public static final String CREATE_TABLE_ACADEMIC_PERIOD = "CREATE TABLE "
-            + AcademicPeriod.TABLE_ACADEMIC_PERIOD + " ("
-            + AcademicPeriod.COLUMN_PERIOD_ID + " VARCHAR PRIMARY KEY, "
-            + AcademicPeriod.COLUMN_PERIOD + " VARCHAR, "
-            + AcademicPeriod.COLUMN_AY_START + " INTEGER, "
-            + AcademicPeriod.COLUMN_AY_END + " INTEGER, "
-            + AcademicPeriod.COLUMN_START_DATE + " DATETIME, "
-            + AcademicPeriod.COLUMN_END_DATE + " DATETIME" + " )";
-
-    public static final String CREATE_TABLE_CAN_DRIVE = "CREATE TABLE "
-            + CanDrive.TABLE_CAN_DRIVE + " ("
-            + CanDrive.COLUMN_MODEL + " VARCHAR PRIMARY KEY )";
-
-    // cant create table with no columns in SQLite
-    // public static final String CREATE_TABLE_CLASS_ASSIGNMENT = "CREATE TABLE " + ClassAssignment.TABLE_CLASS_ASSIGNMENT + "()";
-
-    public static final String CREATE_TABLE_CLASS_SCHEDULE = "CREATE TABLE "
-            + ClassSchedule.TABLE_CLASS_SCHEDULE + " ("
-            + ClassSchedule.COLUMN_SCHED_ID + " INTEGER PRIMARY KEY, "
-            + ClassSchedule.COLUMN_AY + " VARCHAR, "
-            + ClassSchedule.COLUMN_COURSE_CODE + " VARCHAR, "
-            + ClassSchedule.COLUMN_START_TIME + " DATETIME, "
-            + ClassSchedule.COLUMN_END_TIME + " DATETIME, "
-            + ClassSchedule.COLUMN_TERM + " INTEGER, "
-            + ClassSchedule.COLUMN_DAY + " VARCHAR, "
-            + ClassSchedule.COLUMN_SECTION + " VARCHAR, "
-            + ClassSchedule.COLUMN_ROOM + " VARCHAR )";
 
     public static final String CREATE_TABLE_DRIVER = "CREATE TABLE "
             + Driver.TABLE_DRIVER + " ("
@@ -225,23 +161,31 @@ public final class DBContract {
             + Passenger.COLUMN_TAP_OUT + " DATETIME, "
             + Passenger.COLUMN_DISEMBARKATION_PT + " VARCHAR, "
             + Passenger.COLUMN_DESTINATION + " VARCHAR, "
-            + Passenger.COLUMN_IS_CHANCE + " BOOLEAN, "
-            + Passenger.COLUMN_PASSENGER_TRIP + " INTEGER, "
-            + Passenger.COLUMN_PASSENGER_USER + " INTEGER, "
-            + " FOREIGN KEY ( " + Passenger.COLUMN_PASSENGER_TRIP + " ) REFERENCES " + TABLE_TRIP + "( " + Trip.COLUMN_TRIP_ID + " ),"
-            + " FOREIGN KEY ( " + Passenger.COLUMN_PASSENGER_USER + " ) REFERENCES " + TABLE_USER + "( " + User.COLUMN_ID_NUM + " ))";
+            + Passenger.COLUMN_PASSENGER_RESERVATION + " INTEGER, "
+            + Passenger.COLUMN_PASSENGER_VEHICLE + " VARCHAR, "
+            + Passenger.COLUMN_PASSENGER_DRIVER + " INTEGER, "
+            + " FOREIGN KEY ( " + Passenger.COLUMN_PASSENGER_RESERVATION + " ) REFERENCES " + Reservation.TABLE_RESERVATION + "( " + Reservation.COLUMN_RESERVATION_NUM + " ),"
+            + " FOREIGN KEY ( " + Passenger.COLUMN_PASSENGER_VEHICLE + " ) REFERENCES " + Vehicle.TABLE_VEHICLE + "( " + Vehicle.COLUMN_VEHICLE_ID + " ),"
+            + " FOREIGN KEY ( " + Passenger.COLUMN_PASSENGER_DRIVER + " ) REFERENCES " + Driver.TABLE_DRIVER + "( " + Driver.COLUMN_DRIVER_ID + " ))";
 
     public static final String CREATE_TABLE_RESERVATION = "CREATE TABLE "
-            + Reservation.TABLE_RESERVATION + " ("
+            + TABLE_RESERVATION + " ("
             + Reservation.COLUMN_RESERVATION_NUM + " VARCHAR PRIMARY KEY, "
             + Reservation.COLUMN_TIMESTAMP + " DATETIME, "
             + Reservation.COLUMN_DESTINATION + " VARCHAR, "
-            + Reservation.COLUMN_REMARK + " VARCHAR )";
+            + Reservation.COLUMN_REMARK + " VARCHAR,"
+            + Reservation.COLUMN_RESERVATION_TRIP + " INTEGER, "
+            + Reservation.COLUMN_RESERVATION_ROUTE_STOP + " VARCHAR, "
+            + Reservation.COLUMN_RESERVATION_USER + " INTEGER,"
+            + " FOREIGN KEY ( " + Reservation.COLUMN_RESERVATION_TRIP + " ) REFERENCES " + Trip.TABLE_TRIP + "( " + Trip.COLUMN_TRIP_ID + " ),"
+            + " FOREIGN KEY ( " + Reservation.COLUMN_RESERVATION_ROUTE_STOP + " ) REFERENCES " + RouteStop.TABLE_ROUTE_STOP + "( " + RouteStop.COLUMN_STOP_NUM + " ),"
+            + " FOREIGN KEY ( " + Reservation.COLUMN_RESERVATION_USER + " ) REFERENCES " + User.TABLE_USER + "( " + User.COLUMN_ID_NUM + " ))";
 
     public static final String CREATE_TABLE_ROUTE = "CREATE TABLE "
             + Route.TABLE_ROUTE + " ("
             + Route.COLUMN_ROUTE_ID + " INTEGER PRIMARY KEY, "
             + Route.COLUMN_ROUTE_NAME + " VARCHAR, "
+            + Route.COLUMN_ROUTE_ORIGIN + " VARCHAR, "
             + Route.COLUMN_ROUTE_DESCRIPTION + " VARCHAR, "
             + Route.COLUMN_ROUTE_LINE + " INTEGER, "
             + " FOREIGN KEY ( " + Route.COLUMN_ROUTE_LINE + " ) REFERENCES " + Line.TABLE_LINE + "( " + Line.COLUMN_LINE_NUM + " ))";
@@ -255,24 +199,12 @@ public final class DBContract {
             + " FOREIGN KEY ( " + RouteStop.COLUMN_ROUTE_STOP_STOP + " ) REFERENCES " + Stop.TABLE_STOP + "( " + COLUMN_STOP_ID + " ), "
             + " FOREIGN KEY ( " + RouteStop.COLUMN_ROUTE_STOP_ROUTE + " ) REFERENCES " + Route.TABLE_ROUTE + "( " + Route.COLUMN_ROUTE_ID + " ))";
 
-    public static final String CREATE_TABLE_STATUS = "CREATE TABLE "
-            + Status.TABLE_STATUS + " ("
-            + Status.COLUMN_STATUS_CODE + " INTEGER PRIMARY KEY, "
-            + Status.COLUMN_STATUS_NAME + " VARCHAR, "
-            + Status.COLUMN_STATUS_TYPE + " VARCHAR )";
-
     public static final String CREATE_TABLE_STOP = "CREATE TABLE "
             + Stop.TABLE_STOP + " ("
             + COLUMN_STOP_ID + " INTEGER PRIMARY KEY, "
             + Stop.COLUMN_STOP_NAME + " VARCHAR, "
             + Stop.COLUMN_LATITUDE + " VARCHAR, "
             + Stop.COLUMN_LONGITUDE + " VARCHAR )";
-
-    public static final String CREATE_TABLE_SYSTEM_CONFIG = "CREATE TABLE "
-            + SystemConfig.TABLE_SYSTEM_CONFIG + " ("
-            + SystemConfig.COLUMN_CONFIG_ID + " INTEGER PRIMARY KEY, "
-            + SystemConfig.COLUMN_CONFIG_NAME + " VARCHAR, "
-            + SystemConfig.COLUMN_CONFIG_VAL + " VARCHAR )";
 
     public static final String CREATE_TABLE_TRIP = "CREATE TABLE "
             + TABLE_TRIP + " ("
@@ -288,7 +220,7 @@ public final class DBContract {
             + Trip.COLUMN_TRIP_VEHICLE + " VARCHAR, "
             + Trip.COLUMN_TRIP_DRIVER + " INTEGER, "
             + Trip.COLUMN_TRIP_TRIP_SCHED + " INTEGER, "
-            + " FOREIGN KEY ( " + Trip.COLUMN_TRIP_VEHICLE + " ) REFERENCES " + Vehicle.TABLE_VEHICLE + "( " + Vehicle.COLUMN_VEHICLE_ID + " ), "
+            + " FOREIGN KEY ( " + Trip.COLUMN_TRIP_VEHICLE + " ) REFERENCES " + TABLE_VEHICLE + "( " + Vehicle.COLUMN_VEHICLE_ID + " ), "
             + " FOREIGN KEY ( " + Trip.COLUMN_TRIP_DRIVER + " ) REFERENCES " + Driver.TABLE_DRIVER + "( " + Driver.COLUMN_DRIVER_ID + " ), "
             + " FOREIGN KEY ( " + Trip.COLUMN_TRIP_TRIP_SCHED + " ) REFERENCES " + TripSched.TABLE_TRIP_SCHED + "( " + TripSched.COLUMN_TRIP_SCHED_ID + " ))";
 
@@ -309,16 +241,11 @@ public final class DBContract {
             + User.COLUMN_EMERGENCY_CONTACT + " VARCHAR, "
             + User.COLUMN_EMERGENCY_CONTACT_NUM + " VARCHAR, "
             + User.COLUMN_IS_ADMIN + " BOOLEAN, "
-            + User.COLUMN_ADMIN_PASSWORD + " VARCHAR )";
-
-    public static final String CREATE_TABLE_USER_TYPE = "CREATE TABLE "
-            + UserType.TABLE_USER_TYPE + " ("
-            + UserType.COLUMN_TYPE_ID + " INTEGER PRIMARY KEY, "
-            + UserType.COLUMN_TYPE_NAME + " VARCHAR, "
-            + UserType.COLUMN_TYPE_PRIORITY + " INTEGER )";
+            + User.COLUMN_ADMIN_PASSWORD + " VARCHAR,"
+            + User.COLUMN_AP_PRIORITY_ID + " INTEGER )";
 
     public static final String CREATE_TABLE_VEHICLE = "CREATE TABLE "
-            + Vehicle.TABLE_VEHICLE + " ("
+            + TABLE_VEHICLE + " ("
             + Vehicle.COLUMN_VEHICLE_ID + " VARCHAR PRIMARY KEY, "
             + Vehicle.COLUMN_VEHICLE_TYPE + " VARCHAR, "
             + Vehicle.COLUMN_CAPACITY + " INTEGER, "
@@ -327,24 +254,24 @@ public final class DBContract {
             + Vehicle.COLUMN_MODEL + " VARCHAR, "
             + Vehicle.COLUMN_BRAND + " VARCHAR )";
 
+    public static final String CREATE_TABLE_LANDING = "CREATE TABLE "
+            + TABLE_LANDING + " ("
+            + Landing.COLUMN_LANDING_ID + " INTEGER PRIMARY KEY, "
+            + Landing.COLUMN_LANDING_PLATE_NUM + " VARCHAR, "
+            + Landing.COLUMN_LANDING_DRIVER + " VARCHAR )";
+
     // delete
-    public static final String DELETE_ACADEMIC_PERIOD = "DROP TABLE IF EXISTS " + AcademicPeriod.TABLE_ACADEMIC_PERIOD;
-    public static final String DELETE_CAN_DRIVE = "DROP TABLE IF EXISTS " + CanDrive.TABLE_CAN_DRIVE;
-    // public static final String DELETE_CLASS_ASSIGNMENT = "DROP TABLE IF EXISTS " + ClassAssignment.TABLE_CLASS_ASSIGNMENT;
-    public static final String DELETE_CLASS_SCHEDULE = "DROP TABLE IF EXISTS " + ClassSchedule.TABLE_CLASS_SCHEDULE;
     public static final String DELETE_DRIVER = "DROP TABLE IF EXISTS " + Driver.TABLE_DRIVER;
     public static final String DELETE_LINE = "DROP TABLE IF EXISTS " + Line.TABLE_LINE;
     public static final String DELETE_PASSENGER = "DROP TABLE IF EXISTS " + Passenger.TABLE_PASSENGER;
-    public static final String DELETE_RESERVATION = "DROP TABLE IF EXISTS " + Reservation.TABLE_RESERVATION;
+    public static final String DELETE_RESERVATION = "DROP TABLE IF EXISTS " + TABLE_RESERVATION;
     public static final String DELETE_ROUTE = "DROP TABLE IF EXISTS " + Route.TABLE_ROUTE;
     public static final String DELETE_ROUTE_STOP = "DROP TABLE IF EXISTS " + RouteStop.TABLE_ROUTE_STOP;
-    public static final String DELETE_STATUS = "DROP TABLE IF EXISTS " + Status.TABLE_STATUS;
     public static final String DELETE_STOP = "DROP TABLE IF EXISTS " + Stop.TABLE_STOP;
-    public static final String DELETE_SYSTEM_CONFIG = "DROP TABLE IF EXISTS " + SystemConfig.TABLE_SYSTEM_CONFIG;
     public static final String DELETE_TRIP = "DROP TABLE IF EXISTS " + TABLE_TRIP;
     public static final String DELETE_TRIP_SCHED = "DROP TABLE IF EXISTS " + TABLE_TRIP_SCHED;
     public static final String DELETE_USER = "DROP TABLE IF EXISTS " + TABLE_USER;
-    public static final String DELETE_USER_TYPE = "DROP TABLE IF EXISTS " + UserType.TABLE_USER_TYPE;
-    public static final String DELETE_VEHICLE = "DROP TABLE IF EXISTS " + Vehicle.TABLE_VEHICLE;
+    public static final String DELETE_VEHICLE = "DROP TABLE IF EXISTS " + TABLE_VEHICLE;
+    public static final String DELETE_LANDING = "DROP TABLE IF EXISTS " + TABLE_LANDING;
 
 }

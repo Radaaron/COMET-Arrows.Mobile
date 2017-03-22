@@ -60,13 +60,19 @@ public class EmbarkationPassengerRecyclerAdapter extends RecyclerView.Adapter<Em
     // Fills the contents of a view, tags each card, and implements onclick listener to return selected trip index
     @Override
     public void onBindViewHolder(final EmbarkationPassengerRecyclerAdapter.ViewHolder holder, int position) {
-        // get user id of passenger
-        final int userID = keyHandler.getIntFromDB(context,
-                DBContract.Passenger.COLUMN_PASSENGER_USER,
+        // get reservationNum of passenger
+        int reservationNum = keyHandler.getIntFromDB(context,
+                DBContract.Passenger.COLUMN_PASSENGER_RESERVATION,
                 Integer.toString(mDataset.get(position)),
                 DBContract.Passenger.TABLE_PASSENGER,
                 DBContract.Passenger.COLUMN_PASSENGER_ID);
-        // get user name from user id
+        // get userID from reservationNum
+        final int userID = keyHandler.getIntFromDB(context,
+                DBContract.Reservation.COLUMN_RESERVATION_USER,
+                Integer.toString(reservationNum),
+                DBContract.Reservation.TABLE_RESERVATION,
+                DBContract.Reservation.COLUMN_RESERVATION_NUM);
+        // get user name from userID
         String passengerName = keyHandler.getStringFromDB(context,
                 DBContract.User.COLUMN_NAME,
                 Integer.toString(userID),

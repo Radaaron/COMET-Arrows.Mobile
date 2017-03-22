@@ -18,6 +18,7 @@ public class KeyHandler implements Parcelable{
     private String vehicleID;
     private ArrayList<Integer> passengerIDList;
     private ArrayList<Integer> userIDList;
+    private ArrayList<Integer> reservationNumList;
     private int driverID;
     private int tripSchedID;
     private int routeID;
@@ -30,7 +31,7 @@ public class KeyHandler implements Parcelable{
         // empty constructor for method use only
     }
 
-    public KeyHandler(int tripID, String vehicleID, ArrayList<Integer> passengerIDList, int driverID, int tripSchedID, int routeID, int lineID, ArrayList<Integer> stopIDList, ArrayList<Integer> userIDList) {
+    public KeyHandler(int tripID, String vehicleID, ArrayList<Integer> passengerIDList, int driverID, int tripSchedID, int routeID, int lineID, ArrayList<Integer> stopIDList, ArrayList<Integer> userIDList, ArrayList<Integer> reservationNumList) {
         this.tripID = tripID;
         this.vehicleID = vehicleID;
         this.passengerIDList = passengerIDList;
@@ -40,6 +41,7 @@ public class KeyHandler implements Parcelable{
         this.lineID = lineID;
         this.stopIDList = stopIDList;
         this.userIDList = userIDList;
+        this.reservationNumList = reservationNumList;
     }
 
     protected KeyHandler(Parcel in) {
@@ -52,6 +54,7 @@ public class KeyHandler implements Parcelable{
         this.lineID = in.readInt();
         this.stopIDList = in.readArrayList(Integer.class.getClassLoader());
         this.userIDList = in.readArrayList(Integer.class.getClassLoader());
+        this.reservationNumList = in.readArrayList(Integer.class.getClassLoader());
     }
 
     public static final Creator<KeyHandler> CREATOR = new Creator<KeyHandler>() {
@@ -138,6 +141,14 @@ public class KeyHandler implements Parcelable{
         this.userIDList = userIDList;
     }
 
+    public ArrayList<Integer> getReservationNumList() {
+        return reservationNumList;
+    }
+
+    public void setReservationNumList(ArrayList<Integer> reservationNumList) {
+        this.reservationNumList = reservationNumList;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -154,6 +165,7 @@ public class KeyHandler implements Parcelable{
         parcel.writeInt(this.lineID);
         parcel.writeList(this.stopIDList);
         parcel.writeList(this.userIDList);
+        parcel.writeList(this.reservationNumList);
     }
 
     // handles the returning of string values from db

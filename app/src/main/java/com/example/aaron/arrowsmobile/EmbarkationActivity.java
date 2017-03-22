@@ -95,10 +95,12 @@ public class EmbarkationActivity extends AppCompatActivity
             // check whether id is in manifest or is chance passenger
             for(int i = 0; i < selectedTrip.getPassengerIDList().size(); i++){
                 if(Integer.toString(selectedTrip.getPassengerIDList().get(i)).equals(id)){
-                    // set existing passenger tap in
+                    // set existing passenger tap in time, driver and vehicle
                     Calendar cal = Calendar.getInstance();
                     ContentValues cv = new ContentValues();
                     cv.put(DBContract.Passenger.COLUMN_TAP_IN, timeFormat.format(cal.getTime()));
+                    cv.put(DBContract.Passenger.COLUMN_PASSENGER_DRIVER, selectedTrip.getDriverID());
+                    cv.put(DBContract.Passenger.COLUMN_PASSENGER_VEHICLE, selectedTrip.getVehicleID());
                     db.update(DBContract.Passenger.TABLE_PASSENGER, cv, DBContract.Passenger.COLUMN_PASSENGER_ID + "=" +id, null);
                     // refresh passenger manifest
                     setPassengerManifestFragment();

@@ -81,30 +81,6 @@ public class UpcomingTripsFragment extends Fragment implements OnTripSelectedLis
         TripDetailsDialogFragment dialogFragment = new TripDetailsDialogFragment();
         Bundle bundle = new Bundle();
         KeyHandler tripSelected = tripList.get(tripIndex);
-        // get landing plate num and driver nickname
-        String plateNum = tripSelected.getStringFromDB(getContext(),
-                DBContract.Landing.COLUMN_LANDING_PLATE_NUM,
-                1,
-                DBContract.Landing.TABLE_LANDING,
-                DBContract.Landing.COLUMN_LANDING_ID);
-        String driver = tripSelected.getStringFromDB(getContext(),
-                DBContract.Landing.COLUMN_LANDING_DRIVER,
-                1,
-                DBContract.Landing.TABLE_LANDING,
-                DBContract.Landing.COLUMN_LANDING_ID);
-        // driver and vehicle based on landing plate num and driver nickname
-        tripSelected.setVehicleID(tripSelected.getStringFromDB(getContext(),
-                DBContract.Vehicle.COLUMN_VEHICLE_ID,
-                plateNum,
-                DBContract.Vehicle.TABLE_VEHICLE,
-                DBContract.Vehicle.COLUMN_PLATE_NUM
-        ));
-        tripSelected.setDriverID(Integer.parseInt(tripSelected.getStringFromDB(getContext(),
-                DBContract.Driver.COLUMN_DRIVER_ID,
-                driver,
-                DBContract.Driver.TABLE_DRIVER,
-                DBContract.Driver.COLUMN_NICKNAME
-                )));
         bundle.putParcelable("tripSelected", tripSelected);
         dialogFragment.setArguments(bundle);
         dialogFragment.show(ft, "dialog");

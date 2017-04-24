@@ -7,16 +7,25 @@ import android.support.v7.app.AppCompatActivity;
 public class MainActivity extends AppCompatActivity {
 
     DBHandler dbHandler;
+    KeyHandler keyHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // build database
         dbHandler = new DBHandler(this);
+        keyHandler = new KeyHandler();
 
-        // start landing process
-        Intent intent = new Intent(this, LandingActivity.class);
-        startActivityForResult(intent, 1);
+        // check if new day
+        if(keyHandler.getStringFromDB(this, DBContract.Landing.COLUMN_LANDING_PLATE_NUM, 1, DBContract.Landing.TABLE_LANDING, DBContract.Landing.COLUMN_LANDING_ID) == null || keyHandler.getStringFromDB(this, DBContract.Landing.COLUMN_LANDING_PLATE_NUM, 1, DBContract.Landing.TABLE_LANDING, DBContract.Landing.COLUMN_LANDING_ID) == null){
+            Intent intent = new Intent(this, LandingInputActivity.class);
+            startActivityForResult(intent, 1);
+        }
+        else{
+            // continue landing process
+            Intent intent = new Intent(this, LandingActivity.class);
+            startActivityForResult(intent, 1);
+        }
     }
 
     @Override

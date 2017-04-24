@@ -39,6 +39,10 @@
         <activity
             android:name=".EmbarkationActivity"
             android:label="@string/title_activity_embarkation"
+            android:theme="@style/lasalleTheme.NoActionBar" />
+        <activity
+            android:name=".LandingInputActivity"
+            android:label="@string/title_activity_landing_input"
             android:theme="@style/lasalleTheme.NoActionBar"></activity>
     </application>
 

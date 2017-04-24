@@ -12,19 +12,12 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
-    <ImageView
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        app:srcCompat="@drawable/templogo"
-        android:id="@+id/imageView"
-        android:gravity="bottom"/>
-
     <TextView
         android:text="Current Plate Number: "
         android:id="@+id/plateNumView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="16sp"
+        android:textSize="20sp"
         android:paddingTop="4dp"
         android:paddingBottom="4dp"
         android:fontFamily="sans-serif"/>
@@ -34,7 +27,7 @@
         android:id="@+id/driverNameView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="16sp"
+        android:textSize="20sp"
         android:paddingTop="4dp"
         android:paddingBottom="2dp"
         android:fontFamily="sans-serif"/>

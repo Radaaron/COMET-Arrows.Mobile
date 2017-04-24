@@ -15,13 +15,8 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.InputType;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,7 +26,7 @@ public class LandingActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnFragmentInteractionListener{
 
     DBHandler dbHandler;
-    KeyHandler tripHelper; // used to assign plate num and driver to trip selected
+    KeyHandler keyHandler; // used to assign plate num and driver to trip selected
     ArrayList<KeyHandler> tripList;
     TextView plateNumView, driverNameView;
     Fragment currentFragment;
@@ -56,9 +51,7 @@ public class LandingActivity extends AppCompatActivity
         // retrieve data for recycler view
         dbHandler = new DBHandler(this);
         tripList = dbHandler.getTripKeyHolderList();
-        tripHelper = new KeyHandler();
-
-        checkPlateNumDriver();
+        keyHandler = new KeyHandler();
         refreshLandingDetails();
 
         // commit upcoming trips fragment
@@ -110,19 +103,16 @@ public class LandingActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         if (id == R.id.change_plate_num) {
+            ArrayList<String> plateList = keyHandler.getStringArrayListFromDB(this, DBContract.Vehicle.COLUMN_PLATE_NUM, DBContract.Vehicle.TABLE_VEHICLE);
+            final String[] plateItems = plateList.toArray(new String[plateList.size()]);
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            final EditText input = new EditText(this);
-            input.setInputType(InputType.TYPE_CLASS_TEXT);
-            builder.setView(input);
-            builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    if(!input.getText().toString().equals("")) {
-                        SQLiteDatabase db = dbHandler.getWritableDatabase();
-                        ContentValues cv = new ContentValues();
-                        cv.put(DBContract.Landing.COLUMN_LANDING_PLATE_NUM, input.getText().toString());
-                        db.update(DBContract.Landing.TABLE_LANDING, cv, DBContract.Landing.COLUMN_LANDING_ID + "=" + 1, null);
-                        refreshLandingDetails();
-                    }
+            builder.setItems(plateItems, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    SQLiteDatabase db = dbHandler.getWritableDatabase();
+                    ContentValues cv = new ContentValues();
+                    cv.put(DBContract.Landing.COLUMN_LANDING_PLATE_NUM, plateItems[which]);
+                    db.update(DBContract.Landing.TABLE_LANDING, cv, DBContract.Landing.COLUMN_LANDING_ID + "=" + 1, null);
+                    refreshLandingDetails();
                 }
             });
             builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -130,23 +120,25 @@ public class LandingActivity extends AppCompatActivity
                 }
             });
             AlertDialog dialog = builder.create();
-            dialog.setTitle("Enter Vehicle Plate Number");
+            dialog.setTitle("Change Vehicle");
             dialog.show();
         }
         if (id == R.id.change_driver) {
+            ArrayList<String> driverFirstNames = keyHandler.getStringArrayListFromDB(this, DBContract.Driver.COLUMN_FIRST_NAME, DBContract.Driver.TABLE_DRIVER);
+            ArrayList<String> driverLastNames = keyHandler.getStringArrayListFromDB(this, DBContract.Driver.COLUMN_LAST_NAME, DBContract.Driver.TABLE_DRIVER);
+            ArrayList<String> driverList = new ArrayList<>();
+            for(int i = 0; i < driverFirstNames.size(); i++){
+                driverList.add(driverFirstNames.get(i) + " " + driverLastNames.get(i));
+            }
+            final String[] driverItems = driverList.toArray(new String[driverList.size()]);
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            final EditText input = new EditText(this);
-            input.setInputType(InputType.TYPE_CLASS_TEXT);
-            builder.setView(input);
-            builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    if(!input.getText().toString().equals("")) {
-                        SQLiteDatabase db = dbHandler.getWritableDatabase();
-                        ContentValues cv = new ContentValues();
-                        cv.put(DBContract.Landing.COLUMN_LANDING_DRIVER, input.getText().toString());
-                        db.update(DBContract.Landing.TABLE_LANDING, cv, DBContract.Landing.COLUMN_LANDING_ID + "=" + 1, null);
-                        refreshLandingDetails();
-                    }
+            builder.setItems(driverItems, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    SQLiteDatabase db = dbHandler.getWritableDatabase();
+                    ContentValues cv = new ContentValues();
+                    cv.put(DBContract.Landing.COLUMN_LANDING_DRIVER, driverItems[which]);
+                    db.update(DBContract.Landing.TABLE_LANDING, cv, DBContract.Landing.COLUMN_LANDING_DRIVER + "=" + 1, null);
+                    refreshLandingDetails();
                 }
             });
             builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -154,7 +146,7 @@ public class LandingActivity extends AppCompatActivity
                 }
             });
             AlertDialog dialog = builder.create();
-            dialog.setTitle("Enter Driver Nickname");
+            dialog.setTitle("Change Driver");
             dialog.show();
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.landing_drawer_layout);
@@ -166,66 +158,47 @@ public class LandingActivity extends AppCompatActivity
     public void onFragmentInteraction(Object object) {
         Intent intent = new Intent();
         KeyHandler selectedTrip = (KeyHandler) object;
+        // update selectedTrip vehicle and driver
+        selectedTrip.setVehicleID(getIdFromPlate());
+        selectedTrip.setDriverID(getIdFromDriver());
         intent.putExtra("next", "Embarkation");
         intent.putExtra("selectedTrip", selectedTrip);
         setResult(Activity.RESULT_OK, intent);
         finish();
     }
 
-    // checks if there is a plate num and driver already chosen for the trip
-    public void checkPlateNumDriver(){
-        if(tripHelper.getStringFromDB(this, DBContract.Landing.COLUMN_LANDING_PLATE_NUM, 1, DBContract.Landing.TABLE_LANDING, DBContract.Landing.COLUMN_LANDING_ID) == null || tripHelper.getStringFromDB(this, DBContract.Landing.COLUMN_LANDING_PLATE_NUM, 1, DBContract.Landing.TABLE_LANDING, DBContract.Landing.COLUMN_LANDING_ID) == null){
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            LayoutInflater inflater = this.getLayoutInflater();
-            View dialogView = inflater.inflate(R.layout.landing_dialog, null);
-            builder.setView(dialogView);
-            final EditText plateNum = (EditText) dialogView.findViewById(R.id.landing_plate_num);
-            final EditText driverName = (EditText) dialogView.findViewById(R.id.landing_driver_name);
-            builder.setPositiveButton("Confirm", null); // o
-            final AlertDialog dialog = builder.create();
-            dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-                @Override
-                public void onShow(final DialogInterface dialog) {
-                    Button button = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
-                    button.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            if(!plateNum.getText().toString().equals("") && !driverName.getText().toString().equals("")){
-                                SQLiteDatabase db = dbHandler.getWritableDatabase();
-                                ContentValues cv = new ContentValues();
-                                cv.put(DBContract.Landing.COLUMN_LANDING_PLATE_NUM, plateNum.getText().toString());
-                                cv.put(DBContract.Landing.COLUMN_LANDING_DRIVER, driverName.getText().toString());
-                                db.update(DBContract.Landing.TABLE_LANDING, cv, DBContract.Landing.COLUMN_LANDING_ID + "=" + 1, null);
-                                refreshLandingDetails();
-                                dialog.dismiss();
-                            }
-                            else {
-                                Toast.makeText(getApplicationContext(), "Please Complete!", Toast.LENGTH_LONG).show();
-                            }
-                        }
-                    });
-                }
-            });
-            dialog.setCanceledOnTouchOutside(false);
-            dialog.setCancelable(false);
-            dialog.setTitle("Enter landing details");
-            dialog.show();
-        }
-    }
-
     public void refreshLandingDetails(){
-        String plateNum = tripHelper.getStringFromDB(this,
+        String plateNum = keyHandler.getStringFromDB(this,
                 DBContract.Landing.COLUMN_LANDING_PLATE_NUM,
                 1,
                 DBContract.Landing.TABLE_LANDING,
                 DBContract.Landing.COLUMN_LANDING_ID);
-        String driver = tripHelper.getStringFromDB(this,
+        String driver = keyHandler.getStringFromDB(this,
                 DBContract.Landing.COLUMN_LANDING_DRIVER,
                 1,
                 DBContract.Landing.TABLE_LANDING,
                 DBContract.Landing.COLUMN_LANDING_ID);
         plateNumView.setText("Current Plate: " + plateNum);
         driverNameView.setText("Current Driver: " + driver);
+    }
+
+    public String getIdFromPlate(){
+        String plateNum = keyHandler.getStringFromDB(this,
+                DBContract.Landing.COLUMN_LANDING_PLATE_NUM,
+                1,
+                DBContract.Landing.TABLE_LANDING,
+                DBContract.Landing.COLUMN_LANDING_ID);
+        return keyHandler.getStringFromDB(this, DBContract.Vehicle.COLUMN_VEHICLE_ID, plateNum, DBContract.Vehicle.TABLE_VEHICLE, DBContract.Vehicle.COLUMN_PLATE_NUM);
+    }
+
+    public int getIdFromDriver(){
+        String driver = keyHandler.getStringFromDB(this,
+                DBContract.Landing.COLUMN_LANDING_DRIVER,
+                1,
+                DBContract.Landing.TABLE_LANDING,
+                DBContract.Landing.COLUMN_LANDING_ID);
+        String[] temp = driver.split(" ");
+        return keyHandler.getIntFromDB(this, DBContract.Driver.COLUMN_DRIVER_ID, temp[0], DBContract.Driver.TABLE_DRIVER, DBContract.Driver.COLUMN_FIRST_NAME);
     }
 
 }

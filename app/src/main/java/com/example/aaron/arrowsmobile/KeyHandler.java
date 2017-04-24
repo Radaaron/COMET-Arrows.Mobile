@@ -168,6 +168,34 @@ public class KeyHandler implements Parcelable{
         parcel.writeList(this.reservationNumList);
     }
 
+    // handles the returning of string lists from db
+    public ArrayList<String> getStringArrayListFromDB(Context context, String column, String table) {
+        dbHandler = new DBHandler(context);
+        ArrayList<String> temp = null;
+        SQLiteDatabase db = dbHandler.getReadableDatabase();
+        String[] columns = {""};
+        columns[0] = column;
+        Cursor cursor = db.query(table,
+                columns,
+                null,
+                null,
+                null,
+                null,
+                null);
+        if(cursor.moveToFirst()){
+            temp = new ArrayList<>();
+            do{
+                temp.add(cursor.getString(cursor.getColumnIndex(column)));
+            } while( cursor.moveToNext());
+        }
+        else{
+            Log.e(TAG, "getStringArrayListFromDB() failed!");
+        }
+        cursor.close();
+        db.close();
+        return temp;
+    }
+
     // handles the returning of string values from db
     public String getStringFromDB(Context context, String column, Object selected, String table, String id) {
         dbHandler = new DBHandler(context);

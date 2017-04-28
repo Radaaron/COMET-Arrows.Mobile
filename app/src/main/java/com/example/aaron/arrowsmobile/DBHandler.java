@@ -1,6 +1,5 @@
 package com.example.aaron.arrowsmobile;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -9,7 +8,6 @@ import android.util.Log;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 import static android.content.ContentValues.TAG;
 
@@ -38,10 +36,10 @@ public class DBHandler extends SQLiteOpenHelper{
         db.execSQL(DBContract.CREATE_TABLE_USER);
         db.execSQL(DBContract.CREATE_TABLE_VEHICLE);
         db.execSQL(DBContract.CREATE_TABLE_LANDING);
-        // create mock values first time
-        if(!createMockData(db)){
-            System.out.println("INSERT ERROR");
-        }
+//        // create mock values first time
+//        if(!createMockData(db)){
+//            System.out.println("INSERT ERROR");
+//        }
     }
 
     @Override
@@ -69,196 +67,6 @@ public class DBHandler extends SQLiteOpenHelper{
             return true;
         }
         return false;
-    }
-
-    // storing mock values in db (for testing only)
-    public boolean createMockData(SQLiteDatabase db){
-        ContentValues cv = new ContentValues();
-        long insertTest;
-        Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat date = new SimpleDateFormat("MM/dd/yyyy");
-        SimpleDateFormat time = new SimpleDateFormat("HH:mm");
-
-        // Trip1
-        cv.put(DBContract.Trip.COLUMN_TRIP_ID, 0000000001);
-        cv.put(DBContract.Trip.COLUMN_REMARKS, "Sample trip");
-        cv.put(DBContract.Trip.COLUMN_TRIP_DATE, date.format(calendar.getTime()));
-        calendar.set(Calendar.HOUR, 06);
-        calendar.set(Calendar.MINUTE, 00);
-        cv.put(DBContract.Trip.COLUMN_DEP_TIME, time.format(calendar.getTime()));
-        cv.putNull(DBContract.Trip.COLUMN_ARRIVAL_TIME);
-        cv.put(DBContract.Trip.COLUMN_DURATION, 60.00);
-        cv.put(DBContract.Trip.COLUMN_IS_SPECIAL, false);
-        cv.put(DBContract.Trip.COLUMN_SP_NUM_PASS, -1);
-        cv.put(DBContract.Trip.COLUMN_PURPOSE, "Sample Trip");
-        cv.putNull(DBContract.Trip.COLUMN_TRIP_VEHICLE);
-        cv.putNull(DBContract.Trip.COLUMN_TRIP_DRIVER);
-        cv.put(DBContract.Trip.COLUMN_TRIP_TRIP_SCHED, 0000000001);
-        insertTest = db.insert(DBContract.Trip.TABLE_TRIP, null, cv);
-        if(dbInsertTest(insertTest)){
-            return false;
-        }
-
-        // Passenger1
-        cv = new ContentValues();
-        cv.put(DBContract.Passenger.COLUMN_PASSENGER_ID, 0000000001);
-        cv.put(DBContract.Passenger.COLUMN_FEEDBACK_ON, "none");
-        cv.put(DBContract.Passenger.COLUMN_FEEDBACK, 0);
-        cv.putNull(DBContract.Passenger.COLUMN_TAP_IN);
-        cv.putNull(DBContract.Passenger.COLUMN_TAP_OUT);
-        cv.put(DBContract.Passenger.COLUMN_DISEMBARKATION_PT, "Manila Campus");
-        cv.put(DBContract.Passenger.COLUMN_DESTINATION, "STC CAMPUS");
-        cv.put(DBContract.Passenger.COLUMN_PASSENGER_RESERVATION, 123456789);
-        cv.putNull(DBContract.Passenger.COLUMN_PASSENGER_VEHICLE);
-        cv.putNull(DBContract.Passenger.COLUMN_PASSENGER_DRIVER);
-        insertTest = db.insert(DBContract.Passenger.TABLE_PASSENGER, null, cv);
-        if(dbInsertTest(insertTest)){
-            return false;
-        }
-
-        // Driver1
-        cv = new ContentValues();
-        cv.put(DBContract.Driver.COLUMN_DRIVER_ID, 1234567);
-        cv.put(DBContract.Driver.COLUMN_LAST_NAME, "Smith");
-        cv.put(DBContract.Driver.COLUMN_FIRST_NAME, "John");
-        cv.put(DBContract.Driver.COLUMN_NICKNAME, "The Doctor");
-        insertTest = db.insert(DBContract.Driver.TABLE_DRIVER, null, cv);
-        if(dbInsertTest(insertTest)){
-            return false;
-        }
-
-        // Vehicle1
-        cv = new ContentValues();
-        cv.put(DBContract.Vehicle.COLUMN_VEHICLE_ID, "1234567890");
-        cv.put(DBContract.Vehicle.COLUMN_VEHICLE_TYPE, "Large");
-        cv.put(DBContract.Vehicle.COLUMN_CAPACITY, 3);
-        cv.put(DBContract.Vehicle.COLUMN_IMAGE, "tempImage");
-        cv.put(DBContract.Vehicle.COLUMN_PLATE_NUM, "1234567");
-        cv.put(DBContract.Vehicle.COLUMN_MODEL, "tempModel");
-        cv.put(DBContract.Vehicle.COLUMN_BRAND, "tempBrand");
-        insertTest = db.insert(DBContract.Vehicle.TABLE_VEHICLE, null, cv);
-        if(dbInsertTest(insertTest)){
-            return false;
-        }
-
-        // TripSched1
-        cv = new ContentValues();
-        cv.put(DBContract.TripSched.COLUMN_TRIP_SCHED_ID, 0000000001);
-        cv.put(DBContract.TripSched.COLUMN_TRIP_NUM, "1234567890");
-        calendar.set(Calendar.HOUR, 06);
-        calendar.set(Calendar.MINUTE, 00);
-        cv.put(DBContract.TripSched.COLUMN_DEP_TIME, time.format(calendar.getTime()));
-        cv.put(DBContract.TripSched.COLUMN_TRIP_SCHED_ROUTE, 00001);
-        insertTest = db.insert(DBContract.TripSched.TABLE_TRIP_SCHED, null, cv);
-        if(dbInsertTest(insertTest)){
-            return false;
-        }
-
-        // Route1
-        cv = new ContentValues();
-        cv.put(DBContract.Route.COLUMN_ROUTE_ID, 00001);
-        cv.put(DBContract.Route.COLUMN_ROUTE_ORIGIN, "Manila");
-        cv.put(DBContract.Route.COLUMN_ROUTE_NAME, "Manila to STC");
-        cv.put(DBContract.Route.COLUMN_ROUTE_DESCRIPTION, "Route for Manila to STC");
-        cv.put(DBContract.Route.COLUMN_ROUTE_LINE, 00001);
-        insertTest = db.insert(DBContract.Route.TABLE_ROUTE, null, cv);
-        if(dbInsertTest(insertTest)){
-            return false;
-        }
-
-        // Line1
-        cv = new ContentValues();
-        cv.put(DBContract.Line.COLUMN_LINE_NUM, 00001);
-        cv.put(DBContract.Line.COLUMN_LINE_NAME, "Line 1");
-        insertTest = db.insert(DBContract.Line.TABLE_LINE, null, cv);
-        if(dbInsertTest(insertTest)){
-            return false;
-        }
-
-        // RouteStop1
-        cv = new ContentValues();
-        cv.put(DBContract.RouteStop.COLUMN_STOP_NUM, "00000");
-        cv.put(DBContract.RouteStop.COLUMN_ORDER, 00000);
-        cv.put(DBContract.RouteStop.COLUMN_ROUTE_STOP_STOP, 00000);
-        cv.put(DBContract.RouteStop.COLUMN_ROUTE_STOP_ROUTE, 00001);
-        insertTest = db.insert(DBContract.RouteStop.TABLE_ROUTE_STOP, null, cv);
-        if(dbInsertTest(insertTest)){
-            return false;
-        }
-
-        // Stop1
-        cv = new ContentValues();
-        cv.put(DBContract.Stop.COLUMN_STOP_ID, 00000);
-        cv.put(DBContract.Stop.COLUMN_STOP_NAME, "First Stop");
-        cv.put(DBContract.Stop.COLUMN_LATITUDE, "20.00");
-        cv.put(DBContract.Stop.COLUMN_LONGITUDE, "20.00");
-        insertTest = db.insert(DBContract.Stop.TABLE_STOP, null, cv);
-        if(dbInsertTest(insertTest)){
-            return false;
-        }
-
-        // RouteStop2
-        cv = new ContentValues();
-        cv.put(DBContract.RouteStop.COLUMN_STOP_NUM, "00001");
-        cv.put(DBContract.RouteStop.COLUMN_ORDER, 00001);
-        cv.put(DBContract.RouteStop.COLUMN_ROUTE_STOP_STOP, 00001);
-        cv.put(DBContract.RouteStop.COLUMN_ROUTE_STOP_ROUTE, 00001);
-        insertTest = db.insert(DBContract.RouteStop.TABLE_ROUTE_STOP, null, cv);
-        if(dbInsertTest(insertTest)){
-            return false;
-        }
-
-        // Stop2
-        cv = new ContentValues();
-        cv.put(DBContract.Stop.COLUMN_STOP_ID, 00001);
-        cv.put(DBContract.Stop.COLUMN_STOP_NAME, "Second Stop");
-        cv.put(DBContract.Stop.COLUMN_LATITUDE, "60.00");
-        cv.put(DBContract.Stop.COLUMN_LONGITUDE, "60.00");
-        insertTest = db.insert(DBContract.Stop.TABLE_STOP, null, cv);
-        if(dbInsertTest(insertTest)){
-            return false;
-        }
-
-        // User1
-        cv = new ContentValues();
-        cv.put(DBContract.User.COLUMN_ID_NUM, 11407883);
-        cv.put(DBContract.User.COLUMN_NAME, "Aaron M. Candelaria");
-        cv.put(DBContract.User.COLUMN_EMAIL, "email@example.com");
-        cv.put(DBContract.User.COLUMN_EMERGENCY_CONTACT, "Emergency Contact");
-        cv.put(DBContract.User.COLUMN_EMERGENCY_CONTACT_NUM, "12345678911");
-        cv.put(DBContract.User.COLUMN_IS_ADMIN, false);
-        cv.putNull(DBContract.User.COLUMN_AP_PRIORITY_ID);
-        cv.putNull(DBContract.User.COLUMN_ADMIN_PASSWORD);
-        insertTest = db.insert(DBContract.User.TABLE_USER, null, cv);
-        if(dbInsertTest(insertTest)){
-            return false;
-        }
-
-        // Reservation1
-        cv = new ContentValues();
-        cv.put(DBContract.Reservation.COLUMN_RESERVATION_NUM, 123456789);
-        cv.put(DBContract.Reservation.COLUMN_TIMESTAMP, "6:00");
-        cv.put(DBContract.Reservation.COLUMN_DESTINATION, "STC");
-        cv.put(DBContract.Reservation.COLUMN_REMARK, "None");
-        cv.put(DBContract.Reservation.COLUMN_RESERVATION_TRIP, 1);
-        cv.put(DBContract.Reservation.COLUMN_RESERVATION_ROUTE_STOP, "00000");
-        cv.put(DBContract.Reservation.COLUMN_RESERVATION_USER, 11407883);
-        insertTest = db.insert(DBContract.Reservation.TABLE_RESERVATION, null, cv);
-        if(dbInsertTest(insertTest)){
-            return false;
-        }
-
-        // Landing Table
-        cv = new ContentValues();
-        cv.put(DBContract.Landing.COLUMN_LANDING_ID, 1); // there should only be one
-        cv.putNull(DBContract.Landing.COLUMN_LANDING_PLATE_NUM);
-        cv.putNull(DBContract.Landing.COLUMN_LANDING_DRIVER);
-        insertTest = db.insert(DBContract.Landing.TABLE_LANDING, null, cv);
-        if(dbInsertTest(insertTest)){
-            return false;
-        }
-
-        return true;
     }
 
     public ArrayList<KeyHandler> getTripKeyHolderList(){
@@ -377,7 +185,9 @@ public class DBHandler extends SQLiteOpenHelper{
                         Log.e(TAG, "passenger reservationNum foreign keys NOT FOUND");
                     }
                 }
-                cPassenger.close();
+                if(cPassenger != null){
+                    cPassenger.close();
+                }
 
                 keyHandler = new KeyHandler(tripID, vehicleID, passengerIDList, driverID, tripSchedID, routeID, lineID, stopIDList, userIDList, reservationNumList);
                 keyHandlerList.add(keyHandler);

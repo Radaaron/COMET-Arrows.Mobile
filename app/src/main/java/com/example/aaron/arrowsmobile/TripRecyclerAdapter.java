@@ -76,7 +76,7 @@ public class TripRecyclerAdapter extends RecyclerView.Adapter<TripRecyclerAdapte
                 DBContract.Trip.COLUMN_TRIP_ID);
 
         routeName = mDataset.get(position).getStringFromDB(context,
-                DBContract.Route.COLUMN_ROUTE_NAME,
+                DBContract.Route.COLUMN_ROUTE_DESTINATION,
                 mDataset.get(position).getRouteID(),
                 DBContract.Route.TABLE_ROUTE,
                 DBContract.Route.COLUMN_ROUTE_ID);

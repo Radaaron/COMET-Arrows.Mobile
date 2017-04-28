@@ -51,7 +51,7 @@ public class TripActivity extends AppCompatActivity implements View.OnClickListe
         populateStopList();
         gpsHandler = new GPSHandler(stopList, this);
         setTitle("Trip Route: " + selectedTrip.getStringFromDB(getApplicationContext(),
-                DBContract.Route.COLUMN_ROUTE_NAME,
+                DBContract.Route.COLUMN_ROUTE_DESTINATION,
                 selectedTrip.getRouteID(),
                 DBContract.Route.TABLE_ROUTE,
                 DBContract.Route.COLUMN_ROUTE_ID));

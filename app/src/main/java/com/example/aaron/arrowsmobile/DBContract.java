@@ -63,6 +63,7 @@ public final class DBContract {
         public static final String COLUMN_ROUTE_ID = "route_id";
         public static final String COLUMN_ROUTE_ORIGIN = "route_origin";
         public static final String COLUMN_ROUTE_NAME = "route_name";
+        public static final String COLUMN_ROUTE_DESTINATION = "route_destination";
         public static final String COLUMN_ROUTE_DESCRIPTION = "route_description";
         public static final String COLUMN_ROUTE_LINE = "route_line";
     }
@@ -186,6 +187,7 @@ public final class DBContract {
             + Route.COLUMN_ROUTE_ID + " INTEGER PRIMARY KEY, "
             + Route.COLUMN_ROUTE_NAME + " VARCHAR, "
             + Route.COLUMN_ROUTE_ORIGIN + " VARCHAR, "
+            + Route.COLUMN_ROUTE_DESTINATION + " VARCHAR, "
             + Route.COLUMN_ROUTE_DESCRIPTION + " VARCHAR, "
             + Route.COLUMN_ROUTE_LINE + " INTEGER, "
             + " FOREIGN KEY ( " + Route.COLUMN_ROUTE_LINE + " ) REFERENCES " + Line.TABLE_LINE + "( " + Line.COLUMN_LINE_NUM + " ))";

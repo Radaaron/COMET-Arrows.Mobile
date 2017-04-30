@@ -18,11 +18,26 @@ public class MainActivity extends AppCompatActivity implements OnNetworkSuccessL
         // build database
         dbHandler = new DBHandler(this);
         dbHandler.createAppTables();
-        Toast.makeText(getApplicationContext(), "Getting JSON Data...", Toast.LENGTH_LONG).show();
-        try {
-            NetworkHandler networkHandler = new NetworkHandler(this, this);
-        } catch (JSONException e) {
-            e.printStackTrace();
+        keyHandler = new KeyHandler();
+        // check if landing details are present
+        if(keyHandler.getStringFromDB(this, DBContract.Local.COLUMN_LOCAL_PLATE_NUM, 1, DBContract.Local.TABLE_LOCAL, DBContract.Local.COLUMN_LOCAL_ID) == null || keyHandler.getStringFromDB(this, DBContract.Local.COLUMN_LOCAL_PLATE_NUM, 1, DBContract.Local.TABLE_LOCAL, DBContract.Local.COLUMN_LOCAL_ID) == null){
+            Toast.makeText(getApplicationContext(), "Getting JSON Data...", Toast.LENGTH_LONG).show();
+            try {
+                NetworkHandler networkHandler = new NetworkHandler(this, this);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        else{
+            startNextActivity("Landing", null);
+        }
+    }
+
+    @Override
+    public void onNetworkSuccess(Boolean b) {
+        if(b){
+            Intent intent = new Intent(this, LandingInputActivity.class);
+            startActivityForResult(intent, 1);
         }
     }
 
@@ -31,42 +46,27 @@ public class MainActivity extends AppCompatActivity implements OnNetworkSuccessL
         if (resultCode == RESULT_OK) {
             String next = data.getStringExtra("next");
             if(next.equals("Landing")){
-                Intent intent = new Intent(this, LandingActivity.class);
-                startActivityForResult(intent, 1);
-            } else if(next.equals("Embarkation")){
+                startNextActivity(next, null);
+            } else {
                 KeyHandler selectedTrip = data.getParcelableExtra("selectedTrip");
-                Intent intent = new Intent(this, EmbarkationActivity.class);
-                intent.putExtra("selectedTrip", selectedTrip);
-                startActivityForResult(intent, 1);
-            } else if(next.equals("Trip")){
-                KeyHandler onTrip = data.getParcelableExtra("selectedTrip");
-                Intent intent = new Intent(this, TripActivity.class);
-                intent.putExtra("selectedTrip", onTrip);
-                startActivityForResult(intent, 1);
+                startNextActivity(next, selectedTrip);
             }
         }
     }
 
-    @Override
-    public void onNetworkSuccess(Boolean b) {
-        if(b){
-            keyHandler = new KeyHandler();
-            // check if new day
-            if(keyHandler.getStringFromDB(this, DBContract.Local.COLUMN_LOCAL_PLATE_NUM, 1, DBContract.Local.TABLE_LOCAL, DBContract.Local.COLUMN_LOCAL_ID) == null || keyHandler.getStringFromDB(this, DBContract.Local.COLUMN_LOCAL_PLATE_NUM, 1, DBContract.Local.TABLE_LOCAL, DBContract.Local.COLUMN_LOCAL_ID) == null){
-                Intent intent = new Intent(this, LandingInputActivity.class);
-                startActivityForResult(intent, 1);
-            }
-            else{
-                // continue landing process
-                Intent intent = new Intent(this, LandingActivity.class);
-                startActivityForResult(intent, 1);
-            }
+    public void startNextActivity(String next, KeyHandler selectedTrip){
+        if(next.equals("Landing")){
+            Intent intent = new Intent(this, LandingActivity.class);
+            startActivityForResult(intent, 1);
+        } else if(next.equals("Embarkation")){
+            Intent intent = new Intent(this, EmbarkationActivity.class);
+            intent.putExtra("selectedTrip", selectedTrip);
+            startActivityForResult(intent, 1);
+        } else if(next.equals("Trip")){
+            Intent intent = new Intent(this, TripActivity.class);
+            intent.putExtra("selectedTrip", selectedTrip);
+            startActivityForResult(intent, 1);
         }
-    }
-
-    public void saveCurrentActivity(){
-        // SAVE CURRENT ACTIVITY AND TRIPID, WHEN APP IS OPENED, CHECK IT ACTIVITY IS NOT NULL AND SEARCH THROUGH TRIPLIST
-        // FOR SAVED TRIP
     }
 
 }

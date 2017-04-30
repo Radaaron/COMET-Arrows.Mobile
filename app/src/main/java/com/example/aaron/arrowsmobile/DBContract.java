@@ -137,7 +137,6 @@ public final class DBContract {
         public static final String COLUMN_LOCAL_ID = "local_id";
         public static final String COLUMN_LOCAL_PLATE_NUM = "local_plate_num";
         public static final String COLUMN_LOCAL_DRIVER = "local_plate_driver";
-        public static final String COLUMN_LOCAL_ACTIVITY = "local_activity";
     }
 
     // create
@@ -261,8 +260,7 @@ public final class DBContract {
             + TABLE_LOCAL + " ("
             + Local.COLUMN_LOCAL_ID + " INTEGER PRIMARY KEY, "
             + Local.COLUMN_LOCAL_PLATE_NUM + " VARCHAR, "
-            + Local.COLUMN_LOCAL_DRIVER + " VARCHAR, "
-            + Local.COLUMN_LOCAL_ACTIVITY + " VARCHAR )";
+            + Local.COLUMN_LOCAL_DRIVER + " VARCHAR )";
 
     // delete
     public static final String DELETE_DRIVER = "DROP TABLE IF EXISTS " + Driver.TABLE_DRIVER;

@@ -65,7 +65,6 @@ public class DBHandler extends SQLiteOpenHelper{
         cv.put(DBContract.Local.COLUMN_LOCAL_ID, 1); // there should only be one
         cv.putNull(DBContract.Local.COLUMN_LOCAL_PLATE_NUM);
         cv.putNull(DBContract.Local.COLUMN_LOCAL_DRIVER);
-        cv.putNull(DBContract.Local.COLUMN_LOCAL_ACTIVITY);
         db.insert(DBContract.Local.TABLE_LOCAL, null, cv);
     }
 

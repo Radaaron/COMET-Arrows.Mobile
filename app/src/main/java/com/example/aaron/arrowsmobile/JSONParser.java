@@ -67,9 +67,9 @@ public class JSONParser {
                 cv.put(DBContract.Passenger.COLUMN_TAP_OUT, passenger.optString("tapOut"));
                 cv.put(DBContract.Passenger.COLUMN_DISEMBARKATION_PT, passenger.optString("disembarkationPt"));
                 cv.put(DBContract.Passenger.COLUMN_DESTINATION, passenger.optString("destination"));
-                cv.put(DBContract.Passenger.COLUMN_PASSENGER_RESERVATION, passenger.optInt("passengerReservationNum"));
-                cv.put(DBContract.Passenger.COLUMN_PASSENGER_VEHICLE, passenger.optString("passengerVehicle"));
-                cv.put(DBContract.Passenger.COLUMN_PASSENGER_DRIVER, passenger.optInt("passengerDriver"));
+                cv.put(DBContract.Passenger.COLUMN_PASSENGER_RESERVATION, passenger.optInt("reservationNum"));
+                cv.put(DBContract.Passenger.COLUMN_PASSENGER_VEHICLE, passenger.optString("vehicleId"));
+                cv.put(DBContract.Passenger.COLUMN_PASSENGER_DRIVER, passenger.optInt("driverId"));
                 db.insert(DBContract.Passenger.TABLE_PASSENGER, null, cv);
             }
 
@@ -180,6 +180,8 @@ public class JSONParser {
                 cv.put(DBContract.Reservation.COLUMN_RESERVATION_USER, reservation.optInt("idNum"));
                 db.insert(DBContract.Reservation.TABLE_RESERVATION, null, cv);
             }
+
+            db.close();
         } catch (final JSONException e) {
             Log.e(TAG, "Json parsing error: " + e.getMessage());
         }

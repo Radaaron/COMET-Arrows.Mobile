@@ -81,14 +81,16 @@ public class OnTripPassengerRecyclerAdapter extends RecyclerView.Adapter<Embarka
         holder.passengerIdView.setText(Integer.toString(userID));
         holder.passengerNameView.setText(passengerName);
         // check if the passenger has already been tapped in
-        if(keyHandler.getStringFromDB(context,
+        String tapIn = keyHandler.getStringFromDB(context,
                 DBContract.Passenger.COLUMN_TAP_IN,
                 Integer.toString(mDataset.get(position)),
                 DBContract.Passenger.TABLE_PASSENGER,
-                DBContract.Passenger.COLUMN_PASSENGER_ID) != null){
-            holder.passengerCheckInBox.setChecked(true);
+                DBContract.Passenger.COLUMN_PASSENGER_ID);
+        if(tapIn.equals("null")){
+            holder.passengerCheckInBox.setChecked(false);
             holder.passengerCheckInBox.setEnabled(false);
         } else {
+            holder.passengerCheckInBox.setChecked(true);
             holder.passengerCheckInBox.setEnabled(false);
         }
         final int pos = position;
@@ -101,7 +103,7 @@ public class OnTripPassengerRecyclerAdapter extends RecyclerView.Adapter<Embarka
                         DBContract.Passenger.COLUMN_TAP_OUT,
                         Integer.toString(mDataset.get(pos)),
                         DBContract.Passenger.TABLE_PASSENGER,
-                        DBContract.Passenger.COLUMN_PASSENGER_ID) == null){
+                        DBContract.Passenger.COLUMN_PASSENGER_ID).equals("null")){
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
                     builder.setMessage("Manually Tap Out Passenger?");
                     builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {

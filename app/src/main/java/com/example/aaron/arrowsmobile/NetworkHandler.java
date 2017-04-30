@@ -2,8 +2,6 @@ package com.example.aaron.arrowsmobile;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -17,7 +15,6 @@ import static android.content.ContentValues.TAG;
 
 // handles the transportation of data from json to sqlite db
 public class NetworkHandler {
-    TextView mTxtDisplay;
     String url = "http://frozen-escarpment-35603.herokuapp.com/json";
     OnNetworkSuccessListener onNetworkSuccessListener;
 
@@ -28,7 +25,6 @@ public class NetworkHandler {
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        Toast.makeText(ctx, "Getting JSON Data...", Toast.LENGTH_LONG).show();
                         JSONParser jsonParser = new JSONParser(response);
                         jsonParser.parseJSON(ctx);
                         onNetworkSuccessListener.onNetworkSuccess(true);

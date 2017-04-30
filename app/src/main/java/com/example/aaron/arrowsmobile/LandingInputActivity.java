@@ -70,9 +70,9 @@ public class LandingInputActivity extends AppCompatActivity implements AdapterVi
         if (v.getId()== R.id.start_trip_selection_button) {
             SQLiteDatabase db = dbHandler.getWritableDatabase();
             ContentValues cv = new ContentValues();
-            cv.put(DBContract.Landing.COLUMN_LANDING_PLATE_NUM, plate);
-            cv.put(DBContract.Landing.COLUMN_LANDING_DRIVER, driver);
-            db.update(DBContract.Landing.TABLE_LANDING, cv, DBContract.Landing.COLUMN_LANDING_ID + "=" + 1, null);
+            cv.put(DBContract.Local.COLUMN_LOCAL_PLATE_NUM, plate);
+            cv.put(DBContract.Local.COLUMN_LOCAL_DRIVER, driver);
+            db.update(DBContract.Local.TABLE_LOCAL, cv, DBContract.Local.COLUMN_LOCAL_ID + "=" + 1, null);
             Intent intent = new Intent();
             intent.putExtra("next", "Landing");
             setResult(Activity.RESULT_OK, intent);

@@ -110,8 +110,8 @@ public class LandingActivity extends AppCompatActivity
                 public void onClick(DialogInterface dialog, int which) {
                     SQLiteDatabase db = dbHandler.getWritableDatabase();
                     ContentValues cv = new ContentValues();
-                    cv.put(DBContract.Landing.COLUMN_LANDING_PLATE_NUM, plateItems[which]);
-                    db.update(DBContract.Landing.TABLE_LANDING, cv, DBContract.Landing.COLUMN_LANDING_ID + "=" + 1, null);
+                    cv.put(DBContract.Local.COLUMN_LOCAL_PLATE_NUM, plateItems[which]);
+                    db.update(DBContract.Local.TABLE_LOCAL, cv, DBContract.Local.COLUMN_LOCAL_ID + "=" + 1, null);
                     refreshLandingDetails();
                 }
             });
@@ -136,8 +136,8 @@ public class LandingActivity extends AppCompatActivity
                 public void onClick(DialogInterface dialog, int which) {
                     SQLiteDatabase db = dbHandler.getWritableDatabase();
                     ContentValues cv = new ContentValues();
-                    cv.put(DBContract.Landing.COLUMN_LANDING_DRIVER, driverItems[which]);
-                    db.update(DBContract.Landing.TABLE_LANDING, cv, DBContract.Landing.COLUMN_LANDING_DRIVER + "=" + 1, null);
+                    cv.put(DBContract.Local.COLUMN_LOCAL_DRIVER, driverItems[which]);
+                    db.update(DBContract.Local.TABLE_LOCAL, cv, DBContract.Local.COLUMN_LOCAL_ID + "=" + 1, null);
                     refreshLandingDetails();
                 }
             });
@@ -169,34 +169,34 @@ public class LandingActivity extends AppCompatActivity
 
     public void refreshLandingDetails(){
         String plateNum = keyHandler.getStringFromDB(this,
-                DBContract.Landing.COLUMN_LANDING_PLATE_NUM,
+                DBContract.Local.COLUMN_LOCAL_PLATE_NUM,
                 1,
-                DBContract.Landing.TABLE_LANDING,
-                DBContract.Landing.COLUMN_LANDING_ID);
+                DBContract.Local.TABLE_LOCAL,
+                DBContract.Local.COLUMN_LOCAL_ID);
         String driver = keyHandler.getStringFromDB(this,
-                DBContract.Landing.COLUMN_LANDING_DRIVER,
+                DBContract.Local.COLUMN_LOCAL_DRIVER,
                 1,
-                DBContract.Landing.TABLE_LANDING,
-                DBContract.Landing.COLUMN_LANDING_ID);
+                DBContract.Local.TABLE_LOCAL,
+                DBContract.Local.COLUMN_LOCAL_ID);
         plateNumView.setText("Current Plate: " + plateNum);
         driverNameView.setText("Current Driver: " + driver);
     }
 
     public String getIdFromPlate(){
         String plateNum = keyHandler.getStringFromDB(this,
-                DBContract.Landing.COLUMN_LANDING_PLATE_NUM,
+                DBContract.Local.COLUMN_LOCAL_PLATE_NUM,
                 1,
-                DBContract.Landing.TABLE_LANDING,
-                DBContract.Landing.COLUMN_LANDING_ID);
+                DBContract.Local.TABLE_LOCAL,
+                DBContract.Local.COLUMN_LOCAL_ID);
         return keyHandler.getStringFromDB(this, DBContract.Vehicle.COLUMN_VEHICLE_ID, plateNum, DBContract.Vehicle.TABLE_VEHICLE, DBContract.Vehicle.COLUMN_PLATE_NUM);
     }
 
     public int getIdFromDriver(){
         String driver = keyHandler.getStringFromDB(this,
-                DBContract.Landing.COLUMN_LANDING_DRIVER,
+                DBContract.Local.COLUMN_LOCAL_DRIVER,
                 1,
-                DBContract.Landing.TABLE_LANDING,
-                DBContract.Landing.COLUMN_LANDING_ID);
+                DBContract.Local.TABLE_LOCAL,
+                DBContract.Local.COLUMN_LOCAL_ID);
         String[] temp = driver.split(" ");
         return keyHandler.getIntFromDB(this, DBContract.Driver.COLUMN_DRIVER_ID, temp[0], DBContract.Driver.TABLE_DRIVER, DBContract.Driver.COLUMN_FIRST_NAME);
     }

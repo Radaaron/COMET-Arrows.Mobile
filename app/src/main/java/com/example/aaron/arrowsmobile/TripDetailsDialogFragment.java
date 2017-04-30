@@ -48,7 +48,7 @@ public class TripDetailsDialogFragment extends DialogFragment implements View.On
         // trip passenger manifest
         selectedTrip = getArguments().getParcelable("tripSelected");
         RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.landing_manifest_recycler_view);
-        EmbarkationPassengerRecyclerAdapter adapter = new EmbarkationPassengerRecyclerAdapter(selectedTrip.getPassengerIDList(), getContext());
+        PassengerManifestRecyclerAdapter adapter = new PassengerManifestRecyclerAdapter(selectedTrip.getPassengerIDList(), getContext());
         recyclerView.setAdapter(adapter);
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), llm.getOrientation()); // item divider

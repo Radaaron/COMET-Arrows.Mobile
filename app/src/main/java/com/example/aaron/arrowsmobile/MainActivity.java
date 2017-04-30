@@ -3,6 +3,7 @@ package com.example.aaron.arrowsmobile;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
 
 import org.json.JSONException;
 
@@ -16,6 +17,8 @@ public class MainActivity extends AppCompatActivity implements OnNetworkSuccessL
         super.onCreate(savedInstanceState);
         // build database
         dbHandler = new DBHandler(this);
+        dbHandler.createAppTables();
+        Toast.makeText(getApplicationContext(), "Getting JSON Data...", Toast.LENGTH_LONG).show();
         try {
             NetworkHandler networkHandler = new NetworkHandler(this, this);
         } catch (JSONException e) {
@@ -49,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements OnNetworkSuccessL
         if(b){
             keyHandler = new KeyHandler();
             // check if new day
-            if(keyHandler.getStringFromDB(this, DBContract.Landing.COLUMN_LANDING_PLATE_NUM, 1, DBContract.Landing.TABLE_LANDING, DBContract.Landing.COLUMN_LANDING_ID) == null || keyHandler.getStringFromDB(this, DBContract.Landing.COLUMN_LANDING_PLATE_NUM, 1, DBContract.Landing.TABLE_LANDING, DBContract.Landing.COLUMN_LANDING_ID) == null){
+            if(keyHandler.getStringFromDB(this, DBContract.Local.COLUMN_LOCAL_PLATE_NUM, 1, DBContract.Local.TABLE_LOCAL, DBContract.Local.COLUMN_LOCAL_ID) == null || keyHandler.getStringFromDB(this, DBContract.Local.COLUMN_LOCAL_PLATE_NUM, 1, DBContract.Local.TABLE_LOCAL, DBContract.Local.COLUMN_LOCAL_ID) == null){
                 Intent intent = new Intent(this, LandingInputActivity.class);
                 startActivityForResult(intent, 1);
             }
@@ -60,4 +63,10 @@ public class MainActivity extends AppCompatActivity implements OnNetworkSuccessL
             }
         }
     }
+
+    public void saveCurrentActivity(){
+        // SAVE CURRENT ACTIVITY AND TRIPID, WHEN APP IS OPENED, CHECK IT ACTIVITY IS NOT NULL AND SEARCH THROUGH TRIPLIST
+        // FOR SAVED TRIP
+    }
+
 }

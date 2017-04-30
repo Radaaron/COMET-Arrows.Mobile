@@ -2,7 +2,7 @@ package com.example.aaron.arrowsmobile;
 
 import android.provider.BaseColumns;
 
-import static com.example.aaron.arrowsmobile.DBContract.Landing.TABLE_LANDING;
+import static com.example.aaron.arrowsmobile.DBContract.Local.TABLE_LOCAL;
 import static com.example.aaron.arrowsmobile.DBContract.Reservation.TABLE_RESERVATION;
 import static com.example.aaron.arrowsmobile.DBContract.Stop.COLUMN_STOP_ID;
 import static com.example.aaron.arrowsmobile.DBContract.Trip.TABLE_TRIP;
@@ -131,12 +131,13 @@ public final class DBContract {
         public static final String COLUMN_BRAND = "brand";
     }
 
-    // app-only tables
-    public static class Landing implements BaseColumns{
-        public static final String TABLE_LANDING = "landing";
-        public static final String COLUMN_LANDING_ID = "landing_id";
-        public static final String COLUMN_LANDING_PLATE_NUM = "landing_plate_num";
-        public static final String COLUMN_LANDING_DRIVER = "landing_plate_driver";
+    // app-only table
+    public static class Local implements BaseColumns{
+        public static final String TABLE_LOCAL = "local";
+        public static final String COLUMN_LOCAL_ID = "local_id";
+        public static final String COLUMN_LOCAL_PLATE_NUM = "local_plate_num";
+        public static final String COLUMN_LOCAL_DRIVER = "local_plate_driver";
+        public static final String COLUMN_LOCAL_ACTIVITY = "local_activity";
     }
 
     // create
@@ -257,10 +258,11 @@ public final class DBContract {
             + Vehicle.COLUMN_BRAND + " VARCHAR )";
 
     public static final String CREATE_TABLE_LANDING = "CREATE TABLE "
-            + TABLE_LANDING + " ("
-            + Landing.COLUMN_LANDING_ID + " INTEGER PRIMARY KEY, "
-            + Landing.COLUMN_LANDING_PLATE_NUM + " VARCHAR, "
-            + Landing.COLUMN_LANDING_DRIVER + " VARCHAR )";
+            + TABLE_LOCAL + " ("
+            + Local.COLUMN_LOCAL_ID + " INTEGER PRIMARY KEY, "
+            + Local.COLUMN_LOCAL_PLATE_NUM + " VARCHAR, "
+            + Local.COLUMN_LOCAL_DRIVER + " VARCHAR, "
+            + Local.COLUMN_LOCAL_ACTIVITY + " VARCHAR )";
 
     // delete
     public static final String DELETE_DRIVER = "DROP TABLE IF EXISTS " + Driver.TABLE_DRIVER;
@@ -274,6 +276,6 @@ public final class DBContract {
     public static final String DELETE_TRIP_SCHED = "DROP TABLE IF EXISTS " + TABLE_TRIP_SCHED;
     public static final String DELETE_USER = "DROP TABLE IF EXISTS " + TABLE_USER;
     public static final String DELETE_VEHICLE = "DROP TABLE IF EXISTS " + TABLE_VEHICLE;
-    public static final String DELETE_LANDING = "DROP TABLE IF EXISTS " + TABLE_LANDING;
+    public static final String DELETE_LANDING = "DROP TABLE IF EXISTS " + TABLE_LOCAL;
 
 }

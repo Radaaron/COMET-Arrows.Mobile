@@ -16,8 +16,8 @@ public class TripRecyclerAdapter extends RecyclerView.Adapter<TripRecyclerAdapte
     private int selected = -1;
     private ArrayList<KeyHandler> mDataset;
     Context context;
-    String depTime = "", routeName = "";
-    int passengerCount = 0;
+    private String depTime = "", routeName = "";
+    private int passengerCount = 0;
 
     // Provide a reference to the views for each data item
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -75,11 +75,16 @@ public class TripRecyclerAdapter extends RecyclerView.Adapter<TripRecyclerAdapte
                 DBContract.Trip.TABLE_TRIP,
                 DBContract.Trip.COLUMN_TRIP_ID);
 
-        routeName = mDataset.get(position).getStringFromDB(context,
-                DBContract.Route.COLUMN_ROUTE_DESTINATION,
-                mDataset.get(position).getRouteID(),
-                DBContract.Route.TABLE_ROUTE,
-                DBContract.Route.COLUMN_ROUTE_ID);
+        routeName = (mDataset.get(position).getStringFromDB(context,
+                        DBContract.Route.COLUMN_ROUTE_ORIGIN,
+                        mDataset.get(position).getRouteID(),
+                        DBContract.Route.TABLE_ROUTE,
+                        DBContract.Route.COLUMN_ROUTE_ID) + " to " +
+                    mDataset.get(position).getStringFromDB(context,
+                        DBContract.Route.COLUMN_ROUTE_DESTINATION,
+                        mDataset.get(position).getRouteID(),
+                        DBContract.Route.TABLE_ROUTE,
+                        DBContract.Route.COLUMN_ROUTE_ID));
 
         passengerCount = mDataset.get(position).getPassengerIDList().size();
     }

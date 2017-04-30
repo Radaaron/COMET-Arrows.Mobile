@@ -36,21 +36,18 @@ public class UpcomingTripsFragment extends Fragment implements OnTripSelectedLis
         rv.setHasFixedSize(true);
         ArrayList<KeyHandler> fullList = getArguments().getParcelableArrayList("tripList");
         tripList = new ArrayList<>();
-        String[] columns = {""}, selection = {""};
-        String arrivalTime = "";
-
-        // check if trip is pending
+        String arrivalTime;
+        // check if trip is pending and has passengers
         for(int i = 0 ; i < fullList.size(); i++){
             arrivalTime = fullList.get(i).getStringFromDB(this.getContext(),
                     DBContract.Trip.COLUMN_ARRIVAL_TIME,
                     fullList.get(i).getTripID(),
                     DBContract.Trip.TABLE_TRIP,
                     DBContract.Trip.COLUMN_TRIP_ID);
-            if(arrivalTime == null){
+            if(arrivalTime.equals("null") && (fullList.get(i).getPassengerIDList().size() > 0)){
                 tripList.add(fullList.get(i));
             }
         }
-
         TripRecyclerAdapter adapter = new TripRecyclerAdapter(tripList, this, getContext());
         rv.setAdapter(adapter);
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());

@@ -1,5 +1,6 @@
 package com.example.aaron.arrowsmobile;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -36,10 +37,6 @@ public class DBHandler extends SQLiteOpenHelper{
         db.execSQL(DBContract.CREATE_TABLE_USER);
         db.execSQL(DBContract.CREATE_TABLE_VEHICLE);
         db.execSQL(DBContract.CREATE_TABLE_LANDING);
-//        // create mock values first time
-//        if(!createMockData(db)){
-//            System.out.println("INSERT ERROR");
-//        }
     }
 
     @Override
@@ -61,12 +58,15 @@ public class DBHandler extends SQLiteOpenHelper{
         onCreate(db);
     }
 
-    // checks if data insert is not successful
-    public boolean dbInsertTest(long test){
-        if(test == -1){
-            return true;
-        }
-        return false;
+    public void createAppTables(){
+        // Landing Table
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(DBContract.Local.COLUMN_LOCAL_ID, 1); // there should only be one
+        cv.putNull(DBContract.Local.COLUMN_LOCAL_PLATE_NUM);
+        cv.putNull(DBContract.Local.COLUMN_LOCAL_DRIVER);
+        cv.putNull(DBContract.Local.COLUMN_LOCAL_ACTIVITY);
+        db.insert(DBContract.Local.TABLE_LOCAL, null, cv);
     }
 
     public ArrayList<KeyHandler> getTripKeyHolderList(){
@@ -78,14 +78,19 @@ public class DBHandler extends SQLiteOpenHelper{
             int tripID = 0, driverID = 0, tripSchedID = 0, routeID = 0, lineID = 0;
             String vehicleID = null, order = null;
             String[] columns = {"", null}, selection = {""};
-            ArrayList<Integer> stopIDList = new ArrayList<>(), passengerIDList = new ArrayList<>(), userIDList = new ArrayList<>(), reservationNumList = new ArrayList<>();
+            ArrayList<Integer> stopIDList, passengerIDList, userIDList, reservationNumList;
             do {
+                stopIDList = new ArrayList<>();
+                passengerIDList = new ArrayList<>();
+                userIDList = new ArrayList<>();
+                reservationNumList = new ArrayList<>();
                 tripID = cTrip.getInt(cTrip.getColumnIndex(DBContract.Trip.COLUMN_TRIP_ID));
                 vehicleID = cTrip.getString(cTrip.getColumnIndex(DBContract.Trip.COLUMN_TRIP_VEHICLE));
                 driverID = cTrip.getInt(cTrip.getColumnIndex(DBContract.Trip.COLUMN_TRIP_DRIVER));
                 tripSchedID = cTrip.getInt(cTrip.getColumnIndex(DBContract.Trip.COLUMN_TRIP_TRIP_SCHED));
 
                 // get routeID from tripSchedID route foreign key
+                columns[1] = null; // reset
                 columns[0] = DBContract.TripSched.COLUMN_TRIP_SCHED_ROUTE;
                 selection[0] = String.valueOf(tripSchedID);
                 Cursor cRoute = db.query(DBContract.TripSched.TABLE_TRIP_SCHED,
@@ -166,7 +171,7 @@ public class DBHandler extends SQLiteOpenHelper{
                 Cursor cPassenger = null;
                 // get list of passengerID using reservationNum foreign keys
                 columns[0] = DBContract.Passenger.COLUMN_PASSENGER_ID;
-                columns[1] = null; // clear
+                columns[1] = null; // reset
                 for(int i = 0; i < reservationNumList.size(); i++){
                     selection[0] = String.valueOf(reservationNumList.get(i));
                     cPassenger = db.query(DBContract.Passenger.TABLE_PASSENGER,

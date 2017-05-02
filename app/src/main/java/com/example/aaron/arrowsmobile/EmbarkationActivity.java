@@ -83,7 +83,7 @@ public class EmbarkationActivity extends AppCompatActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+        SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
         SQLiteDatabase db = dbHandler.getWritableDatabase();
         if (resultCode == RESULT_CANCELED) {
             // no change, just refresh whatever the current fragment is

@@ -14,6 +14,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,6 +24,8 @@ import android.widget.Toast;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+
+import static android.content.ContentValues.TAG;
 
 public class TripActivity extends AppCompatActivity implements View.OnClickListener, OnFragmentInteractionListener, OnTripStopListener{
 
@@ -104,7 +107,7 @@ public class TripActivity extends AppCompatActivity implements View.OnClickListe
             // nothing lol
         } else if(resultCode == RESULT_OK){
             String id = data.getStringExtra("id");
-            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+            SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
             Calendar cal;
             SQLiteDatabase db = dbHandler.getWritableDatabase();
             ContentValues cv = new ContentValues();
@@ -140,7 +143,7 @@ public class TripActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         if (view.getId()== R.id.next_stop_button) {
             // update trip arrival time
-            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+            SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
             SQLiteDatabase db = dbHandler.getWritableDatabase();
             ContentValues cv = new ContentValues();
             Calendar cal = Calendar.getInstance();
@@ -197,7 +200,7 @@ public class TripActivity extends AppCompatActivity implements View.OnClickListe
                             DBContract.Stop.TABLE_STOP,
                             DBContract.Stop.COLUMN_STOP_ID),
                     selectedTrip.getStringFromDB(getApplicationContext(),
-                            DBContract.Stop.COLUMN_LONGITUDE,
+                            DBContract.Stop.COLUMN_LATITUDE,
                             selectedTrip.getStopIDList().get(i),
                             DBContract.Stop.TABLE_STOP,
                             DBContract.Stop.COLUMN_STOP_ID),
@@ -208,6 +211,11 @@ public class TripActivity extends AppCompatActivity implements View.OnClickListe
                             DBContract.Stop.COLUMN_STOP_ID)
             );
             stopList.add(stop);
+            Log.e(TAG, "index: " + i);
+            Log.e(TAG, "stopId: " + stopList.get(i).getStopID());
+            Log.e(TAG, "stopName: " + stopList.get(i).getStopName());
+            Log.e(TAG, "stopLat: " + stopList.get(i).getLatitude());
+            Log.e(TAG, "stopLong: " + stopList.get(i).getLongitude());
         }
     }
 

@@ -4,8 +4,11 @@ package com.example.aaron.arrowsmobile;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
+import android.util.Log;
 
 import java.util.ArrayList;
+
+import static android.content.ContentValues.TAG;
 
 public class GPSHandler implements LocationListener {
 
@@ -25,6 +28,7 @@ public class GPSHandler implements LocationListener {
         latitude = location.getLatitude();
         longitude = location.getLongitude();
         stopName = checkGPSFences(latitude, longitude);
+        Log.e(TAG, "Lat: " + latitude + " Long: " + longitude + " stopName: " + stopName);
         mListener.OnTripStopArrival(stopName);
     }
 
@@ -61,7 +65,8 @@ public class GPSHandler implements LocationListener {
     // fills up fenceList with GPSFence objects with parameters from Constants
     public void populateFenceList(ArrayList<Stop> stopList){
         for(int i = 0; i < stopList.size(); i++){
-            GPSFence fence = new GPSFence(stopList.get(i).getStopName(), Double.parseDouble(stopList.get(i).getLongitude()), Double.parseDouble(stopList.get(i).getLatitude()), 5.00);
+            // 0.01 = 1.1132 km radius
+            GPSFence fence = new GPSFence(stopList.get(i).getStopName(), Double.parseDouble(stopList.get(i).getLongitude()), Double.parseDouble(stopList.get(i).getLatitude()), 0.01);
             fenceList.add(fence);
         }
     }

@@ -98,7 +98,7 @@ public class EmbarkationPassengerRecyclerAdapter extends RecyclerView.Adapter<Em
         holder.passengerCardView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+                final SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
                 if(keyHandler.getStringFromDB(context,
                         DBContract.Passenger.COLUMN_TAP_IN,
                         Integer.toString(mDataset.get(pos)),

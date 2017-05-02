@@ -23,7 +23,8 @@ public class MainActivity extends AppCompatActivity implements OnNetworkSuccessL
         if(keyHandler.getStringFromDB(this, DBContract.Local.COLUMN_LOCAL_PLATE_NUM, 1, DBContract.Local.TABLE_LOCAL, DBContract.Local.COLUMN_LOCAL_ID) == null || keyHandler.getStringFromDB(this, DBContract.Local.COLUMN_LOCAL_PLATE_NUM, 1, DBContract.Local.TABLE_LOCAL, DBContract.Local.COLUMN_LOCAL_ID) == null){
             Toast.makeText(getApplicationContext(), "Getting JSON Data...", Toast.LENGTH_LONG).show();
             try {
-                NetworkHandler networkHandler = new NetworkHandler(this, this);
+                NetworkHandler networkHandler = new NetworkHandler(this);
+                networkHandler.volleyGetRequest(this);
             } catch (JSONException e) {
                 e.printStackTrace();
             }

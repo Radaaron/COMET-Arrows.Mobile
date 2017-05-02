@@ -28,7 +28,6 @@ public class GPSHandler implements LocationListener {
         latitude = location.getLatitude();
         longitude = location.getLongitude();
         stopName = checkGPSFences(latitude, longitude);
-        Log.e(TAG, "Lat: " + latitude + " Long: " + longitude + " stopName: " + stopName);
         mListener.OnTripStopArrival(stopName);
     }
 
@@ -65,8 +64,8 @@ public class GPSHandler implements LocationListener {
     // fills up fenceList with GPSFence objects with parameters from Constants
     public void populateFenceList(ArrayList<Stop> stopList){
         for(int i = 0; i < stopList.size(); i++){
-            // 0.01 = 1.1132 km radius
-            GPSFence fence = new GPSFence(stopList.get(i).getStopName(), Double.parseDouble(stopList.get(i).getLongitude()), Double.parseDouble(stopList.get(i).getLatitude()), 0.01);
+            // 0.1 = 11.132 km radius
+            GPSFence fence = new GPSFence(stopList.get(i).getStopName(), Double.parseDouble(stopList.get(i).getLongitude()), Double.parseDouble(stopList.get(i).getLatitude()), 0.1);
             fenceList.add(fence);
         }
     }

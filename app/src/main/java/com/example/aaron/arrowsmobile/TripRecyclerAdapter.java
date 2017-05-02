@@ -70,10 +70,10 @@ public class TripRecyclerAdapter extends RecyclerView.Adapter<TripRecyclerAdapte
 
     public void populateCardItem(int position){
         depTime = mDataset.get(position).getStringFromDB(context,
-                DBContract.Trip.COLUMN_DEP_TIME,
-                mDataset.get(position).getTripID(),
-                DBContract.Trip.TABLE_TRIP,
-                DBContract.Trip.COLUMN_TRIP_ID);
+                DBContract.TripSched.COLUMN_DEP_TIME,
+                mDataset.get(position).getTripSchedID(),
+                DBContract.TripSched.TABLE_TRIP_SCHED,
+                DBContract.TripSched.COLUMN_TRIP_SCHED_ID);
 
         routeName = (mDataset.get(position).getStringFromDB(context,
                         DBContract.Route.COLUMN_ROUTE_ORIGIN,

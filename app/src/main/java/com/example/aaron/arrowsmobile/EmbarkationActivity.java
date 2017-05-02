@@ -91,7 +91,7 @@ public class EmbarkationActivity extends AppCompatActivity
                 setPassengerManifestFragment();
             }
         } else if(resultCode == RESULT_OK){
-            final String id = data.getStringExtra("id");
+            String id = data.getStringExtra("id");
             // check whether id is in manifest or is chance passenger
             for(int i = 0; i < selectedTrip.getPassengerIDList().size(); i++){
                 if(Integer.toString(selectedTrip.getPassengerIDList().get(i)).equals(id)){

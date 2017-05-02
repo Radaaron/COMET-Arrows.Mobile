@@ -42,7 +42,7 @@
             </TextView>
 
             <TextView
-                android:text="x/x"
+                android:text="x"
                 android:id="@+id/trip_passenger_count_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

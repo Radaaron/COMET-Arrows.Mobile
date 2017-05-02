@@ -74,7 +74,7 @@ public class PassengerManifestRecyclerAdapter extends RecyclerView.Adapter<Passe
         holder.passengerIdView.setText(Integer.toString(userID));
         holder.passengerNameView.setText(passengerName);
         // for viewing only
-        holder.passengerCheckInBox.setEnabled(false);
+        holder.passengerCheckInBox.setVisibility(View.INVISIBLE);
     }
 
 

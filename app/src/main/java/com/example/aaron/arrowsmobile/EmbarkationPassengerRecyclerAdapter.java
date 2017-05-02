@@ -24,6 +24,7 @@ public class EmbarkationPassengerRecyclerAdapter extends RecyclerView.Adapter<Em
     KeyHandler keyHandler;
     DBHandler dbHandler;
     Context context;
+    KeyHandler selectedTrip;
 
     // Provide a reference to the views for each data item
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -40,11 +41,12 @@ public class EmbarkationPassengerRecyclerAdapter extends RecyclerView.Adapter<Em
         }
     }
 
-    public EmbarkationPassengerRecyclerAdapter(ArrayList<Integer> myDataset, Context context) {
+    public EmbarkationPassengerRecyclerAdapter(ArrayList<Integer> myDataset, Context context, KeyHandler selectedTrip) {
         this.mDataset = myDataset;
         this.keyHandler = new KeyHandler();
         this.context = context;
         this.dbHandler = new DBHandler(context);
+        this.selectedTrip = selectedTrip;
     }
 
     // Create new views (invoked by the layout manager)
@@ -112,6 +114,8 @@ public class EmbarkationPassengerRecyclerAdapter extends RecyclerView.Adapter<Em
                             Calendar cal = Calendar.getInstance();
                             ContentValues cv = new ContentValues();
                             cv.put(DBContract.Passenger.COLUMN_TAP_IN, timeFormat.format(cal.getTime()));
+                            cv.put(DBContract.Passenger.COLUMN_PASSENGER_DRIVER, selectedTrip.getDriverID());
+                            cv.put(DBContract.Passenger.COLUMN_PASSENGER_VEHICLE, selectedTrip.getVehicleID());
                             db.update(DBContract.Passenger.TABLE_PASSENGER, cv, DBContract.Passenger.COLUMN_PASSENGER_ID + "=" + Integer.toString(mDataset.get(pos)), null);
                             notifyDataSetChanged();
                         }

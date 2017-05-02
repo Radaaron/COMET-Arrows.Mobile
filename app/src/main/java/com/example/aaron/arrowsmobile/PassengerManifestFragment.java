@@ -31,7 +31,7 @@ public class PassengerManifestFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_passenger_manifest, container, false);
         selectedTrip = getArguments().getParcelable("selectedTrip");
         RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.passenger_manifest_recycler_view);
-        EmbarkationPassengerRecyclerAdapter adapter = new EmbarkationPassengerRecyclerAdapter(selectedTrip.getPassengerIDList(), getContext());
+        EmbarkationPassengerRecyclerAdapter adapter = new EmbarkationPassengerRecyclerAdapter(selectedTrip.getPassengerIDList(), getContext(), selectedTrip);
         recyclerView.setAdapter(adapter);
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), llm.getOrientation()); // item divider

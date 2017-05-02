@@ -20,7 +20,9 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class LandingActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnFragmentInteractionListener{
@@ -154,19 +156,6 @@ public class LandingActivity extends AppCompatActivity
         return true;
     }
 
-    @Override
-    public void onFragmentInteraction(Object object) {
-        Intent intent = new Intent();
-        KeyHandler selectedTrip = (KeyHandler) object;
-        // update selectedTrip vehicle and driver
-        selectedTrip.setVehicleID(getIdFromPlate());
-        selectedTrip.setDriverID(getIdFromDriver());
-        intent.putExtra("next", "Embarkation");
-        intent.putExtra("selectedTrip", selectedTrip);
-        setResult(Activity.RESULT_OK, intent);
-        finish();
-    }
-
     public void refreshLandingDetails(){
         String plateNum = keyHandler.getStringFromDB(this,
                 DBContract.Local.COLUMN_LOCAL_PLATE_NUM,
@@ -199,6 +188,28 @@ public class LandingActivity extends AppCompatActivity
                 DBContract.Local.COLUMN_LOCAL_ID);
         String[] temp = driver.split(" ");
         return keyHandler.getIntFromDB(this, DBContract.Driver.COLUMN_DRIVER_ID, temp[0], DBContract.Driver.TABLE_DRIVER, DBContract.Driver.COLUMN_FIRST_NAME);
+    }
+
+    @Override
+    public void onFragmentInteraction(Object object) {
+        Intent intent = new Intent();
+        KeyHandler selectedTrip = (KeyHandler) object;
+        // update selectedTrip vehicle and driver
+        selectedTrip.setVehicleID(getIdFromPlate(), getApplicationContext());
+        selectedTrip.setDriverID(getIdFromDriver(), getApplicationContext());
+        // update trip depTime
+        SQLiteDatabase db = dbHandler.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        final SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
+        Calendar cal = Calendar.getInstance();
+        cv.put(DBContract.Trip.COLUMN_DEP_TIME, timeFormat.format(cal.getTime()));
+        db.update(DBContract.Trip.TABLE_TRIP, cv, DBContract.Trip.COLUMN_TRIP_ID + "=" + selectedTrip.getTripID(), null);
+        db.close();
+        // send selectedTrip to embarkation activity
+        intent.putExtra("next", "Embarkation");
+        intent.putExtra("selectedTrip", selectedTrip);
+        setResult(Activity.RESULT_OK, intent);
+        finish();
     }
 
 }

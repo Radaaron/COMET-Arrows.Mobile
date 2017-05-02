@@ -1,5 +1,6 @@
 package com.example.aaron.arrowsmobile;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -113,10 +114,6 @@ public class KeyHandler implements Parcelable{
         return driverID;
     }
 
-    public void setDriverID(int driverID) {
-        this.driverID = driverID;
-    }
-
     public ArrayList<Integer> getPassengerIDList() {
         return passengerIDList;
     }
@@ -127,10 +124,6 @@ public class KeyHandler implements Parcelable{
 
     public String getVehicleID() {
         return vehicleID;
-    }
-
-    public void setVehicleID(String vehicleID) {
-        this.vehicleID = vehicleID;
     }
 
     public ArrayList<Integer> getUserIDList() {
@@ -147,6 +140,28 @@ public class KeyHandler implements Parcelable{
 
     public void setReservationNumList(ArrayList<Integer> reservationNumList) {
         this.reservationNumList = reservationNumList;
+    }
+
+    // following setters also overwrite the db
+
+    public void setDriverID(int driverID, Context context) {
+        this.driverID = driverID;
+        dbHandler = new DBHandler(context);
+        SQLiteDatabase db = dbHandler.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(DBContract.Trip.COLUMN_TRIP_DRIVER, driverID);
+        db.update(DBContract.Trip.TABLE_TRIP, cv, DBContract.Trip.COLUMN_TRIP_ID + "=" + getTripID(), null);
+        db.close();
+    }
+
+    public void setVehicleID(String vehicleID, Context context) {
+        this.vehicleID = vehicleID;
+        dbHandler = new DBHandler(context);
+        SQLiteDatabase db = dbHandler.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(DBContract.Trip.COLUMN_TRIP_VEHICLE, vehicleID);
+        db.update(DBContract.Trip.TABLE_TRIP, cv, DBContract.Trip.COLUMN_TRIP_ID + "=" + getTripID(), null);
+        db.close();
     }
 
     @Override

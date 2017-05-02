@@ -8,12 +8,17 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import static android.content.ContentValues.TAG;
 
-public class JSONParser {
+// handles the json parse into db and and db to json
+public class JSONHandler {
     private JSONObject json;
 
-    public JSONParser(JSONObject json){
+    public JSONHandler(JSONObject json){
         this.json = json;
     }
 
@@ -185,6 +190,11 @@ public class JSONParser {
         } catch (final JSONException e) {
             Log.e(TAG, "Json parsing error: " + e.getMessage());
         }
+    }
+
+    public Map<String, String> dbToJson(){
+        Map<String, String> jsonMap = new HashMap<String, String>();
+        return jsonMap;
     }
 
 }

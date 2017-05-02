@@ -18,14 +18,17 @@ public class NetworkHandler {
     String url = "http://frozen-escarpment-35603.herokuapp.com/json";
     OnNetworkSuccessListener onNetworkSuccessListener;
 
-    NetworkHandler(Context context, OnNetworkSuccessListener listener) throws JSONException {
+    NetworkHandler(OnNetworkSuccessListener listener) throws JSONException {
         onNetworkSuccessListener = listener;
+    }
+
+    public void volleyGetRequest(Context context){
         final Context ctx = context;
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        JSONParser jsonParser = new JSONParser(response);
+                        JSONHandler jsonParser = new JSONHandler(response);
                         jsonParser.parseJSON(ctx);
                         onNetworkSuccessListener.onNetworkSuccess(true);
                     }

@@ -3,7 +3,6 @@ package com.example.aaron.arrowsmobile;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.Toast;
 
 import org.json.JSONException;
 
@@ -15,13 +14,13 @@ public class MainActivity extends AppCompatActivity implements OnNetworkSuccessL
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.loading_layout);
         // build database
         dbHandler = new DBHandler(this);
         dbHandler.createAppTables();
         keyHandler = new KeyHandler();
         // check if landing details are present
         if(keyHandler.getStringFromDB(this, DBContract.Local.COLUMN_LOCAL_PLATE_NUM, 1, DBContract.Local.TABLE_LOCAL, DBContract.Local.COLUMN_LOCAL_ID) == null || keyHandler.getStringFromDB(this, DBContract.Local.COLUMN_LOCAL_PLATE_NUM, 1, DBContract.Local.TABLE_LOCAL, DBContract.Local.COLUMN_LOCAL_ID) == null){
-            Toast.makeText(getApplicationContext(), "Getting JSON Data...", Toast.LENGTH_LONG).show();
             try {
                 NetworkHandler networkHandler = new NetworkHandler(this);
                 networkHandler.volleyGetRequest(this);
@@ -65,6 +64,10 @@ public class MainActivity extends AppCompatActivity implements OnNetworkSuccessL
             startActivityForResult(intent, 1);
         } else if(next.equals("Trip")){
             Intent intent = new Intent(this, TripActivity.class);
+            intent.putExtra("selectedTrip", selectedTrip);
+            startActivityForResult(intent, 1);
+        } else if(next.equals("Summary")){
+            Intent intent = new Intent(this, TripSummaryActivity.class);
             intent.putExtra("selectedTrip", selectedTrip);
             startActivityForResult(intent, 1);
         }

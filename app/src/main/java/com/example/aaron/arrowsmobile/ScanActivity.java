@@ -39,6 +39,7 @@ public class ScanActivity extends AppCompatActivity {
                 finish();
             } else {
                 String id = result.getContents();
+                // name tapped in
                 Toast.makeText(this, "Scanned: " + id, Toast.LENGTH_LONG).show();
                 Intent intent = new Intent();
                 intent.putExtra("id", id);

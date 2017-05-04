@@ -17,6 +17,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,12 +29,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 public class LandingActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OnFragmentInteractionListener{
+        implements NavigationView.OnNavigationItemSelectedListener, OnFragmentInteractionListener, AdapterView.OnItemSelectedListener{
 
     DBHandler dbHandler;
     KeyHandler keyHandler; // used to assign plate num and driver to trip selected
     ArrayList<KeyHandler> tripList;
     TextView plateNumView, driverNameView;
+    Spinner routeSpinner;
     Fragment currentFragment;
 
     @Override
@@ -48,7 +53,15 @@ public class LandingActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         plateNumView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.plateNumView);
         driverNameView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.driverNameView);
-        setTitle("Upcoming Trips");
+        routeSpinner = (Spinner) findViewById(R.id.trip_route_spinner);
+        routeSpinner.setOnItemSelectedListener(this);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        TextView toolbarTitle = (TextView) findViewById(R.id.custom_toolbar_title);
+        TextView toolbarDate = (TextView) findViewById(R.id.toolbar_date);
+        toolbarTitle.setText("Upcoming Trips");
+        SimpleDateFormat timeFormat = new SimpleDateFormat("MM/dd/yyyy");
+        Calendar cal = Calendar.getInstance();
+        toolbarDate.setText(timeFormat.format(cal.getTime()));
 
         // retrieve data for recycler view
         dbHandler = new DBHandler(this);
@@ -56,9 +69,36 @@ public class LandingActivity extends AppCompatActivity
         keyHandler = new KeyHandler();
         refreshLandingDetails();
 
-        // commit upcoming trips fragment
+        // populate spinner
+        ArrayList<String> routeOrigins = keyHandler.getStringArrayListFromDB(this, DBContract.Route.COLUMN_ROUTE_ORIGIN, DBContract.Route.TABLE_ROUTE);
+        ArrayList<String> routeDestinations = keyHandler.getStringArrayListFromDB(this, DBContract.Route.COLUMN_ROUTE_DESTINATION, DBContract.Route.TABLE_ROUTE);
+        ArrayList<String> routeItems = new ArrayList<>();
+        for(int i = 0; i < routeOrigins.size(); i++){
+            routeItems.add(routeOrigins.get(i) + " to " + routeDestinations.get(i));
+        }
+        ArrayAdapter<String> routeAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, routeItems);
+        routeAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
+        routeSpinner.setAdapter(routeAdapter);
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        filterTrips(getIdFromRoute(parent.getItemAtPosition(position).toString()));
+    }
+    public void onNothingSelected(AdapterView<?> arg0) {
+        // nothing
+    }
+
+    public void filterTrips(int routeId){
+        // commit upcoming trips fragment with filtered tripList
+        ArrayList<KeyHandler> filteredList = new ArrayList<>();
+        for(int i = 0; i < tripList.size(); i++){
+            if(tripList.get(i).getRouteID() == routeId){
+                filteredList.add(tripList.get(i));
+            }
+        }
         Bundle bundle = new Bundle();
-        bundle.putParcelableArrayList("tripList", tripList);
+        bundle.putParcelableArrayList("filteredList", filteredList);
         currentFragment = new UpcomingTripsFragment();
         currentFragment.setArguments(bundle);
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -190,6 +230,11 @@ public class LandingActivity extends AppCompatActivity
         return keyHandler.getIntFromDB(this, DBContract.Driver.COLUMN_DRIVER_ID, temp[0], DBContract.Driver.TABLE_DRIVER, DBContract.Driver.COLUMN_FIRST_NAME);
     }
 
+    public int getIdFromRoute(String routeItem){
+        String[] temp = routeItem.split("to ");
+        return keyHandler.getIntFromDB(this, DBContract.Route.COLUMN_ROUTE_ID, temp[1], DBContract.Route.TABLE_ROUTE, DBContract.Route.COLUMN_ROUTE_DESTINATION);
+    }
+
     @Override
     public void onFragmentInteraction(Object object) {
         Intent intent = new Intent();
@@ -200,7 +245,7 @@ public class LandingActivity extends AppCompatActivity
         // update trip depTime
         SQLiteDatabase db = dbHandler.getWritableDatabase();
         ContentValues cv = new ContentValues();
-        final SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
+        SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
         Calendar cal = Calendar.getInstance();
         cv.put(DBContract.Trip.COLUMN_DEP_TIME, timeFormat.format(cal.getTime()));
         db.update(DBContract.Trip.TABLE_TRIP, cv, DBContract.Trip.COLUMN_TRIP_ID + "=" + selectedTrip.getTripID(), null);

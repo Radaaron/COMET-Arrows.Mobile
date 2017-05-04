@@ -16,6 +16,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class TripDetailsDialogFragment extends DialogFragment implements View.OnClickListener{
 
     OnFragmentInteractionListener mListener;
@@ -35,18 +39,32 @@ public class TripDetailsDialogFragment extends DialogFragment implements View.On
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.trip_details_dialog, container, false);
         Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.dialog_toolbar);
-        toolbar.setTitle("Trip Passenger Manifest");
+        selectedTrip = getArguments().getParcelable("tripSelected");
+        SimpleDateFormat sentFormat = new SimpleDateFormat("h:mm:ss a");
+        SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
+        Date date = null;
+        try {
+            date = sentFormat.parse(selectedTrip.getStringFromDB(getContext(),
+                    DBContract.TripSched.COLUMN_DEP_TIME,
+                    selectedTrip.getTripSchedID(),
+                    DBContract.TripSched.TABLE_TRIP_SCHED,
+                    DBContract.TripSched.COLUMN_TRIP_SCHED_ID));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        String depTime = timeFormat.format(date);
+        String route = selectedTrip.getStringFromDB(getContext(), DBContract.Route.COLUMN_ROUTE_ORIGIN, selectedTrip.getRouteID(), DBContract.Route.TABLE_ROUTE, DBContract.Route.COLUMN_ROUTE_ID)
+                + " to " + selectedTrip.getStringFromDB(getContext(), DBContract.Route.COLUMN_ROUTE_DESTINATION, selectedTrip.getRouteID(), DBContract.Route.TABLE_ROUTE, DBContract.Route.COLUMN_ROUTE_ID);
+        toolbar.setTitle(depTime + " | " + route);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeButtonEnabled(true);
-            actionBar.setHomeAsUpIndicator(android.R.drawable.ic_menu_revert);
         }
         setHasOptionsMenu(true);
 
         // trip passenger manifest
-        selectedTrip = getArguments().getParcelable("tripSelected");
         RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.landing_manifest_recycler_view);
         PassengerManifestRecyclerAdapter adapter = new PassengerManifestRecyclerAdapter(selectedTrip.getPassengerIDList(), getContext());
         recyclerView.setAdapter(adapter);
@@ -54,7 +72,6 @@ public class TripDetailsDialogFragment extends DialogFragment implements View.On
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), llm.getOrientation()); // item divider
         recyclerView.addItemDecoration(dividerItemDecoration);
         recyclerView.setLayoutManager(llm);
-
         embarkationStart = (Button) rootView.findViewById(R.id.start_embarkation_button);
         embarkationStart.setOnClickListener(this);
 

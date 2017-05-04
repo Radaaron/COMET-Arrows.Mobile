@@ -53,7 +53,7 @@ public class TripActivity extends AppCompatActivity implements View.OnClickListe
         selectedTrip = getIntent().getParcelableExtra("selectedTrip");
         populateStopList();
         gpsHandler = new GPSHandler(stopList, this);
-        setTitle("Trip Route: " + selectedTrip.getStringFromDB(getApplicationContext(),
+        setTitle("Enroute to: " + selectedTrip.getStringFromDB(getApplicationContext(),
                 DBContract.Route.COLUMN_ROUTE_DESTINATION,
                 selectedTrip.getRouteID(),
                 DBContract.Route.TABLE_ROUTE,
@@ -149,9 +149,10 @@ public class TripActivity extends AppCompatActivity implements View.OnClickListe
             Calendar cal = Calendar.getInstance();
             cv.put(DBContract.Trip.COLUMN_ARRIVAL_TIME, timeFormat.format(cal.getTime()));
             db.update(DBContract.Trip.TABLE_TRIP, cv, DBContract.Trip.COLUMN_TRIP_ID + "=" +selectedTrip.getTripID(), null);
-            // go back to landing activity for new trip
+            // go to trip summary
             Intent intent = new Intent();
-            intent.putExtra("next", "Landing");
+            intent.putExtra("next", "Summary");
+            intent.putExtra("selectedTrip", selectedTrip);
             setResult(Activity.RESULT_OK, intent);
             finish();
         }

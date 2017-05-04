@@ -107,7 +107,7 @@ public class EmbarkationPassengerRecyclerAdapter extends RecyclerView.Adapter<Em
                         DBContract.Passenger.TABLE_PASSENGER,
                         DBContract.Passenger.COLUMN_PASSENGER_ID).equals("null")){
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                    builder.setMessage("Manually Tap In " + Integer.toString(userID) + "?");
+                    builder.setMessage("Manually Embark " + Integer.toString(userID) + "?");
                     builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             SQLiteDatabase db = dbHandler.getWritableDatabase();
@@ -128,7 +128,7 @@ public class EmbarkationPassengerRecyclerAdapter extends RecyclerView.Adapter<Em
                     dialog.show();
                     return true;
                 }
-                Toast.makeText(context, "Passenger is already tapped in", Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "Passenger has already embarked!", Toast.LENGTH_LONG).show();
                 return false;
             }
         });

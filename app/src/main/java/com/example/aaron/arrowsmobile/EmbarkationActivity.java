@@ -105,7 +105,7 @@ public class EmbarkationActivity extends AppCompatActivity
                     // refresh passenger manifest
                     setPassengerManifestFragment();
                 } else{
-                    Toast.makeText(this, "ID is not part of this trip!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "This person is not part of this trip!", Toast.LENGTH_LONG).show();
                 }
             }
         }

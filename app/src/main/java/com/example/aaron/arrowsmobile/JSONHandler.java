@@ -9,6 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -192,8 +193,12 @@ public class JSONHandler {
         }
     }
 
-    public Map<String, String> dbToJson(){
+    public Map<String, String> dbToJson(ArrayList<KeyHandler> tripList){
         Map<String, String> jsonMap = new HashMap<String, String>();
+        KeyHandler keyHandler = new KeyHandler();
+        for(int i = 0; i < tripList.size(); i++){
+
+        }
         return jsonMap;
     }
 

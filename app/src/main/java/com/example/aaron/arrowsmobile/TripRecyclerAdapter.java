@@ -8,7 +8,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class TripRecyclerAdapter extends RecyclerView.Adapter<TripRecyclerAdapter.ViewHolder> {
 
@@ -16,7 +19,7 @@ public class TripRecyclerAdapter extends RecyclerView.Adapter<TripRecyclerAdapte
     private int selected = -1;
     private ArrayList<KeyHandler> mDataset;
     Context context;
-    private String depTime = "", routeName = "";
+    private String depTime = "", routeDescription = "";
     private int passengerCount = 0;
 
     // Provide a reference to the views for each data item
@@ -53,9 +56,13 @@ public class TripRecyclerAdapter extends RecyclerView.Adapter<TripRecyclerAdapte
     // Fills the contents of a view, tags each card, and implements onclick listener to return selected trip index
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        populateCardItem(position);
+        try {
+            populateCardItem(position);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         holder.tripTimeView.setText(depTime);
-        holder.tripRouteView.setText(routeName);
+        holder.tripRouteView.setText(routeDescription);
         // "passenger count / capacity"
         holder.tripPassengerCountView.setText("" + passengerCount);
         holder.tripCardView.setTag(position);
@@ -68,14 +75,19 @@ public class TripRecyclerAdapter extends RecyclerView.Adapter<TripRecyclerAdapte
         });
     }
 
-    public void populateCardItem(int position){
-        depTime = mDataset.get(position).getStringFromDB(context,
+    public void populateCardItem(int position) throws ParseException {
+        SimpleDateFormat sentFormat = new SimpleDateFormat("h:mm:ss a");
+        SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
+
+        Date date = sentFormat.parse(mDataset.get(position).getStringFromDB(context,
                 DBContract.TripSched.COLUMN_DEP_TIME,
                 mDataset.get(position).getTripSchedID(),
                 DBContract.TripSched.TABLE_TRIP_SCHED,
-                DBContract.TripSched.COLUMN_TRIP_SCHED_ID);
+                DBContract.TripSched.COLUMN_TRIP_SCHED_ID));
 
-        routeName = (mDataset.get(position).getStringFromDB(context,
+        depTime = timeFormat.format(date);
+
+        routeDescription = (mDataset.get(position).getStringFromDB(context,
                         DBContract.Route.COLUMN_ROUTE_ORIGIN,
                         mDataset.get(position).getRouteID(),
                         DBContract.Route.TABLE_ROUTE,

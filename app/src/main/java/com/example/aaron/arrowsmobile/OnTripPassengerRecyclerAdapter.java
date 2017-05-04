@@ -105,7 +105,7 @@ public class OnTripPassengerRecyclerAdapter extends RecyclerView.Adapter<Embarka
                         DBContract.Passenger.TABLE_PASSENGER,
                         DBContract.Passenger.COLUMN_PASSENGER_ID).equals("null")){
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                    builder.setMessage("Manually Tap Out Passenger?");
+                    builder.setMessage("Manually Disembark?");
                     builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             SQLiteDatabase db = dbHandler.getWritableDatabase();
@@ -113,7 +113,7 @@ public class OnTripPassengerRecyclerAdapter extends RecyclerView.Adapter<Embarka
                             ContentValues cv = new ContentValues();
                             cv.put(DBContract.Passenger.COLUMN_TAP_OUT, timeFormat.format(cal.getTime()));
                             db.update(DBContract.Passenger.TABLE_PASSENGER, cv, DBContract.Passenger.COLUMN_PASSENGER_ID + "=" + Integer.toString(mDataset.get(pos)), null);
-                            Toast.makeText(context, "Passenger Tapped Out", Toast.LENGTH_LONG).show();
+                            Toast.makeText(context, "Passenger Has Disembarked", Toast.LENGTH_LONG).show();
                             mDataset.remove(pos);
                             notifyItemRemoved(pos);
                         }

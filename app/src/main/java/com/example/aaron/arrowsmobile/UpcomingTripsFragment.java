@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -34,7 +35,7 @@ public class UpcomingTripsFragment extends Fragment implements OnTripSelectedLis
         View rootView = inflater.inflate(R.layout.fragment_upcoming_trips, container, false);
         RecyclerView rv = (RecyclerView) rootView.findViewById(R.id.pending_trips_recycler_view);
         rv.setHasFixedSize(true);
-        ArrayList<KeyHandler> fullList = getArguments().getParcelableArrayList("tripList");
+        ArrayList<KeyHandler> fullList = getArguments().getParcelableArrayList("filteredList");
         tripList = new ArrayList<>();
         String arrivalTime;
         // check if trip is pending and has passengers
@@ -44,13 +45,15 @@ public class UpcomingTripsFragment extends Fragment implements OnTripSelectedLis
                     fullList.get(i).getTripID(),
                     DBContract.Trip.TABLE_TRIP,
                     DBContract.Trip.COLUMN_TRIP_ID);
-            if(arrivalTime.equals("null") && (fullList.get(i).getPassengerIDList().size() > 0)){
+            if(arrivalTime.equals("null")){
                 tripList.add(fullList.get(i));
             }
         }
         TripRecyclerAdapter adapter = new TripRecyclerAdapter(tripList, this, getContext());
         rv.setAdapter(adapter);
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(rv.getContext(), llm.getOrientation()); // item divider
+        rv.addItemDecoration(dividerItemDecoration);
         rv.setLayoutManager(llm);
         return rootView;
     }

@@ -10,6 +10,7 @@ public class MainActivity extends AppCompatActivity implements OnNetworkSuccessL
 
     DBHandler dbHandler;
     KeyHandler keyHandler;
+    NetworkHandler networkHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -22,7 +23,7 @@ public class MainActivity extends AppCompatActivity implements OnNetworkSuccessL
         // check if landing details are present
         if(keyHandler.getStringFromDB(this, DBContract.Local.COLUMN_LOCAL_PLATE_NUM, 1, DBContract.Local.TABLE_LOCAL, DBContract.Local.COLUMN_LOCAL_ID) == null || keyHandler.getStringFromDB(this, DBContract.Local.COLUMN_LOCAL_PLATE_NUM, 1, DBContract.Local.TABLE_LOCAL, DBContract.Local.COLUMN_LOCAL_ID) == null){
             try {
-                NetworkHandler networkHandler = new NetworkHandler(this);
+                networkHandler = new NetworkHandler(this);
                 networkHandler.volleyGetRequest(this);
             } catch (JSONException e) {
                 e.printStackTrace();

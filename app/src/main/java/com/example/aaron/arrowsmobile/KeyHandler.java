@@ -3,6 +3,7 @@ package com.example.aaron.arrowsmobile;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -181,6 +182,18 @@ public class KeyHandler implements Parcelable{
         parcel.writeList(this.stopIDList);
         parcel.writeList(this.userIDList);
         parcel.writeList(this.reservationNumList);
+    }
+
+    // following methods are for db accessing
+
+    // handles returning the count of rows in a table
+    public long getRowCount(Context context, String table){
+        dbHandler = new DBHandler(context);
+        long count;
+        SQLiteDatabase db = dbHandler.getReadableDatabase();
+        count = DatabaseUtils.queryNumEntries(db, table);
+        db.close();
+        return count;
     }
 
     // handles the returning of string lists from db

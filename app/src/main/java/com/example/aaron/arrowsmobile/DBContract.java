@@ -165,7 +165,7 @@ public final class DBContract {
             + Passenger.COLUMN_PASSENGER_RESERVATION + " INTEGER, "
             + Passenger.COLUMN_PASSENGER_VEHICLE + " VARCHAR, "
             + Passenger.COLUMN_PASSENGER_DRIVER + " INTEGER, "
-            + " FOREIGN KEY ( " + Passenger.COLUMN_PASSENGER_RESERVATION + " ) REFERENCES " + Reservation.TABLE_RESERVATION + "( " + Reservation.COLUMN_RESERVATION_NUM + " ),"
+            + " FOREIGN KEY ( " + Passenger.COLUMN_PASSENGER_RESERVATION + " ) REFERENCES " + Reservation.TABLE_RESERVATION + "( " + Reservation.COLUMN_RESERVATION_NUM + " ) ON DELETE CASCADE,"
             + " FOREIGN KEY ( " + Passenger.COLUMN_PASSENGER_VEHICLE + " ) REFERENCES " + Vehicle.TABLE_VEHICLE + "( " + Vehicle.COLUMN_VEHICLE_ID + " ),"
             + " FOREIGN KEY ( " + Passenger.COLUMN_PASSENGER_DRIVER + " ) REFERENCES " + Driver.TABLE_DRIVER + "( " + Driver.COLUMN_DRIVER_ID + " ))";
 

@@ -20,8 +20,9 @@ import static android.content.ContentValues.TAG;
 
 // handles the transportation of data from json to sqlite db
 public class NetworkHandler {
+
     String url = "http://frozen-escarpment-35603.herokuapp.com/json";
-    OnNetworkSuccessListener onNetworkSuccessListener;
+    private OnNetworkSuccessListener onNetworkSuccessListener;
 
     NetworkHandler(OnNetworkSuccessListener listener) throws JSONException {
         onNetworkSuccessListener = listener;
@@ -33,8 +34,10 @@ public class NetworkHandler {
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
+                        Log.e(TAG, "JSON Get Start");
                         JSONHandler jsonParser = new JSONHandler(response);
                         jsonParser.jsonToDb(ctx);
+                        Log.e(TAG, "JSON Get Success");
                         onNetworkSuccessListener.onNetworkSuccess(true);
                     }
                 }, new Response.ErrorListener() {
@@ -65,7 +68,7 @@ public class NetworkHandler {
                         onNetworkSuccessListener.onNetworkSuccess(false);
                     }
                 });
-        // Access the RequestQueue through your singleton class.
+        // Access the RequestQueue through singleton class.
         VolleySingleton.getInstance(ctx).addToRequestQueue(jsObjRequest);
     }
 
@@ -84,7 +87,7 @@ public class NetworkHandler {
             @Override
             public void onResponse(String response) {
                 Log.e(TAG, "Result: " + response);
-                onNetworkSuccessListener.onNetworkSuccess(true);
+                // no need for success interface call because it's the end of the day
             }
         }, new Response.ErrorListener() {
             @Override

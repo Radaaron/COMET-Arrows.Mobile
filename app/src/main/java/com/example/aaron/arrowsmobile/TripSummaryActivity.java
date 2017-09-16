@@ -9,6 +9,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 public class TripSummaryActivity extends AppCompatActivity implements View.OnClickListener{
 
     KeyHandler selectedTrip;
@@ -25,7 +27,7 @@ public class TripSummaryActivity extends AppCompatActivity implements View.OnCli
         setContentView(R.layout.activity_trip_summary);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_trip_summary);
         setSupportActionBar(toolbar);
-        toolbar.setTitle("Trip Summary");
+        setTitle("Trip Summary");
         tripRoute = (TextView) findViewById(R.id.trip_summary_route);
         tripDepTime = (TextView) findViewById(R.id.trip_summary_dep_time);
         tripArrTime = (TextView) findViewById(R.id.trip_summary_arrival_time);
@@ -81,7 +83,24 @@ public class TripSummaryActivity extends AppCompatActivity implements View.OnCli
                 DBContract.Vehicle.TABLE_VEHICLE,
                 DBContract.Vehicle.COLUMN_VEHICLE_ID));
 
-        tripPassCount.setText("" + selectedTrip.getPassengerIDList().size());
+        ArrayList<Integer> reservationList = selectedTrip.getIntIDListFromDB(this,
+                DBContract.Reservation.COLUMN_RESERVATION_NUM,
+                selectedTrip.getTripID(),
+                DBContract.Reservation.TABLE_RESERVATION,
+                DBContract.Reservation.COLUMN_TRIP_ID);
+        int passengerCount = 0;
+        for(int i = 0; i < reservationList.size(); i++){
+            // check if the passenger has already been tapped out
+            final String tapOut = selectedTrip.getStringFromDB(this,
+                    DBContract.Passenger.COLUMN_TAP_OUT,
+                    reservationList.get(i),
+                    DBContract.Passenger.TABLE_PASSENGER,
+                    DBContract.Passenger.COLUMN_RESERVATION_NUM);
+            if(tapOut != null && !tapOut.equals("null")){
+                passengerCount++;
+            }
+        }
+        tripPassCount.setText("" + passengerCount);
     }
 
     @Override

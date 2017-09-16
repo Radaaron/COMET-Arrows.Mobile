@@ -18,7 +18,7 @@ public class OnTripPassengersFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     private KeyHandler selectedTrip;
-    private ArrayList<Integer> passengerList, onTripPassengerList;
+    private ArrayList<Integer> passengerList;
 
     public OnTripPassengersFragment() {
         // Required empty public constructor
@@ -35,18 +35,22 @@ public class OnTripPassengersFragment extends Fragment {
         selectedTrip = getArguments().getParcelable("selectedTrip");
         passengerList = selectedTrip.getPassengerIDList();
         // only show the passengers that have been tapped in
-        onTripPassengerList = new ArrayList<>();
         for(int i = 0; i < passengerList.size(); i++){
-            if(selectedTrip.getStringFromDB(getContext(),
+            String tapIn = selectedTrip.getStringFromDB(getContext(),
                     DBContract.Passenger.COLUMN_TAP_IN,
                     Integer.toString(passengerList.get(i)),
                     DBContract.Passenger.TABLE_PASSENGER,
-                    DBContract.Passenger.COLUMN_PASSENGER_ID) != null){
-                onTripPassengerList.add(passengerList.get(i));
+                    DBContract.Passenger.COLUMN_PASSENGER_ID);
+            if(tapIn == null){
+                passengerList.remove(i);
+                i--; // offset removal
+            } else if(tapIn.equals("null")){
+                passengerList.remove(i);
+                i--; // offset removal
             }
         }
         RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.trip_passengers_recycler_view);
-        OnTripPassengerRecyclerAdapter adapter = new OnTripPassengerRecyclerAdapter(onTripPassengerList, getContext());
+        OnTripPassengerRecyclerAdapter adapter = new OnTripPassengerRecyclerAdapter(passengerList, getContext());
         recyclerView.setAdapter(adapter);
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), llm.getOrientation());

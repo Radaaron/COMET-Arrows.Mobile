@@ -7,16 +7,17 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 import static android.content.ContentValues.TAG;
 
 public class DBHandler extends SQLiteOpenHelper{
 
     final static String SCHEMA = "arrowsDB.db";
-    SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
-    SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
 
     public DBHandler(Context context) {
         super(context, SCHEMA, null, 1);
@@ -33,6 +34,7 @@ public class DBHandler extends SQLiteOpenHelper{
         db.execSQL(DBContract.CREATE_TABLE_ROUTE_STOP);
         db.execSQL(DBContract.CREATE_TABLE_STOP);
         db.execSQL(DBContract.CREATE_TABLE_TRIP);
+        db.execSQL(DBContract.CREATE_TABLE_TRIP_VEHICLE_ASSIGNMENT);
         db.execSQL(DBContract.CREATE_TABLE_TRIP_SCHED);
         db.execSQL(DBContract.CREATE_TABLE_USER);
         db.execSQL(DBContract.CREATE_TABLE_VEHICLE);
@@ -50,6 +52,7 @@ public class DBHandler extends SQLiteOpenHelper{
         db.execSQL(DBContract.DELETE_ROUTE_STOP);
         db.execSQL(DBContract.DELETE_STOP);
         db.execSQL(DBContract.DELETE_TRIP);
+        db.execSQL(DBContract.DELETE_TRIP_VEHICLE_ASSIGNMENT);
         db.execSQL(DBContract.DELETE_TRIP_SCHED);
         db.execSQL(DBContract.DELETE_USER);
         db.execSQL(DBContract.DELETE_VEHICLE);
@@ -62,20 +65,22 @@ public class DBHandler extends SQLiteOpenHelper{
         // Landing Table
         SQLiteDatabase db = getWritableDatabase();
         ContentValues cv = new ContentValues();
-        cv.put(DBContract.Local.COLUMN_LOCAL_ID, 1); // there should only be one
+        cv.put(DBContract.Local.COLUMN_LOCAL_ID, 1); // there should only be one per device
         cv.putNull(DBContract.Local.COLUMN_LOCAL_PLATE_NUM);
         cv.putNull(DBContract.Local.COLUMN_LOCAL_DRIVER);
+        cv.putNull(DBContract.Local.COLUMN_LOCAL_DATE);
         db.insert(DBContract.Local.TABLE_LOCAL, null, cv);
     }
 
-    public ArrayList<KeyHandler> getTripKeyHolderList(){
+    // gets list of trips
+    public ArrayList<KeyHandler> getTripKeyHolderList(Context context){
         ArrayList<KeyHandler> keyHandlerList = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
         Cursor cTrip = db.query(DBContract.Trip.TABLE_TRIP, null, null, null, null, null, null);
         if(cTrip.moveToFirst()) {
-            KeyHandler keyHandler = null;
-            int tripID = 0, driverID = 0, tripSchedID = 0, routeID = 0, lineID = 0;
-            String vehicleID = null, order = null;
+            KeyHandler keyHandler;
+            int tripID, tripSchedID, routeID = 0, lineID = 0;
+            String vehicleID = "", driverID = "";
             String[] columns = {"", null}, selection = {""};
             ArrayList<Integer> stopIDList, passengerIDList, userIDList, reservationNumList;
             do {
@@ -84,13 +89,10 @@ public class DBHandler extends SQLiteOpenHelper{
                 userIDList = new ArrayList<>();
                 reservationNumList = new ArrayList<>();
                 tripID = cTrip.getInt(cTrip.getColumnIndex(DBContract.Trip.COLUMN_TRIP_ID));
-                vehicleID = cTrip.getString(cTrip.getColumnIndex(DBContract.Trip.COLUMN_TRIP_VEHICLE));
-                driverID = cTrip.getInt(cTrip.getColumnIndex(DBContract.Trip.COLUMN_TRIP_DRIVER));
-                tripSchedID = cTrip.getInt(cTrip.getColumnIndex(DBContract.Trip.COLUMN_TRIP_TRIP_SCHED));
+                tripSchedID = cTrip.getInt(cTrip.getColumnIndex(DBContract.Trip.COLUMN_TRIP_SCHED_ID));
 
                 // get routeID from tripSchedID route foreign key
-                columns[1] = null; // reset
-                columns[0] = DBContract.TripSched.COLUMN_TRIP_SCHED_ROUTE;
+                columns[0] = DBContract.TripSched.COLUMN_ROUTE_ID;
                 selection[0] = String.valueOf(tripSchedID);
                 Cursor cRoute = db.query(DBContract.TripSched.TABLE_TRIP_SCHED,
                         columns,
@@ -100,7 +102,7 @@ public class DBHandler extends SQLiteOpenHelper{
                         null,
                         null);
                 if(cRoute.moveToFirst()){
-                    routeID = cRoute.getInt(cRoute.getColumnIndex(DBContract.TripSched.COLUMN_TRIP_SCHED_ROUTE));
+                    routeID = cRoute.getInt(cRoute.getColumnIndex(DBContract.TripSched.COLUMN_ROUTE_ID));
                 }
                 else{
                     Log.e(TAG, "routeID foreign key NOT FOUND");
@@ -108,7 +110,7 @@ public class DBHandler extends SQLiteOpenHelper{
                 cRoute.close();
 
                 // get lineID from routeID line foreign key
-                columns[0] = DBContract.Route.COLUMN_ROUTE_LINE;
+                columns[0] = DBContract.Route.COLUMN_LINE_NUM;
                 selection[0] = String.valueOf(routeID);
                 Cursor cLine = db.query(DBContract.Route.TABLE_ROUTE,
                         columns,
@@ -118,26 +120,26 @@ public class DBHandler extends SQLiteOpenHelper{
                         null,
                         null);
                 if(cLine.moveToFirst()){
-                    lineID = cLine.getInt(cLine.getColumnIndex(DBContract.Route.COLUMN_ROUTE_LINE));
+                    lineID = cLine.getInt(cLine.getColumnIndex(DBContract.Route.COLUMN_LINE_NUM));
                 }
                 else{
                     Log.e(TAG, "routeID foreign key NOT FOUND");
                 }
                 cLine.close();
 
-                // get list of stopID using routestops junction table routeID relationship
-                columns[0] = DBContract.RouteStop.COLUMN_ROUTE_STOP_STOP;
+                // get list of stopID using routeStops junction table routeID relationship
+                columns[0] = DBContract.RouteStop.COLUMN_STOP_ID;
                 selection[0] = String.valueOf(routeID);
                 Cursor cStop = db.query(DBContract.RouteStop.TABLE_ROUTE_STOP,
                         columns,
-                        " " + DBContract.RouteStop.COLUMN_ROUTE_STOP_ROUTE + " = ? ",
+                        " " + DBContract.RouteStop.COLUMN_ROUTE_ID + " = ? ",
                         selection,
                         null,
                         null,
-                        null);
+                        DBContract.RouteStop.COLUMN_ORDER + " ASC"); // order them by routeStop order
                 if(cStop.moveToFirst()){
                     do{
-                        stopIDList.add(cStop.getInt(cStop.getColumnIndex((DBContract.RouteStop.COLUMN_ROUTE_STOP_STOP))));
+                        stopIDList.add(cStop.getInt(cStop.getColumnIndex((DBContract.RouteStop.COLUMN_STOP_ID))));
                     } while( cStop.moveToNext());
                 }
                 else{
@@ -147,11 +149,11 @@ public class DBHandler extends SQLiteOpenHelper{
 
                 // get list of reservation using reservation tripID foreign key while also populating the list of userID using userID foreign key
                 columns[0] = DBContract.Reservation.COLUMN_RESERVATION_NUM;
-                columns[1] = DBContract.Reservation.COLUMN_RESERVATION_USER;
+                columns[1] = DBContract.Reservation.COLUMN_ID_NUM;
                 selection[0] = String.valueOf(tripID);
                 Cursor cReservations = db.query(DBContract.Reservation.TABLE_RESERVATION,
                         columns,
-                        " " + DBContract.Reservation.COLUMN_RESERVATION_TRIP + " = ? ",
+                        " " + DBContract.Reservation.COLUMN_TRIP_ID + " = ? ",
                         selection,
                         null,
                         null,
@@ -159,13 +161,33 @@ public class DBHandler extends SQLiteOpenHelper{
                 if(cReservations.moveToFirst()){
                     do{
                         reservationNumList.add(cReservations.getInt(cReservations.getColumnIndex((DBContract.Reservation.COLUMN_RESERVATION_NUM))));
-                        userIDList.add(cReservations.getInt(cReservations.getColumnIndex((DBContract.Reservation.COLUMN_RESERVATION_USER))));
+                        userIDList.add(cReservations.getInt(cReservations.getColumnIndex((DBContract.Reservation.COLUMN_ID_NUM))));
                     } while( cReservations.moveToNext());
                 }
                 else{
                     Log.e(TAG, "tripID reservation foreign keys NOT FOUND");
                 }
                 cReservations.close();
+
+                // get vehicleID and driverID from TripVehicleAssignment
+                columns[0] = DBContract.TripVehicleAssignment.COLUMN_VEHICLE_ID;
+                columns[1] = DBContract.TripVehicleAssignment.COLUMN_DRIVER_ID;
+                selection[0] = String.valueOf(tripID);
+                Cursor cVehicleAndDriver = db.query(DBContract.TripVehicleAssignment.TABLE_TRIP_VEHICLE_ASSIGNMENT,
+                        columns,
+                        " " + DBContract.TripVehicleAssignment.COLUMN_TRIP_ID + " = ? ",
+                        selection,
+                        null,
+                        null,
+                        null);
+                if(cVehicleAndDriver.moveToFirst()){
+                    vehicleID = cVehicleAndDriver.getString(cVehicleAndDriver.getColumnIndex(DBContract.TripVehicleAssignment.COLUMN_VEHICLE_ID));
+                    driverID = cVehicleAndDriver.getString(cVehicleAndDriver.getColumnIndex(DBContract.TripVehicleAssignment.COLUMN_DRIVER_ID));
+                }
+                else{
+                    Log.e(TAG, "vehicleID and driverID foreign key NOT FOUND");
+                }
+                cVehicleAndDriver.close();
 
                 Cursor cPassenger = null;
                 // get list of passengerID using reservationNum foreign keys
@@ -175,7 +197,7 @@ public class DBHandler extends SQLiteOpenHelper{
                     selection[0] = String.valueOf(reservationNumList.get(i));
                     cPassenger = db.query(DBContract.Passenger.TABLE_PASSENGER,
                             columns,
-                            " " + DBContract.Passenger.COLUMN_PASSENGER_RESERVATION + " = ? ",
+                            " " + DBContract.Passenger.COLUMN_RESERVATION_NUM + " = ? ",
                             selection,
                             null,
                             null,
@@ -199,6 +221,43 @@ public class DBHandler extends SQLiteOpenHelper{
             cTrip.close();
         }
         db.close();
+        return keyHandlerList;
+        // return filterTripList(keyHandlerList, context);
+    }
+
+    // filters tripList for trips that have already departed so individual devices are "synced"
+    private ArrayList<KeyHandler> filterTripList(ArrayList<KeyHandler> keyHandlerList, Context context) {
+        String arrivalTime, time;
+        SimpleDateFormat sentFormat = new SimpleDateFormat("h:mm:ss");
+        Calendar cal;
+        Date depTime, currentTime;
+        for(int i = 0; i < keyHandlerList.size(); i++){
+            // check if trip is pending
+            arrivalTime = keyHandlerList.get(i).getStringFromDB(context,
+                    DBContract.Trip.COLUMN_ARRIVAL_TIME,
+                    keyHandlerList.get(i).getTripID(),
+                    DBContract.Trip.TABLE_TRIP,
+                    DBContract.Trip.COLUMN_TRIP_ID);
+            // check if departure time hasn't already passed
+            try {
+                cal = Calendar.getInstance();
+                time = sentFormat.format(cal.getTime()); // reset for proper format and removal of other data
+                currentTime = sentFormat.parse(time);
+                time = keyHandlerList.get(i).getStringFromDB(context,
+                        DBContract.TripSched.COLUMN_DEP_TIME,
+                        keyHandlerList.get(i).getTripSchedID(),
+                        DBContract.TripSched.TABLE_TRIP_SCHED,
+                        DBContract.TripSched.COLUMN_TRIP_SCHED_ID);
+                depTime = sentFormat.parse(time);
+                // check
+                if((!arrivalTime.equals("null")) || depTime.before(currentTime)){
+                    keyHandlerList.remove(i);
+                    i--; // offset the removal
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
         return keyHandlerList;
     }
 

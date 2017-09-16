@@ -26,13 +26,11 @@ public class TripRecyclerAdapter extends RecyclerView.Adapter<TripRecyclerAdapte
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public CardView tripCardView;
         public TextView tripTimeView;
-        public TextView tripRouteView;
         public TextView tripPassengerCountView;
         public ViewHolder(View v) {
             super(v);
             this.tripCardView = (CardView) v.findViewById(R.id.trip_card_view);
             this.tripTimeView = (TextView) v.findViewById(R.id.trip_time_view);
-            this.tripRouteView = (TextView) v.findViewById(R.id.trip_route_view);
             this.tripPassengerCountView = (TextView) v.findViewById(R.id.trip_passenger_count_view);
         }
     }
@@ -62,9 +60,8 @@ public class TripRecyclerAdapter extends RecyclerView.Adapter<TripRecyclerAdapte
             e.printStackTrace();
         }
         holder.tripTimeView.setText(depTime);
-        holder.tripRouteView.setText(routeDescription);
         // "passenger count / capacity"
-        holder.tripPassengerCountView.setText("" + passengerCount);
+        holder.tripPassengerCountView.setText(passengerCount + " Passengers");
         holder.tripCardView.setTag(position);
         holder.tripCardView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,9 +73,8 @@ public class TripRecyclerAdapter extends RecyclerView.Adapter<TripRecyclerAdapte
     }
 
     public void populateCardItem(int position) throws ParseException {
-        SimpleDateFormat sentFormat = new SimpleDateFormat("h:mm:ss a");
+        SimpleDateFormat sentFormat = new SimpleDateFormat("h:mm:ss");
         SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
-
         Date date = sentFormat.parse(mDataset.get(position).getStringFromDB(context,
                 DBContract.TripSched.COLUMN_DEP_TIME,
                 mDataset.get(position).getTripSchedID(),
@@ -86,18 +82,6 @@ public class TripRecyclerAdapter extends RecyclerView.Adapter<TripRecyclerAdapte
                 DBContract.TripSched.COLUMN_TRIP_SCHED_ID));
 
         depTime = timeFormat.format(date);
-
-        routeDescription = (mDataset.get(position).getStringFromDB(context,
-                        DBContract.Route.COLUMN_ROUTE_ORIGIN,
-                        mDataset.get(position).getRouteID(),
-                        DBContract.Route.TABLE_ROUTE,
-                        DBContract.Route.COLUMN_ROUTE_ID) + " to " +
-                    mDataset.get(position).getStringFromDB(context,
-                        DBContract.Route.COLUMN_ROUTE_DESTINATION,
-                        mDataset.get(position).getRouteID(),
-                        DBContract.Route.TABLE_ROUTE,
-                        DBContract.Route.COLUMN_ROUTE_ID));
-
         passengerCount = mDataset.get(position).getPassengerIDList().size();
     }
 

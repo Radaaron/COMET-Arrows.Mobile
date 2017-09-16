@@ -34,7 +34,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Plate Number:"
-            android:textSize="16sp"
+            android:textSize="20sp"
             android:fontFamily="sans-serif"
             android:layout_alignParentTop="true"
             android:layout_alignStart="@+id/plateNumSpinner"
@@ -44,14 +44,15 @@
             style="@style/border_style"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/plateLabel"/>
+            android:layout_below="@+id/plateLabel"
+            android:spinnerMode="dialog"/>
     </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/spinnerLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="24dp"
+        android:paddingTop="40dp"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:layout_below="@+id/imageView"
@@ -62,7 +63,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Driver Name:"
-            android:textSize="16sp"
+            android:textSize="20sp"
             android:fontFamily="sans-serif"
             android:layout_alignParentTop="true"
             android:layout_alignStart="@+id/driverSpinner"
@@ -72,7 +73,8 @@
             style="@style/border_style"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/driverLabel"/>
+            android:layout_below="@+id/driverLabel"
+            android:spinnerMode="dialog"/>
     </RelativeLayout>
 
     <Button

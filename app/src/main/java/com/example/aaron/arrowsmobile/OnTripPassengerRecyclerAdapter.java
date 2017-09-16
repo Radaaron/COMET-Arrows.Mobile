@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -62,42 +61,31 @@ public class OnTripPassengerRecyclerAdapter extends RecyclerView.Adapter<Embarka
     public void onBindViewHolder(final EmbarkationPassengerRecyclerAdapter.ViewHolder holder, int position) {
         // get reservationNum of passenger
         int reservationNum = keyHandler.getIntFromDB(context,
-                DBContract.Passenger.COLUMN_PASSENGER_RESERVATION,
+                DBContract.Passenger.COLUMN_RESERVATION_NUM,
                 Integer.toString(mDataset.get(position)),
                 DBContract.Passenger.TABLE_PASSENGER,
                 DBContract.Passenger.COLUMN_PASSENGER_ID);
         // get userID from reservationNum
         final int userID = keyHandler.getIntFromDB(context,
-                DBContract.Reservation.COLUMN_RESERVATION_USER,
+                DBContract.Reservation.COLUMN_ID_NUM,
                 Integer.toString(reservationNum),
                 DBContract.Reservation.TABLE_RESERVATION,
                 DBContract.Reservation.COLUMN_RESERVATION_NUM);
         // get user name from userID
-        String passengerName = keyHandler.getStringFromDB(context,
+        final String passengerName = keyHandler.getStringFromDB(context,
                 DBContract.User.COLUMN_NAME,
                 Integer.toString(userID),
                 DBContract.User.TABLE_USER,
                 DBContract.User.COLUMN_ID_NUM);
         holder.passengerIdView.setText(Integer.toString(userID));
         holder.passengerNameView.setText(passengerName);
-        // check if the passenger has already been tapped in
-        String tapIn = keyHandler.getStringFromDB(context,
-                DBContract.Passenger.COLUMN_TAP_IN,
-                Integer.toString(mDataset.get(position)),
-                DBContract.Passenger.TABLE_PASSENGER,
-                DBContract.Passenger.COLUMN_PASSENGER_ID);
-        if(tapIn.equals("null")){
-            holder.passengerCheckInBox.setChecked(false);
-            holder.passengerCheckInBox.setEnabled(false);
-        } else {
-            holder.passengerCheckInBox.setChecked(true);
-            holder.passengerCheckInBox.setEnabled(false);
-        }
+        holder.passengerCheckInBox.setChecked(true);
+        holder.passengerCheckInBox.setEnabled(false);
         final int pos = position;
         // attach on long click for manual tap out
-        holder.passengerCardView.setOnLongClickListener(new View.OnLongClickListener() {
+        holder.passengerCardView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onLongClick(View view) {
+            public void onClick(View view) {
                 final SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
                 if(keyHandler.getStringFromDB(context,
                         DBContract.Passenger.COLUMN_TAP_OUT,
@@ -105,7 +93,7 @@ public class OnTripPassengerRecyclerAdapter extends RecyclerView.Adapter<Embarka
                         DBContract.Passenger.TABLE_PASSENGER,
                         DBContract.Passenger.COLUMN_PASSENGER_ID).equals("null")){
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                    builder.setMessage("Manually Disembark?");
+                    builder.setMessage("Manually Disembark " + passengerName + "?");
                     builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             SQLiteDatabase db = dbHandler.getWritableDatabase();
@@ -113,9 +101,9 @@ public class OnTripPassengerRecyclerAdapter extends RecyclerView.Adapter<Embarka
                             ContentValues cv = new ContentValues();
                             cv.put(DBContract.Passenger.COLUMN_TAP_OUT, timeFormat.format(cal.getTime()));
                             db.update(DBContract.Passenger.TABLE_PASSENGER, cv, DBContract.Passenger.COLUMN_PASSENGER_ID + "=" + Integer.toString(mDataset.get(pos)), null);
-                            Toast.makeText(context, "Passenger Has Disembarked", Toast.LENGTH_LONG).show();
                             mDataset.remove(pos);
                             notifyItemRemoved(pos);
+                            notifyItemRangeChanged(pos, mDataset.size());
                         }
                     });
                     builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -124,9 +112,7 @@ public class OnTripPassengerRecyclerAdapter extends RecyclerView.Adapter<Embarka
                     });
                     AlertDialog dialog = builder.create();
                     dialog.show();
-                    return true;
                 }
-                return false;
             }
         });
     }

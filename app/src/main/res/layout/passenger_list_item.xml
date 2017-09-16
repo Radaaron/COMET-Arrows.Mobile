@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="60dp"
+    android:layout_height="64dp"
     android:paddingTop="4dp"
     android:paddingBottom="4dp">
 
@@ -33,7 +33,7 @@
                     android:id="@+id/passenger_name_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="16sp"
+                    android:textSize="20sp"
                     android:fontFamily="sans-serif"/>
 
                 <TextView
@@ -41,7 +41,7 @@
                     android:id="@+id/passenger_id_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="14sp"
+                    android:textSize="16sp"
                     android:textColor="@color/colorGray"
                     android:fontFamily="sans-serif"/>
 

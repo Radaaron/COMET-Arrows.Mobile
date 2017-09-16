@@ -40,7 +40,7 @@ public class TripDetailsDialogFragment extends DialogFragment implements View.On
         View rootView = inflater.inflate(R.layout.trip_details_dialog, container, false);
         Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.dialog_toolbar);
         selectedTrip = getArguments().getParcelable("tripSelected");
-        SimpleDateFormat sentFormat = new SimpleDateFormat("h:mm:ss a");
+        SimpleDateFormat sentFormat = new SimpleDateFormat("h:mm:ss");
         SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
         Date date = null;
         try {
@@ -55,7 +55,7 @@ public class TripDetailsDialogFragment extends DialogFragment implements View.On
         String depTime = timeFormat.format(date);
         String route = selectedTrip.getStringFromDB(getContext(), DBContract.Route.COLUMN_ROUTE_ORIGIN, selectedTrip.getRouteID(), DBContract.Route.TABLE_ROUTE, DBContract.Route.COLUMN_ROUTE_ID)
                 + " to " + selectedTrip.getStringFromDB(getContext(), DBContract.Route.COLUMN_ROUTE_DESTINATION, selectedTrip.getRouteID(), DBContract.Route.TABLE_ROUTE, DBContract.Route.COLUMN_ROUTE_ID);
-        toolbar.setTitle(depTime + " | " + route);
+        toolbar.setTitle(depTime + " " + route);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (actionBar != null) {

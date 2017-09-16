@@ -48,6 +48,10 @@
             android:name=".TripSummaryActivity"
             android:label="@string/title_activity_trip_summary"
             android:theme="@style/lasalleTheme.NoActionBar"/>
+        <service
+            android:name=".UpdateService"
+            android:process=":updateProcess"
+            android:exported="false"/>
     </application>
 
 </manifest>

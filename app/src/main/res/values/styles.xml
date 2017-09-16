@@ -27,9 +27,10 @@
     </style>
 
     <style name="CustomButton" parent="Theme.AppCompat.Light">
-        <item name="colorButtonNormal">@color/colorPrimary</item>
-        <item name="colorControlHighlight">@color/colorPrimaryDark</item>
-        <item name="android:textColor">@color/colorWhite</item>
+        <item name="colorButtonNormal">@drawable/button_normal_color_selector</item>
+        <item name="colorControlHighlight">@drawable/button_highlight_color_selector</item>
+        <item name="android:textColor">@drawable/button_text_color_selector</item>
+        <item name="android:textSize">20sp</item>
     </style>
 
     <style name="lasalleTheme.NoActionBar">
@@ -53,4 +54,9 @@
         <item name="android:paddingBottom">5dp</item>
         <item name="android:popupBackground">#DFFFFFFF</item>
     </style>
+
+    <style name="Toolbar.TitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textSize">20sp</item>
+    </style>
+
 </resources>

@@ -8,10 +8,10 @@ public class Stop implements Parcelable{
 
     private int stopID;
     private String stopName;
-    private String latitude;
-    private String longitude;
+    private double latitude;
+    private double longitude;
 
-    public Stop(int stopID, String stopName, String latitude, String longitude) {
+    public Stop(int stopID, String stopName, double latitude, double longitude) {
         this.stopID = stopID;
         this.stopName = stopName;
         this.latitude = latitude;
@@ -21,8 +21,8 @@ public class Stop implements Parcelable{
     protected Stop(Parcel in) {
         this.stopID = in.readInt();
         this.stopName = in.readString();
-        this.latitude = in.readString();
-        this.longitude = in.readString();
+        this.latitude = in.readDouble();
+        this.longitude = in.readDouble();
     }
 
     public static final Creator<Stop> CREATOR = new Creator<Stop>() {
@@ -37,36 +37,16 @@ public class Stop implements Parcelable{
         }
     };
 
-    public int getStopID() {
-        return this.stopID;
-    }
-
-    public void setStopID(int stopID) {
-        this.stopID = stopID;
-    }
-
-    public String getLongitude() {
+    public double getLongitude() {
         return this.longitude;
     }
 
-    public void setLongitude(String longitude) {
-        this.longitude = longitude;
-    }
-
-    public String getLatitude() {
+    public double getLatitude() {
         return this.latitude;
-    }
-
-    public void setLatitude(String latitude) {
-        this.latitude = latitude;
     }
 
     public String getStopName() {
         return this.stopName;
-    }
-
-    public void setStopName(String stopName) {
-        this.stopName = stopName;
     }
 
     @Override
@@ -78,7 +58,7 @@ public class Stop implements Parcelable{
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeInt(this.stopID);
         parcel.writeString(this.stopName);
-        parcel.writeString(this.latitude);
-        parcel.writeString(this.longitude);
+        parcel.writeDouble(this.latitude);
+        parcel.writeDouble(this.longitude);
     }
 }

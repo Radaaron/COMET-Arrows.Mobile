@@ -15,6 +15,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,15 +29,19 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import static android.content.ContentValues.TAG;
+
 public class LandingActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnFragmentInteractionListener, AdapterView.OnItemSelectedListener{
 
     DBHandler dbHandler;
     KeyHandler keyHandler; // used to assign plate num and driver to trip selected
     ArrayList<KeyHandler> tripList;
-    TextView plateNumView, driverNameView;
+    TextView plateNumView, driverNameView, toolbarDate;
     Spinner routeSpinner;
     Fragment currentFragment;
+    SimpleDateFormat dateFormat;
+    String dateToday;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,15 +62,25 @@ public class LandingActivity extends AppCompatActivity
         routeSpinner.setOnItemSelectedListener(this);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         TextView toolbarTitle = (TextView) findViewById(R.id.custom_toolbar_title);
-        TextView toolbarDate = (TextView) findViewById(R.id.toolbar_date);
+        toolbarDate = (TextView) findViewById(R.id.toolbar_date);
         toolbarTitle.setText("Upcoming Trips");
-        SimpleDateFormat timeFormat = new SimpleDateFormat("MM/dd/yyyy");
+
+        dateFormat = new SimpleDateFormat("MM/dd");
         Calendar cal = Calendar.getInstance();
-        toolbarDate.setText(timeFormat.format(cal.getTime()));
+        dateToday = dateFormat.format(cal.getTime());
+        toolbarDate.setText(dateToday);
 
         // retrieve data for recycler view
         dbHandler = new DBHandler(this);
-        tripList = dbHandler.getTripKeyHolderList();
+        tripList = dbHandler.getTripKeyHolderList(getApplicationContext());
+
+        // check if there are no more trips in total
+        Log.e(TAG, "tripList size: " + tripList.size());
+        if(tripList.isEmpty()){
+            // post to server
+            returnToMain();
+        }
+
         keyHandler = new KeyHandler();
         refreshLandingDetails();
 
@@ -76,15 +91,24 @@ public class LandingActivity extends AppCompatActivity
         for(int i = 0; i < routeOrigins.size(); i++){
             routeItems.add(routeOrigins.get(i) + " to " + routeDestinations.get(i));
         }
-        ArrayAdapter<String> routeAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, routeItems);
+        ArrayAdapter<String> routeAdapter = new ArrayAdapter<String>(this, R.layout.custom_spinner_item, routeItems);
         routeAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
         routeSpinner.setAdapter(routeAdapter);
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        Calendar cal = Calendar.getInstance();
+        dateToday = dateFormat.format(cal.getTime());
+        toolbarDate.setText(dateToday);
     }
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         filterTrips(getIdFromRoute(parent.getItemAtPosition(position).toString()));
     }
+
     public void onNothingSelected(AdapterView<?> arg0) {
         // nothing
     }
@@ -93,10 +117,11 @@ public class LandingActivity extends AppCompatActivity
         // commit upcoming trips fragment with filtered tripList
         ArrayList<KeyHandler> filteredList = new ArrayList<>();
         for(int i = 0; i < tripList.size(); i++){
-            if(tripList.get(i).getRouteID() == routeId){
+            if(tripList.get(i).getRouteID() == routeId && !tripList.get(i).getPassengerIDList().isEmpty()){
                 filteredList.add(tripList.get(i));
             }
         }
+        Log.e(TAG, "filteredList size: " + filteredList.size());
         Bundle bundle = new Bundle();
         bundle.putParcelableArrayList("filteredList", filteredList);
         currentFragment = new UpcomingTripsFragment();
@@ -220,14 +245,14 @@ public class LandingActivity extends AppCompatActivity
         return keyHandler.getStringFromDB(this, DBContract.Vehicle.COLUMN_VEHICLE_ID, plateNum, DBContract.Vehicle.TABLE_VEHICLE, DBContract.Vehicle.COLUMN_PLATE_NUM);
     }
 
-    public int getIdFromDriver(){
+    public String getIdFromDriver(){
         String driver = keyHandler.getStringFromDB(this,
                 DBContract.Local.COLUMN_LOCAL_DRIVER,
                 1,
                 DBContract.Local.TABLE_LOCAL,
                 DBContract.Local.COLUMN_LOCAL_ID);
         String[] temp = driver.split(" ");
-        return keyHandler.getIntFromDB(this, DBContract.Driver.COLUMN_DRIVER_ID, temp[0], DBContract.Driver.TABLE_DRIVER, DBContract.Driver.COLUMN_FIRST_NAME);
+        return keyHandler.getStringFromDB(this, DBContract.Driver.COLUMN_DRIVER_ID, temp[0], DBContract.Driver.TABLE_DRIVER, DBContract.Driver.COLUMN_FIRST_NAME);
     }
 
     public int getIdFromRoute(String routeItem){
@@ -257,4 +282,10 @@ public class LandingActivity extends AppCompatActivity
         finish();
     }
 
+    private void returnToMain() {
+        Intent intent = new Intent();
+        intent.putExtra("next", "End");
+        setResult(Activity.RESULT_OK, intent);
+        finish();
+    }
 }

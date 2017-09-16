@@ -17,7 +17,8 @@
         android:id="@+id/trip_route_spinner"
         style="@style/border_style"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:spinnerMode="dialog"/>
 
     <FrameLayout
         android:id="@+id/landing_fragment_container"

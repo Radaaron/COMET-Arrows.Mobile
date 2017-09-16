@@ -16,8 +16,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 public class EmbarkationActivity extends AppCompatActivity
         implements OnFragmentInteractionListener, View.OnClickListener {
@@ -50,14 +53,29 @@ public class EmbarkationActivity extends AppCompatActivity
         currentFragment.setArguments(bundle);
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.embarkation_fragment_container, currentFragment);
-        setTitle("Passenger Manifest");
+        SimpleDateFormat sentFormat = new SimpleDateFormat("h:mm:ss");
+        SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
+        Date date = null;
+        try {
+            date = sentFormat.parse(selectedTrip.getStringFromDB(this,
+                    DBContract.TripSched.COLUMN_DEP_TIME,
+                    selectedTrip.getTripSchedID(),
+                    DBContract.TripSched.TABLE_TRIP_SCHED,
+                    DBContract.TripSched.COLUMN_TRIP_SCHED_ID));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        String depTime = timeFormat.format(date);
+        String route = selectedTrip.getStringFromDB(this, DBContract.Route.COLUMN_ROUTE_ORIGIN, selectedTrip.getRouteID(), DBContract.Route.TABLE_ROUTE, DBContract.Route.COLUMN_ROUTE_ID)
+                + " to " + selectedTrip.getStringFromDB(this, DBContract.Route.COLUMN_ROUTE_DESTINATION, selectedTrip.getRouteID(), DBContract.Route.TABLE_ROUTE, DBContract.Route.COLUMN_ROUTE_ID);
+        setTitle(depTime + " " + route);
         fragmentTransaction.commitAllowingStateLoss();
     }
 
     @Override
     public void onBackPressed() {
         if(currentFragment instanceof PassengerManifestFragment){
-            // do nothing
+            // nothing
         } else {
             super.onBackPressed();
         }
@@ -99,8 +117,8 @@ public class EmbarkationActivity extends AppCompatActivity
                     Calendar cal = Calendar.getInstance();
                     ContentValues cv = new ContentValues();
                     cv.put(DBContract.Passenger.COLUMN_TAP_IN, timeFormat.format(cal.getTime()));
-                    cv.put(DBContract.Passenger.COLUMN_PASSENGER_DRIVER, selectedTrip.getDriverID());
-                    cv.put(DBContract.Passenger.COLUMN_PASSENGER_VEHICLE, selectedTrip.getVehicleID());
+                    cv.put(DBContract.Passenger.COLUMN_DRIVER_ID, selectedTrip.getDriverID());
+                    cv.put(DBContract.Passenger.COLUMN_VEHICLE_ID, selectedTrip.getVehicleID());
                     db.update(DBContract.Passenger.TABLE_PASSENGER, cv, DBContract.Passenger.COLUMN_PASSENGER_ID + "=" +id, null);
                     // refresh passenger manifest
                     setPassengerManifestFragment();

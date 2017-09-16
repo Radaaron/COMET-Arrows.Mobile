@@ -30,17 +30,7 @@
                 android:paddingStart="8dp"
                 android:paddingEnd="0dp"
                 android:gravity="start"
-                android:textSize="16sp">
-            </TextView>
-
-            <TextView
-                android:text="Manila to STC"
-                android:id="@+id/trip_route_view"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:paddingStart="32dp"
-                android:paddingEnd="0dp"
-                android:textSize="16sp">
+                android:textSize="20sp">
             </TextView>
 
             <TextView
@@ -48,10 +38,9 @@
                 android:id="@+id/trip_passenger_count_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingStart="0dp"
-                android:paddingEnd="16dp"
-                android:gravity="end"
-                android:textSize="16sp">
+                android:paddingStart="32dp"
+                android:paddingEnd="0dp"
+                android:textSize="20sp">
             </TextView>
 
         </LinearLayout>

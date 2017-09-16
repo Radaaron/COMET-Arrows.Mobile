@@ -17,14 +17,11 @@ import static android.content.ContentValues.TAG;
 public class KeyHandler implements Parcelable{
 
     private int tripID;
-    private String vehicleID;
+    private String vehicleID, driverID;
     private ArrayList<Integer> passengerIDList;
     private ArrayList<Integer> userIDList;
     private ArrayList<Integer> reservationNumList;
-    private int driverID;
-    private int tripSchedID;
-    private int routeID;
-    private int lineID;
+    private int tripSchedID, routeID, lineID;
     private ArrayList<Integer> stopIDList;
 
     private DBHandler dbHandler;
@@ -33,7 +30,7 @@ public class KeyHandler implements Parcelable{
         // empty constructor for method use only
     }
 
-    public KeyHandler(int tripID, String vehicleID, ArrayList<Integer> passengerIDList, int driverID, int tripSchedID, int routeID, int lineID, ArrayList<Integer> stopIDList, ArrayList<Integer> userIDList, ArrayList<Integer> reservationNumList) {
+    public KeyHandler(int tripID, String vehicleID, ArrayList<Integer> passengerIDList, String driverID, int tripSchedID, int routeID, int lineID, ArrayList<Integer> stopIDList, ArrayList<Integer> userIDList, ArrayList<Integer> reservationNumList) {
         this.tripID = tripID;
         this.vehicleID = vehicleID;
         this.passengerIDList = passengerIDList;
@@ -50,7 +47,7 @@ public class KeyHandler implements Parcelable{
         this.tripID = in.readInt();
         this.vehicleID = in.readString();
         this.passengerIDList = in.readArrayList(Integer.class.getClassLoader());
-        this.driverID = in.readInt();
+        this.driverID = in.readString();
         this.tripSchedID = in.readInt();
         this.routeID = in.readInt();
         this.lineID = in.readInt();
@@ -75,43 +72,19 @@ public class KeyHandler implements Parcelable{
         return tripID;
     }
 
-    public void setTripID(int tripID) {
-        this.tripID = tripID;
-    }
-
     public ArrayList<Integer> getStopIDList() {
         return stopIDList;
-    }
-
-    public void setStopIDList(ArrayList<Integer> stopIDList) {
-        this.stopIDList = stopIDList;
-    }
-
-    public int getLineID() {
-        return lineID;
-    }
-
-    public void setLineID(int lineID) {
-        this.lineID = lineID;
     }
 
     public int getRouteID() {
         return routeID;
     }
 
-    public void setRouteID(int routeID) {
-        this.routeID = routeID;
-    }
-
     public int getTripSchedID() {
         return tripSchedID;
     }
 
-    public void setTripSchedID(int tripSchedID) {
-        this.tripSchedID = tripSchedID;
-    }
-
-    public int getDriverID() {
+    public String getDriverID() {
         return driverID;
     }
 
@@ -119,39 +92,19 @@ public class KeyHandler implements Parcelable{
         return passengerIDList;
     }
 
-    public void setPassengerIDList(ArrayList<Integer> passengerIDList) {
-        this.passengerIDList = passengerIDList;
-    }
-
     public String getVehicleID() {
         return vehicleID;
     }
 
-    public ArrayList<Integer> getUserIDList() {
-        return userIDList;
-    }
-
-    public void setUserIDList(ArrayList<Integer> userIDList) {
-        this.userIDList = userIDList;
-    }
-
-    public ArrayList<Integer> getReservationNumList() {
-        return reservationNumList;
-    }
-
-    public void setReservationNumList(ArrayList<Integer> reservationNumList) {
-        this.reservationNumList = reservationNumList;
-    }
-
     // following setters also overwrite the db
 
-    public void setDriverID(int driverID, Context context) {
+    public void setDriverID(String driverID, Context context) {
         this.driverID = driverID;
         dbHandler = new DBHandler(context);
         SQLiteDatabase db = dbHandler.getWritableDatabase();
         ContentValues cv = new ContentValues();
-        cv.put(DBContract.Trip.COLUMN_TRIP_DRIVER, driverID);
-        db.update(DBContract.Trip.TABLE_TRIP, cv, DBContract.Trip.COLUMN_TRIP_ID + "=" + getTripID(), null);
+        cv.put(DBContract.TripVehicleAssignment.COLUMN_DRIVER_ID, driverID);
+        db.update(DBContract.TripVehicleAssignment.TABLE_TRIP_VEHICLE_ASSIGNMENT, cv, DBContract.TripVehicleAssignment.COLUMN_TRIP_ID + "=" + getTripID(), null);
         db.close();
     }
 
@@ -160,8 +113,8 @@ public class KeyHandler implements Parcelable{
         dbHandler = new DBHandler(context);
         SQLiteDatabase db = dbHandler.getWritableDatabase();
         ContentValues cv = new ContentValues();
-        cv.put(DBContract.Trip.COLUMN_TRIP_VEHICLE, vehicleID);
-        db.update(DBContract.Trip.TABLE_TRIP, cv, DBContract.Trip.COLUMN_TRIP_ID + "=" + getTripID(), null);
+        cv.put(DBContract.TripVehicleAssignment.COLUMN_VEHICLE_ID, vehicleID);
+        db.update(DBContract.TripVehicleAssignment.TABLE_TRIP_VEHICLE_ASSIGNMENT, cv, DBContract.TripVehicleAssignment.COLUMN_TRIP_ID + "=" + getTripID(), null);
         db.close();
     }
 
@@ -175,7 +128,7 @@ public class KeyHandler implements Parcelable{
         parcel.writeInt(this.tripID);
         parcel.writeString(this.vehicleID);
         parcel.writeList(this.passengerIDList);
-        parcel.writeInt(this.driverID);
+        parcel.writeString(this.driverID);
         parcel.writeInt(this.tripSchedID);
         parcel.writeInt(this.routeID);
         parcel.writeInt(this.lineID);
@@ -218,6 +171,35 @@ public class KeyHandler implements Parcelable{
         }
         else{
             Log.e(TAG, "getStringArrayListFromDB() failed!");
+        }
+        cursor.close();
+        db.close();
+        return temp;
+    }
+
+    // handles the returning of integer IDs from db based on selection
+    public ArrayList<Integer> getIntIDListFromDB(Context context, String column, Object selected, String table, String id) {
+        dbHandler = new DBHandler(context);
+        ArrayList<Integer> temp = null;
+        SQLiteDatabase db = dbHandler.getReadableDatabase();
+        String[] columns = {""}, selection = {""};
+        columns[0] = column;
+        selection[0] = String.valueOf(selected);
+        Cursor cursor = db.query(table,
+                columns,
+                " " + id + " = ? ",
+                selection,
+                null,
+                null,
+                null);
+        if(cursor.moveToFirst()){
+            temp = new ArrayList<>();
+            do{
+                temp.add(cursor.getInt(cursor.getColumnIndex(column)));
+            } while( cursor.moveToNext());
+        }
+        else{
+            Log.e(TAG, "getIntIDListFromDB() failed!");
         }
         cursor.close();
         db.close();

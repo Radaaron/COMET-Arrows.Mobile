@@ -55,13 +55,13 @@ public class PassengerManifestRecyclerAdapter extends RecyclerView.Adapter<Passe
     public void onBindViewHolder(final PassengerManifestRecyclerAdapter.ViewHolder holder, int position) {
         // get reservationNum of passenger
         int reservationNum = keyHandler.getIntFromDB(context,
-                DBContract.Passenger.COLUMN_PASSENGER_RESERVATION,
+                DBContract.Passenger.COLUMN_RESERVATION_NUM,
                 Integer.toString(mDataset.get(position)),
                 DBContract.Passenger.TABLE_PASSENGER,
                 DBContract.Passenger.COLUMN_PASSENGER_ID);
         // get userID from reservationNum
         final int userID = keyHandler.getIntFromDB(context,
-                DBContract.Reservation.COLUMN_RESERVATION_USER,
+                DBContract.Reservation.COLUMN_ID_NUM,
                 Integer.toString(reservationNum),
                 DBContract.Reservation.TABLE_RESERVATION,
                 DBContract.Reservation.COLUMN_RESERVATION_NUM);

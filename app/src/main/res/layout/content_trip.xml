@@ -13,12 +13,25 @@
     tools:context="com.example.aaron.arrowsmobile.TripActivity"
     tools:showIn="@layout/activity_trip">
 
+    <TextView
+        android:text="Passengers"
+        android:id="@+id/passenger_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingEnd="0dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        android:textSize="20sp"
+        android:textColor="@color/colorGray">
+    </TextView>
+
     <FrameLayout
         android:id="@+id/trip_fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/next_stop_button">
-    </FrameLayout>
+        android:layout_above="@+id/next_stop_button"
+        android:layout_below="@+id/passenger_label" />
 
     <Button
         android:id="@+id/next_stop_button"

@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -64,18 +63,18 @@ public class EmbarkationPassengerRecyclerAdapter extends RecyclerView.Adapter<Em
     public void onBindViewHolder(final EmbarkationPassengerRecyclerAdapter.ViewHolder holder, int position) {
         // get reservationNum of passenger
         int reservationNum = keyHandler.getIntFromDB(context,
-                DBContract.Passenger.COLUMN_PASSENGER_RESERVATION,
+                DBContract.Passenger.COLUMN_RESERVATION_NUM,
                 Integer.toString(mDataset.get(position)),
                 DBContract.Passenger.TABLE_PASSENGER,
                 DBContract.Passenger.COLUMN_PASSENGER_ID);
         // get userID from reservationNum
         final int userID = keyHandler.getIntFromDB(context,
-                DBContract.Reservation.COLUMN_RESERVATION_USER,
+                DBContract.Reservation.COLUMN_ID_NUM,
                 Integer.toString(reservationNum),
                 DBContract.Reservation.TABLE_RESERVATION,
                 DBContract.Reservation.COLUMN_RESERVATION_NUM);
         // get user name from userID
-        String passengerName = keyHandler.getStringFromDB(context,
+        final String passengerName = keyHandler.getStringFromDB(context,
                 DBContract.User.COLUMN_NAME,
                 Integer.toString(userID),
                 DBContract.User.TABLE_USER,
@@ -83,12 +82,16 @@ public class EmbarkationPassengerRecyclerAdapter extends RecyclerView.Adapter<Em
         holder.passengerIdView.setText(Integer.toString(userID));
         holder.passengerNameView.setText(passengerName);
         // check if the passenger has already been tapped in
-        String tapIn = keyHandler.getStringFromDB(context,
+        final String tapIn = keyHandler.getStringFromDB(context,
                 DBContract.Passenger.COLUMN_TAP_IN,
                 Integer.toString(mDataset.get(position)),
                 DBContract.Passenger.TABLE_PASSENGER,
                 DBContract.Passenger.COLUMN_PASSENGER_ID);
-        if(tapIn.equals("null")){
+        if(tapIn == null){
+            holder.passengerCheckInBox.setChecked(false);
+            holder.passengerCheckInBox.setEnabled(false);
+        }
+        else if(tapIn.equals("null")){
             holder.passengerCheckInBox.setChecked(false);
             holder.passengerCheckInBox.setEnabled(false);
         } else {
@@ -96,26 +99,22 @@ public class EmbarkationPassengerRecyclerAdapter extends RecyclerView.Adapter<Em
             holder.passengerCheckInBox.setEnabled(false);
         }
         final int pos = position;
-        // attach on long click for manual tap in
-        holder.passengerCardView.setOnLongClickListener(new View.OnLongClickListener() {
+        // attach on click for manual tap in
+        holder.passengerCardView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onLongClick(View view) {
+            public void onClick(View view) {
                 final SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
-                if(keyHandler.getStringFromDB(context,
-                        DBContract.Passenger.COLUMN_TAP_IN,
-                        Integer.toString(mDataset.get(pos)),
-                        DBContract.Passenger.TABLE_PASSENGER,
-                        DBContract.Passenger.COLUMN_PASSENGER_ID).equals("null")){
+                if(tapIn == null) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                    builder.setMessage("Manually Embark " + Integer.toString(userID) + "?");
+                    builder.setMessage("Manually Embark " + passengerName + "?");
                     builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             SQLiteDatabase db = dbHandler.getWritableDatabase();
                             Calendar cal = Calendar.getInstance();
                             ContentValues cv = new ContentValues();
                             cv.put(DBContract.Passenger.COLUMN_TAP_IN, timeFormat.format(cal.getTime()));
-                            cv.put(DBContract.Passenger.COLUMN_PASSENGER_DRIVER, selectedTrip.getDriverID());
-                            cv.put(DBContract.Passenger.COLUMN_PASSENGER_VEHICLE, selectedTrip.getVehicleID());
+                            cv.put(DBContract.Passenger.COLUMN_DRIVER_ID, selectedTrip.getDriverID());
+                            cv.put(DBContract.Passenger.COLUMN_VEHICLE_ID, selectedTrip.getVehicleID());
                             db.update(DBContract.Passenger.TABLE_PASSENGER, cv, DBContract.Passenger.COLUMN_PASSENGER_ID + "=" + Integer.toString(mDataset.get(pos)), null);
                             notifyDataSetChanged();
                         }
@@ -126,10 +125,48 @@ public class EmbarkationPassengerRecyclerAdapter extends RecyclerView.Adapter<Em
                     });
                     AlertDialog dialog = builder.create();
                     dialog.show();
-                    return true;
+                } else if(tapIn.equals("null")){
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setMessage("Manually Embark " + passengerName + "?");
+                    builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            SQLiteDatabase db = dbHandler.getWritableDatabase();
+                            Calendar cal = Calendar.getInstance();
+                            ContentValues cv = new ContentValues();
+                            cv.put(DBContract.Passenger.COLUMN_TAP_IN, timeFormat.format(cal.getTime()));
+                            cv.put(DBContract.Passenger.COLUMN_DRIVER_ID, selectedTrip.getDriverID());
+                            cv.put(DBContract.Passenger.COLUMN_VEHICLE_ID, selectedTrip.getVehicleID());
+                            db.update(DBContract.Passenger.TABLE_PASSENGER, cv, DBContract.Passenger.COLUMN_PASSENGER_ID + "=" + Integer.toString(mDataset.get(pos)), null);
+                            notifyDataSetChanged();
+                        }
+                    });
+                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                        }
+                    });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setMessage("Cancel Embarkation of " + passengerName + "?");
+                    builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            SQLiteDatabase db = dbHandler.getWritableDatabase();
+                            ContentValues cv = new ContentValues();
+                            cv.putNull(DBContract.Passenger.COLUMN_TAP_IN);
+                            cv.putNull(DBContract.Passenger.COLUMN_DRIVER_ID);
+                            cv.putNull(DBContract.Passenger.COLUMN_VEHICLE_ID);
+                            db.update(DBContract.Passenger.TABLE_PASSENGER, cv, DBContract.Passenger.COLUMN_PASSENGER_ID + "=" + Integer.toString(mDataset.get(pos)), null);
+                            notifyDataSetChanged();
+                        }
+                    });
+                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                        }
+                    });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
                 }
-                Toast.makeText(context, "Passenger has already embarked!", Toast.LENGTH_LONG).show();
-                return false;
             }
         });
     }

@@ -62,7 +62,7 @@ public class GPSHandler implements LocationListener {
     public void populateFenceList(ArrayList<Stop> stopList){
         for(int i = 0; i < stopList.size(); i++){
             // 0.01 = 1.1132 km radius
-            GPSFence fence = new GPSFence(stopList.get(i).getStopName(), Double.parseDouble(stopList.get(i).getLongitude()), Double.parseDouble(stopList.get(i).getLatitude()), 0.01);
+            GPSFence fence = new GPSFence(stopList.get(i).getStopName(), stopList.get(i).getLongitude(), stopList.get(i).getLatitude(), 0.01);
             fenceList.add(fence);
         }
     }

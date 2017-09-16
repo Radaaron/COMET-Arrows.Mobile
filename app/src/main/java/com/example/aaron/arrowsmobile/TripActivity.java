@@ -14,7 +14,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,8 +23,6 @@ import android.widget.Toast;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-
-import static android.content.ContentValues.TAG;
 
 public class TripActivity extends AppCompatActivity implements View.OnClickListener, OnFragmentInteractionListener, OnTripStopListener{
 
@@ -200,23 +197,18 @@ public class TripActivity extends AppCompatActivity implements View.OnClickListe
                             selectedTrip.getStopIDList().get(i),
                             DBContract.Stop.TABLE_STOP,
                             DBContract.Stop.COLUMN_STOP_ID),
-                    selectedTrip.getStringFromDB(getApplicationContext(),
+                    selectedTrip.getDoubleFromDB(getApplicationContext(),
                             DBContract.Stop.COLUMN_LATITUDE,
                             selectedTrip.getStopIDList().get(i),
                             DBContract.Stop.TABLE_STOP,
                             DBContract.Stop.COLUMN_STOP_ID),
-                    selectedTrip.getStringFromDB(getApplicationContext(),
+                    selectedTrip.getDoubleFromDB(getApplicationContext(),
                             DBContract.Stop.COLUMN_LONGITUDE,
                             selectedTrip.getStopIDList().get(i),
                             DBContract.Stop.TABLE_STOP,
                             DBContract.Stop.COLUMN_STOP_ID)
             );
             stopList.add(stop);
-            Log.e(TAG, "index: " + i);
-            Log.e(TAG, "stopId: " + stopList.get(i).getStopID());
-            Log.e(TAG, "stopName: " + stopList.get(i).getStopName());
-            Log.e(TAG, "stopLat: " + stopList.get(i).getLatitude());
-            Log.e(TAG, "stopLong: " + stopList.get(i).getLongitude());
         }
     }
 
@@ -228,7 +220,7 @@ public class TripActivity extends AppCompatActivity implements View.OnClickListe
                 nextStopButton.setEnabled(false);
             }
             else{
-                // set currentStop and nextStop if there is, if the currentStop is the last stop, set nextStop to null and enable end trip button
+                // find next stop
                 int i = 0;
                 int nextStopPosition = 0;
                 boolean found = false;
@@ -240,11 +232,13 @@ public class TripActivity extends AppCompatActivity implements View.OnClickListe
                     }
                     i++;
                 }
+                // set currentStop and nextStop if there is
                 if(nextStopPosition == stopList.size()){
                     nextStop = null;
                     nextStopButton.setText("End Trip");
                     nextStopButton.setEnabled(true);
                 } else {
+                    // if the currentStop is the last stop, set nextStop to null and enable end trip button
                     nextStop = stopList.get(nextStopPosition).getStopName();
                     nextStopButton.setText("Next Stop: " + nextStop);
                 }

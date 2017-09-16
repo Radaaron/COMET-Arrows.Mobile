@@ -41,8 +41,8 @@ public class LandingInputActivity extends AppCompatActivity implements AdapterVi
         for(int i = 0; i < driverFirstNames.size(); i++){
             driverItems.add(driverFirstNames.get(i) + " " + driverLastNames.get(i));
         }
-        ArrayAdapter<String> plateAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, plateItems);
-        ArrayAdapter<String> driverAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, driverItems);
+        ArrayAdapter<String> plateAdapter = new ArrayAdapter<String>(this, R.layout.custom_spinner_item, plateItems);
+        ArrayAdapter<String> driverAdapter = new ArrayAdapter<String>(this, R.layout.custom_spinner_item, driverItems);
         plateAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
         driverAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
         plateNumSpinner.setAdapter(plateAdapter);

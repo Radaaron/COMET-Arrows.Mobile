@@ -17,7 +17,8 @@ import java.util.ArrayList;
 public class UpcomingTripsFragment extends Fragment implements OnTripSelectedListener{
 
     private OnFragmentInteractionListener mListener;
-    private ArrayList<KeyHandler> tripList;
+    private ArrayList<KeyHandler> filteredList;
+
 
     public UpcomingTripsFragment() {
         // Required empty public constructor
@@ -35,21 +36,8 @@ public class UpcomingTripsFragment extends Fragment implements OnTripSelectedLis
         View rootView = inflater.inflate(R.layout.fragment_upcoming_trips, container, false);
         RecyclerView rv = (RecyclerView) rootView.findViewById(R.id.pending_trips_recycler_view);
         rv.setHasFixedSize(true);
-        ArrayList<KeyHandler> fullList = getArguments().getParcelableArrayList("filteredList");
-        tripList = new ArrayList<>();
-        String arrivalTime;
-        // check if trip is pending and has passengers
-        for(int i = 0 ; i < fullList.size(); i++){
-            arrivalTime = fullList.get(i).getStringFromDB(this.getContext(),
-                    DBContract.Trip.COLUMN_ARRIVAL_TIME,
-                    fullList.get(i).getTripID(),
-                    DBContract.Trip.TABLE_TRIP,
-                    DBContract.Trip.COLUMN_TRIP_ID);
-            if(arrivalTime.equals("null")){
-                tripList.add(fullList.get(i));
-            }
-        }
-        TripRecyclerAdapter adapter = new TripRecyclerAdapter(tripList, this, getContext());
+        filteredList = getArguments().getParcelableArrayList("filteredList");
+        TripRecyclerAdapter adapter = new TripRecyclerAdapter(filteredList, this, getContext());
         rv.setAdapter(adapter);
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(rv.getContext(), llm.getOrientation()); // item divider
@@ -80,7 +68,7 @@ public class UpcomingTripsFragment extends Fragment implements OnTripSelectedLis
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         TripDetailsDialogFragment dialogFragment = new TripDetailsDialogFragment();
         Bundle bundle = new Bundle();
-        KeyHandler tripSelected = tripList.get(tripIndex);
+        KeyHandler tripSelected = filteredList.get(tripIndex);
         bundle.putParcelable("tripSelected", tripSelected);
         dialogFragment.setArguments(bundle);
         dialogFragment.show(ft, "dialog");
